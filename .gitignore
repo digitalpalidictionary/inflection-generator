@@ -4,3 +4,4 @@ data/df
 errors.txt
 output/
 inflection generator.py
+__pycache__/modules.cpython-310.pyc
