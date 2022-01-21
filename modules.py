@@ -713,6 +713,29 @@ def make_list_of_all_inflections_no_eg2():
 	no_eg2_list = no_eg2_string.split()
 	no_eg2_list = list(dict.fromkeys(no_eg2_list))
 
+def clean_machine(text):
+	text = text.lower()
+	text = re.sub("\d", "", text)
+	text = re.sub("\.", "", text)
+	text = re.sub(",", "", text)
+	text = re.sub("‘", "", text)
+	text = re.sub(";", "", text)
+	text = re.sub("’", "", text)
+	text = re.sub("\!", "", text)
+	text = re.sub("\?", "", text)
+	text = re.sub("﻿", "", text)
+	text = re.sub("\(", "", text)
+	text = re.sub("\)", "", text)
+	text = re.sub("\-", "", text)
+	text = re.sub("\t", "", text)
+	text = re.sub("…", " ", text)
+	text = re.sub("–", " ", text)
+	text = re.sub("\n", " \n", text)
+	text = re.sub("  ", " ", text)
+	text = re.sub("^ ", "", text)
+	text = re.sub("^ ", "", text)
+	text = re.sub("^ ", "", text)
+	return text
 
 def read_and_clean_sutta_text():
 
@@ -729,38 +752,31 @@ def read_and_clean_sutta_text():
 	global sutta_file
 	sutta_file = input("paste sutta file name here: ")
 
-	with open(f"{input_path}{sutta_file}", 'r') as input_file :
-		clean_text = input_file.read()
+	global commentary_file
+	commentary_file = input("paste commnetary file name here: ")
 
-	clean_text = clean_text.lower()
-	clean_text = re.sub("\d", "", clean_text)
-	clean_text = re.sub("\.", "", clean_text)
-	clean_text = re.sub(",", "", clean_text)
-	clean_text = re.sub("‘", "", clean_text)
-	clean_text = re.sub(";", "", clean_text)
-	clean_text = re.sub("’", "", clean_text)
-	clean_text = re.sub("\!", "", clean_text)
-	clean_text = re.sub("\?", "", clean_text)
-	clean_text = re.sub("﻿", "", clean_text)
-	clean_text = re.sub("\(", "", clean_text)
-	clean_text = re.sub("\)", "", clean_text)
-	clean_text = re.sub("\-", "", clean_text)
-	clean_text = re.sub("\t", "", clean_text)
-	clean_text = re.sub("…", " ", clean_text)
-	clean_text = re.sub("–", " ", clean_text)
-	clean_text = re.sub("\n", " \n", clean_text)
-	clean_text = re.sub("  ", " ", clean_text)
-	clean_text = re.sub("^ ", "", clean_text)
-	clean_text = re.sub("^ ", "", clean_text)
+	with open(f"{input_path}{sutta_file}", 'r') as input_file :
+		sutta_text = input_file.read()
+
+	sutta_text = clean_machine(sutta_text)
 
 	with open(f"{output_path}{sutta_file}", "w") as output_file:
-		output_file.write(clean_text)
-	
+		output_file.write(sutta_text)
+
+	# commentary
+
+	with open(f"{input_path}{commentary_file}", 'r') as input_file :
+		commentary_text = input_file.read()
+
+	commentary_text = clean_machine(commentary_text)
+
+	with open(f"{output_path}{commentary_file}", "w") as output_file:
+		output_file.write(commentary_text)
 
 def make_comparison_table():
 
 	print("~" * 40)
-	print("making comparison table")
+	print("making sutta comparison table")
 
 	with open(f"{output_path}{sutta_file}") as text_to_split:
 		word_llst=[word for line in text_to_split for word in line.split(" ")]
@@ -781,15 +797,40 @@ def make_comparison_table():
 	with open(f"{output_path}{sutta_file}.csv", 'w') as txt_file:
 		sutta_words_df.to_csv(txt_file, header=True, index=True, sep="\t")
 
+	print("~" * 40)
+	print("making commentary comparison table")
+
+	with open(f"{output_path}{commentary_file}") as text_to_split:
+		word_llst=[word for line in text_to_split for word in line.split(" ")]
+
+	global commentary_words_df
+	commentary_words_df = pd.DataFrame(word_llst)
+
+	inflection_test = commentary_words_df[0].isin(no_meaning_list)
+	commentary_words_df["Inflection"] = inflection_test
+	
+	eg2_test = commentary_words_df[0].isin(no_eg2_list)
+	commentary_words_df["Eg2"] = ~eg2_test
+
+	commentary_words_df.rename(columns={0 :"Pali"}, inplace=True)
+
+	commentary_words_df.drop_duplicates(subset=["Pali"], keep="first", inplace=True)
+
+	with open(f"{output_path}{commentary_file}.csv", 'w') as txt_file:
+		commentary_words_df.to_csv(txt_file, header=True, index=True, sep="\t")
+
 
 def html_find_and_replace():
 
 	print("~" * 40)
-	print("finding and replacing html")
+	print("finding and replacing sutta html")
 	print("~" * 40)
 
+	global sutta_text
+	global commentary_text
+
 	with open(f"{output_path}{sutta_file}", 'r') as input_file:
-		clean_text = input_file.read()
+		sutta_text = input_file.read()
 	
 	max_row = sutta_words_df.shape[0]
 	row=0
@@ -806,31 +847,130 @@ def html_find_and_replace():
 
 		if inflection_exists == "False":
 
-			clean_text = re.sub(fr"(^|\s)({pali_word})(\s|\n|$)", f"""\\1<span class = "inflection">\\2</span>\\3""", clean_text)
+			sutta_text = re.sub(fr"(^|\s)({pali_word})(\s|\n|$)", f"""\\1<span class = "inflection">\\2</span>\\3""", sutta_text)
 
 		if eg2_exists == "False":
 
-			clean_text = re.sub(fr"(^|\s)({pali_word})(\s|\n|$)", f"""\\1<span class = "noeg2">\\2</span>\\3""", clean_text)
+			sutta_text = re.sub(fr"(^|\s)({pali_word})(\s|\n|$)", f"""\\1<span class = "noeg2">\\2</span>\\3""", sutta_text)
 
-	clean_text = re.sub("\n", "<br><br> ", clean_text)
+	sutta_text = re.sub("\n", "<br><br> ", sutta_text)
 
-	clean_text = re.sub("^", """<!DOCTYPE html>
+	print("~" * 40)
+	print("finding and replacing commentary html")
+	print("~" * 40)
+
+	with open(f"{output_path}{commentary_file}", 'r') as input_file:
+		commentary_text = input_file.read()
+	
+	max_row = commentary_words_df.shape[0]
+	row=0
+
+	for word in range(row, max_row):
+		pali_word = str(commentary_words_df.iloc[row, 0])
+		inflection_exists = str(commentary_words_df.iloc[row, 1])
+		eg2_exists = str(commentary_words_df.iloc[row, 2])
+
+		if row % 250 == 0:
+			print(f"{row}/{max_row}\t{pali_word}")
+
+		row +=1
+
+		if inflection_exists == "False":
+
+			commentary_text = re.sub(fr"(^|\s)({pali_word})(\s|\n|$)", f"""\\1<span class = "inflection">\\2</span>\\3""", commentary_text)
+
+		# if eg2_exists == "False":
+
+		# 	commentary_text = re.sub(fr"(^|\s)({pali_word})(\s|\n|$)", f"""\\1<span class = "noeg2">\\2</span>\\3""", commentary_text)
+
+	commentary_text = re.sub("\n", "<br><br> ", commentary_text)
+
+def write_html():
+	
+	html1 = """
+<!DOCTYPE html>
 <html>
 <head>
 <style>
-	body {
-		color: #666666;
-		background-color: #221a0e;
+#content, html, body { 
+	height: 98%;
 	}
-	.inflection {
-		color:#ab7e4d;
+
+#left {
+    float: left;
+    width: 50%;
+    background: #221a0e;
+    height: 100%;
+    overflow: scroll;}
+
+#right {
+    float: left;
+    width: 50%;
+    background: #221a0e;
+    height: 100%;
+	overflow: scroll;
 	}
-	.noeg2 {
-		font-style: italic;		
-	}
+
+body {
+	color: #666666;
+	background-color: #221a0e;
+	padding: 20;
+	font-size: 2em;}
+
+	::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+::-webkit-scrollbar-button {
+    width: 0px;
+    height: 0px;
+}
+::-webkit-scrollbar-thumb {
+    background: #221a0e;
+    border: 0px solid transparent;
+    border-radius: 0px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #221a0e;
+}
+::-webkit-scrollbar-track:hover {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb:active {
+    background: transparent;
+}
+::-webkit-scrollbar-track:active {
+    background: transparent;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+    border: 0px none transparent;
+    border-radius: 0px;
+}
+::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+.inflection {
+	color:#ab7e4d;}
+
+.noeg2{
+	font-style: italic;}
 </style>
 </head>
-<body>""", clean_text)
+<body>
+<div id="content">
+<div id="left">"""
 
-	with open(f"{output_path}{sutta_file}.html", "w") as output_file:
-		output_file.write(clean_text)
+	html2 = """</div><div id="right">"""
+
+	html3 = """</div></div>"""
+
+	html_file = open(f"{output_path}{sutta_file}.html", "w")
+	html_file = open(f"{output_path}{sutta_file}.html", "a")
+	html_file.write(html1)
+	html_file.write(sutta_text)
+	html_file.write(html2)
+	html_file.write(commentary_text)
+	html_file.write(html3)
+	html_file.close

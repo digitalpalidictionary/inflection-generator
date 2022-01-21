@@ -21,5 +21,6 @@ def inflection_exists_in_sutta():
 	read_and_clean_sutta_text()
 	make_comparison_table()
 	html_find_and_replace()
+	write_html()
 
 inflection_exists_in_sutta()
