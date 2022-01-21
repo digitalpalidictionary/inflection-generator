@@ -5,7 +5,6 @@ from pandas_ods_reader import read_ods
 import os
 from aksharamukha import transliterate
 
-
 def create_inflection_table_index():
 
 	global inflection_table_index_df
@@ -19,6 +18,7 @@ def create_inflection_table_index():
 	global inflection_table_index_dict
 	inflection_table_index_dict = dict(zip(inflection_table_index_df.iloc[:, 0], inflection_table_index_df.iloc[:, 2]))
 
+
 def create_inflection_table_df():
 	print("~" * 40)
 	print("creating inflection_table_df")
@@ -31,6 +31,7 @@ def create_inflection_table_df():
 	inflection_table_df.columns = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "AB", "AC", "AD", "AE", "AF", "AG", "AH", "AI", "AJ", "AK", "AL", "AM", "AN", "AO", "AP", "AQ", "AR", "AS", "AT", "AU", "AV", "AW", "AX", "AY", "AZ", "BA", "BB", "BC", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BK", "BL", "BM", "BN", "BO", "BP", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BX", "BY", "BZ", "CA", "CB", "CC", "CD", "CE", "CF", "CG", "CH", "CI", "CJ", "CK", "CL", "CM", "CN", "CO", "CP", "CQ", "CR", "CS", "CT", "CU", "CV", "CW", "CX", "CY", "CZ", "DA", "DB", "DC", "DD", "DE", "DF", "DG", "DH", "DI", "DJ", "DK"]
 
 	inflection_table_df.fillna("", inplace=True)
+
 
 def test_inflection_pattern_changed():
 	print("~" * 40)
@@ -98,6 +99,7 @@ def test_inflection_pattern_changed():
 		print("~" * 40)
 		print(f"the following patterns have changes and will be generated\n{pattern_changed}")
 
+
 def create_dpd_df():
 	print("~" * 40)
 	print("create dpd_df")
@@ -110,6 +112,7 @@ def create_dpd_df():
 	global dpd_df_length
 
 	dpd_df_length = dpd_df.shape[0]
+
 
 def test_for_missing_stem_and_pattern():
 	print("~" * 40)
@@ -133,6 +136,7 @@ def test_for_missing_stem_and_pattern():
 		input("there are stem & pattern errors, please fix them before continuiing")
 	else:
 		print("no stem & pattern errors found")
+
 
 def test_for_wrong_patterns():
 
@@ -210,6 +214,7 @@ def test_for_differences_in_stem_and_pattern():
 	if changed != []:
 		print(f"the following patterns have changes and will be generated:\n{changed}")
 
+
 def test_if_inflections_exist():
 
 	global inflections_not_exist
@@ -233,6 +238,7 @@ def test_if_inflections_exist():
 		print("no missing inflection files")
 	if inflections_not_exist != []:
 		print(f"the following inflection files are missing and will be generated:\n{inflections_not_exist}")
+
 
 def generate_html_inflection_table():
 	print("~" * 40)
@@ -319,6 +325,7 @@ def generate_html_inflection_table():
 				
 				html = heading + table 
 				html_table.write(html)
+
 
 def generate_changed_inflected_forms_df():
 
@@ -414,6 +421,7 @@ def transcribe_new_inflections():
 	else:
 		print("no new inflections to transcribe")
 
+
 def combine_old_and_new_translit_dataframes():
 
 	global diff
@@ -485,6 +493,7 @@ def export_translit_to_pickle():
 			with open(f"output/inflections translit/{headword}", "wb") as text_file:
 				pickle.dump(inflections_list, text_file)
 
+
 def make_master_list_of_all_inflections():
 
 	print("~" * 40)
@@ -503,6 +512,7 @@ def make_master_list_of_all_inflections():
 
 	all_inflections_list = all_inflections_string.split()
 	all_inflections_list = list(dict.fromkeys(all_inflections_list))
+
 
 def combine_old_and_new_dataframes():
 	print("~" * 40)
@@ -543,6 +553,7 @@ def combine_old_and_new_dataframes():
 
 	else:
 		print("all inflections.csv unchanged")
+
 
 def export_inflections_to_pickle():
 
@@ -619,6 +630,7 @@ def make_list_of_all_inflections_no_meaning():
 	no_meaing_list = no_meaning_string.split()
 	no_meaning_list = list(dict.fromkeys(no_meaing_list))
 
+
 def make_list_of_all_inflections_no_eg2():
 
 	print("~" * 40)
@@ -647,6 +659,7 @@ def make_list_of_all_inflections_no_eg2():
 
 	no_eg2_list = no_eg2_string.split()
 	no_eg2_list = list(dict.fromkeys(no_eg2_list))
+
 
 def read_and_clean_sutta_text():
 
@@ -682,15 +695,19 @@ def read_and_clean_sutta_text():
 	clean_text = re.sub("\t", "", clean_text)
 	clean_text = re.sub("…", " ", clean_text)
 	clean_text = re.sub("–", " ", clean_text)
-	clean_text = re.sub("^ ", "", clean_text)
-	clean_text = re.sub("^ ", "", clean_text)
 	clean_text = re.sub("\n", " \n", clean_text)
 	clean_text = re.sub("  ", " ", clean_text)
+	clean_text = re.sub("^ ", "", clean_text)
+	clean_text = re.sub("^ ", "", clean_text)
 
 	with open(f"{output_path}{sutta_file}", "w") as output_file:
 		output_file.write(clean_text)
 	
+
 def make_comparison_table():
+
+	print("~" * 40)
+	print("making comparison table")
 
 	with open(f"{output_path}{sutta_file}") as text_to_split:
 		word_llst=[word for line in text_to_split for word in line.split(" ")]
@@ -711,8 +728,12 @@ def make_comparison_table():
 	with open(f"{output_path}{sutta_file}.csv", 'w') as txt_file:
 		sutta_words_df.to_csv(txt_file, header=True, index=True, sep="\t")
 
-	
+
 def html_find_and_replace():
+
+	print("~" * 40)
+	print("finding and replacing html")
+	print("~" * 40)
 
 	with open(f"{output_path}{sutta_file}", 'r') as input_file:
 		clean_text = input_file.read()
@@ -725,23 +746,38 @@ def html_find_and_replace():
 		inflection_exists = str(sutta_words_df.iloc[row, 1])
 		eg2_exists = str(sutta_words_df.iloc[row, 2])
 
+		if row % 500 == 0:
+			print(f"{row}/{max_row}\t{pali_word}")
+
 		row +=1
 
 		if inflection_exists == "False":
 
-			clean_text = re.sub(fr"(^| ){pali_word}( |\n|$)", fr"\1<font color=#9b794b>{pali_word}</font>\2", clean_text)
-
+			clean_text = re.sub(fr"(^|\s)({pali_word})(\s|\n|$)", f"""\\1<span class = "inflection">\\2</span>\\3""", clean_text)
 
 		if eg2_exists == "False":
 
-			clean_text = re.sub(fr"(^| ){pali_word}( |\n|$)", fr"\1<i>{pali_word}</i>\2", clean_text)
+			clean_text = re.sub(fr"(^|\s)({pali_word})(\s|\n|$)", f"""\\1<span class = "noeg2">\\2</span>\\3""", clean_text)
 
-	clean_text = re.sub("/n", " <br> <br> ", clean_text)
+	clean_text = re.sub("\n", "<br><br> ", clean_text)
 
-	clean_text = re.sub("^", "<p style='color: black'><body style='background-color: #221a0e'>", clean_text)
-	clean_text = re.sub("$", "</body style><p style>", clean_text)
-	
+	clean_text = re.sub("^", """<!DOCTYPE html>
+<html>
+<head>
+<style>
+	body {
+		color: #666666;
+		background-color: #221a0e;
+	}
+	.inflection {
+		color:#ab7e4d;
+	}
+	.noeg2 {
+		font-style: italic;		
+	}
+</style>
+</head>
+<body>""", clean_text)
+
 	with open(f"{output_path}{sutta_file}.html", "w") as output_file:
 		output_file.write(clean_text)
-
-	
