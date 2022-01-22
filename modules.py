@@ -343,7 +343,6 @@ def generate_changed_inflected_forms():
 						error_log.write(f"error on: {headword}\n")
 						print(f"error on: {headword}\n")
 
-				
 			this_word_inflections = {headword : inflections_string}
 			new_inflections_dict.update(this_word_inflections)
 
@@ -545,26 +544,6 @@ def export_translit_to_pickle():
 				pickle.dump(inflections_list, text_file)
 
 
-def make_master_list_of_all_inflections():
-
-	print("~" * 40)
-	print("making master list of all inflections")
-	print("~" * 40)
-
-	global all_inflections_list
-	all_inflections_string = ""
-	for row in range (all_inflections_df.shape[0]):
-		headword = all_inflections_df.iloc[row, 0]
-		inflections = all_inflections_df.iloc[row, 1]
-		all_inflections_string += inflections
-		
-		if row %5000 == 0:
-			print(f"{row} {headword}")
-
-	all_inflections_list = all_inflections_string.split()
-	all_inflections_list = list(dict.fromkeys(all_inflections_list))
-
-
 def combine_old_and_new_dataframes():
 	print("~" * 40)
 	print("combinging old and new dataframes:")
@@ -637,13 +616,32 @@ def export_inflections_to_pickle():
 				pickle.dump(inflections_list, text_file)
 
 
-def create_all_inflections_df():
-
+def make_list_of_all_inflections():
 	print("~" * 40)
 	print("creating all inflections df")
 
 	global all_inflections_df
 	all_inflections_df = pd.read_csv("output/all inflections.csv", header=None, sep="\t")
+
+	print("~" * 40)
+	print("making master list of all inflections")
+	print("~" * 40)
+
+	# global all_inflections_list
+	all_inflections_string = ""
+	for row in range (all_inflections_df.shape[0]):
+		headword = all_inflections_df.iloc[row, 0]
+		inflections = all_inflections_df.iloc[row, 1]
+		all_inflections_string += inflections
+		
+		if row %5000 == 0:
+			print(f"{row} {headword}")
+
+	all_inflections_list = all_inflections_string.split()
+	all_inflections_list = list(dict.fromkeys(all_inflections_list))
+
+	global all_inflections_set
+	all_inflections_set = set(dict.fromkeys(all_inflections_list))
 
 
 def make_list_of_all_inflections_no_meaning():
@@ -721,16 +719,18 @@ def clean_machine(text):
 	text = re.sub("‘", "", text)
 	text = re.sub(";", "", text)
 	text = re.sub("’", "", text)
-	text = re.sub("\!", "", text)
+	text = re.sub("!", "", text)
 	text = re.sub("\?", "", text)
+	text = re.sub("\+", "", text)
 	text = re.sub("﻿", "", text)
 	text = re.sub("\(", "", text)
 	text = re.sub("\)", "", text)
-	text = re.sub("\-", "", text)
-	text = re.sub("\t", "", text)
+	text = re.sub("-", "", text)
+	text = re.sub("–", "", text)	
+	text = re.sub("\t", " ", text)
 	text = re.sub("…", " ", text)
-	text = re.sub("–", " ", text)
-	text = re.sub("\n", " \n", text)
+	text = re.sub("–", "", text)
+	text = re.sub("\n", " <br> ", text)
 	text = re.sub("  ", " ", text)
 	text = re.sub("^ ", "", text)
 	text = re.sub("^ ", "", text)
@@ -806,11 +806,10 @@ def make_comparison_table():
 	global commentary_words_df
 	commentary_words_df = pd.DataFrame(word_llst)
 
-	inflection_test = commentary_words_df[0].isin(no_meaning_list)
+	inflection_test = commentary_words_df[0].isin(all_inflections_set)
 	commentary_words_df["Inflection"] = inflection_test
 	
-	eg2_test = commentary_words_df[0].isin(no_eg2_list)
-	commentary_words_df["Eg2"] = ~eg2_test
+
 
 	commentary_words_df.rename(columns={0 :"Pali"}, inplace=True)
 
@@ -853,8 +852,6 @@ def html_find_and_replace():
 
 			sutta_text = re.sub(fr"(^|\s)({pali_word})(\s|\n|$)", f"""\\1<span class = "noeg2">\\2</span>\\3""", sutta_text)
 
-	sutta_text = re.sub("\n", "<br><br> ", sutta_text)
-
 	print("~" * 40)
 	print("finding and replacing commentary html")
 	print("~" * 40)
@@ -868,7 +865,6 @@ def html_find_and_replace():
 	for word in range(row, max_row):
 		pali_word = str(commentary_words_df.iloc[row, 0])
 		inflection_exists = str(commentary_words_df.iloc[row, 1])
-		eg2_exists = str(commentary_words_df.iloc[row, 2])
 
 		if row % 250 == 0:
 			print(f"{row}/{max_row}\t{pali_word}")
@@ -878,12 +874,6 @@ def html_find_and_replace():
 		if inflection_exists == "False":
 
 			commentary_text = re.sub(fr"(^|\s)({pali_word})(\s|\n|$)", f"""\\1<span class = "inflection">\\2</span>\\3""", commentary_text)
-
-		# if eg2_exists == "False":
-
-		# 	commentary_text = re.sub(fr"(^|\s)({pali_word})(\s|\n|$)", f"""\\1<span class = "noeg2">\\2</span>\\3""", commentary_text)
-
-	commentary_text = re.sub("\n", "<br><br> ", commentary_text)
 
 def write_html():
 	
@@ -899,63 +889,77 @@ def write_html():
 #left {
     float: left;
     width: 50%;
-    background: #221a0e;
     height: 100%;
     overflow: scroll;}
 
 #right {
     float: left;
     width: 50%;
-    background: #221a0e;
     height: 100%;
 	overflow: scroll;
 	}
 
 body {
-	color: #666666;
-	background-color: #221a0e;
+	color: #909090;
+	background-color: #f3ddb6;
 	padding: 20;
 	font-size: 2em;}
 
-	::-webkit-scrollbar {
+::-webkit-scrollbar {
     width: 10px;
     height: 10px;
-}
+	}
+
 ::-webkit-scrollbar-button {
     width: 0px;
     height: 0px;
-}
+	}
+
 ::-webkit-scrollbar-thumb {
-    background: #221a0e;
-    border: 0px solid transparent;
-    border-radius: 0px;
-}
+    background: #65DBFF;
+    border: 2px solid #E2FFFF;
+    border-radius: 10px;
+	}
+
 ::-webkit-scrollbar-thumb:hover {
-    background: #221a0e;
-}
+    background: #65DBFF;
+	}
+
 ::-webkit-scrollbar-track:hover {
-    background: transparent;
-}
+    background: #E2FFFF;
+	}
+
 ::-webkit-scrollbar-thumb:active {
-    background: transparent;
-}
+    background: #00A4CC;
+	}
+
 ::-webkit-scrollbar-track:active {
-    background: transparent;
-}
+    background: #E2FFFF;
+	}
+
 ::-webkit-scrollbar-track {
     background: transparent;
     border: 0px none transparent;
     border-radius: 0px;
-}
+	}
+
 ::-webkit-scrollbar-corner {
     background: transparent;
-}
+	    border-radius: 10px;
+	}
 
 .inflection {
-	color:#ab7e4d;}
+	color:#00A4CC;
+    background-color: #E2FFFF ;
+    /* #E2FFFF; */
+    border-radius: 5px;
+	}
 
 .noeg2{
-	font-style: italic;}
+    border-radius: 5px;
+    color: #00A4CC;
+	}
+
 </style>
 </head>
 <body>

@@ -15,7 +15,7 @@ def inflection_exists_in_sutta():
 	generate_changed_inflected_forms()
 	combine_old_and_new_dataframes()
 	export_inflections_to_pickle()
-	create_all_inflections_df()
+	make_list_of_all_inflections()
 	make_list_of_all_inflections_no_meaning()
 	make_list_of_all_inflections_no_eg2()
 	read_and_clean_sutta_text()
