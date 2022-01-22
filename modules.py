@@ -900,10 +900,9 @@ def write_html():
 	}
 
 body {
-	color: #909090;
-	background-color: #f3ddb6;
-	padding: 20;
-	font-size: 2em;}
+	color: #270202;
+	background-color: #e9e9b5;
+	font-size: 15px;}
 
 ::-webkit-scrollbar {
     width: 10px;
@@ -916,25 +915,25 @@ body {
 	}
 
 ::-webkit-scrollbar-thumb {
-    background: #65DBFF;
-    border: 2px solid #E2FFFF;
+    background: #f0e6cc;
+    border: 2px solid #transparent;
     border-radius: 10px;
 	}
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #65DBFF;
+    background: #a59366;
 	}
 
 ::-webkit-scrollbar-track:hover {
-    background: #E2FFFF;
+    background: transparent;
 	}
 
 ::-webkit-scrollbar-thumb:active {
-    background: #00A4CC;
+    background: #a59366;
 	}
 
 ::-webkit-scrollbar-track:active {
-    background: #E2FFFF;
+    background: #c9b993;
 	}
 
 ::-webkit-scrollbar-track {
@@ -945,19 +944,17 @@ body {
 
 ::-webkit-scrollbar-corner {
     background: transparent;
-	    border-radius: 10px;
+	border-radius: 10px;
 	}
 
 .inflection {
-	color:#00A4CC;
-    background-color: #E2FFFF ;
-    /* #E2FFFF; */
-    border-radius: 5px;
+	color:#7e2801;
+    background-color: #feffaa ;
 	}
 
 .noeg2{
     border-radius: 5px;
-    color: #00A4CC;
+    color: #cf4e12;
 	}
 
 </style>
