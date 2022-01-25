@@ -723,6 +723,7 @@ def clean_machine(text):
 	text = re.sub("\?", "", text)
 	text = re.sub("\+", "", text)
 	text = re.sub("﻿", "", text)
+	text = re.sub("§", " ", text)
 	text = re.sub("\(", "", text)
 	text = re.sub("\)", "", text)
 	text = re.sub("-", "", text)
