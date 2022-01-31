@@ -678,8 +678,8 @@ def make_list_of_all_inflections_no_meaning():
 		if headword in no_meaning_headword_list:
 			no_meaning_string += inflections
 
-	no_meaing_list = no_meaning_string.split()
-	no_meaning_list = list(dict.fromkeys(no_meaing_list))
+	no_meaning_list = no_meaning_string.split()
+	no_meaning_list = list(dict.fromkeys(no_meaning_list))
 
 
 def make_list_of_all_inflections_no_eg2():
@@ -916,8 +916,8 @@ body {
 	}
 
 ::-webkit-scrollbar-thumb {
-    background: #f0e6cc;
-    border: 2px solid #transparent;
+    background: #a59366;
+    border: 2px solid transparent;
     border-radius: 10px;
 	}
 

@@ -5,3 +5,4 @@ errors.txt
 output/
 __pycache__/modules.cpython-310.pyc
 test if inflection exists in sutta.sh
+sutta text/
