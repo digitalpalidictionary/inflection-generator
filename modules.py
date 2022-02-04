@@ -302,6 +302,8 @@ def generate_changed_inflected_forms():
 		headword = dpd_df.loc[row, "Pāli1"]
 		headword_clean = re.sub(" \d*$", "", headword)
 		stem = dpd_df.loc[row, "Stem"]
+		if re.match("!.+", stem) != None: #stem contains "!.+" - must get inflection table but no synonsyms
+			stem = "!"
 		if stem == "*":
 			stem = ""
 		pattern = dpd_df.loc[row, "Pattern"]
@@ -367,6 +369,8 @@ def generate_html_inflection_table():
 		headword = dpd_df.loc[row, "Pāli1"]
 		headword_clean = re.sub(" \d*$", "", headword)
 		stem = dpd_df.loc[row, "Stem"]
+		if re.match("!.+", stem) != None: #stem contains "!.+" - must get inflection table but no synonsyms
+			stem = re.sub("!", "", stem)
 		if stem == "*":
 			stem = ""
 		pattern = dpd_df.loc[row, "Pattern"]
