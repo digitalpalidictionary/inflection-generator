@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# coding: utf-8 
+
 from modules import *
 
 def inflection_generator_for_dpd():
@@ -15,4 +18,5 @@ def inflection_generator_for_dpd():
 	combine_old_and_new_translit_dataframes()
 	export_translit_to_pickle()
 
-inflection_generator_for_dpd()
+if __name__ == "__main__":
+   inflection_generator_for_dpd()
