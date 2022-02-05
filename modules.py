@@ -107,7 +107,7 @@ def create_dpd_df():
 	
 	global dpd_df
 	
-	dpd_df = pd.read_csv("/home/bhikkhu/Bodhirasa/Dropbox/dpd/csvs/dpd-full.csv", sep="\t", dtype=str)
+	dpd_df = pd.read_csv("../csvs/dpd-full.csv", sep="\t", dtype=str)
 	dpd_df.fillna("", inplace=True)
 
 	global dpd_df_length
@@ -749,7 +749,7 @@ def read_and_clean_sutta_text():
 	print("~" * 40)
 	
 	global input_path
-	input_path = "/home/bhikkhu/git/pure-machine-readable-corpus/cscd/"
+	input_path = "../pure-machine-readable-corpus/cscd/"
 
 	global output_path
 	output_path = "output/html suttas/"
