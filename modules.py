@@ -686,6 +686,36 @@ def make_list_of_all_inflections_no_meaning():
 	no_meaning_list = list(dict.fromkeys(no_meaning_list))
 
 
+def make_list_of_all_inflections_no_eg1():
+
+	print("~" * 40)
+	print("making list of all inflections with no eg1")
+	print("~" * 40)
+
+	global no_eg1_list
+
+	test = dpd_df["Sutta1"] == ""
+	no_eg1_df = dpd_df[test]
+
+	no_eg1_headword_list = no_eg1_df["Pāli1"].tolist()
+
+	no_eg1_df = all_inflections_df[all_inflections_df[0].isin(no_eg1_headword_list)]
+
+	no_eg1_string = ""
+	for row in range (all_inflections_df.shape[0]):
+		headword = all_inflections_df.iloc[row, 0]
+		inflections = all_inflections_df.iloc[row, 1]
+
+		if row %5000 == 0:
+			print(f"{row} {headword}")
+
+		if headword in no_eg1_headword_list:
+			no_eg1_string += inflections
+
+	no_eg1_list = no_eg1_string.split()
+	no_eg1_list = list(dict.fromkeys(no_eg1_list))
+
+
 def make_list_of_all_inflections_no_eg2():
 
 	print("~" * 40)
@@ -789,8 +819,14 @@ def make_comparison_table():
 	global sutta_words_df
 	sutta_words_df = pd.DataFrame(word_llst)
 
-	inflection_test = sutta_words_df[0].isin(no_meaning_list)
+	inflection_test = sutta_words_df[0].isin(all_inflections_set)
 	sutta_words_df["Inflection"] = inflection_test
+
+	no_meaning_test = sutta_words_df[0].isin(no_meaning_list)
+	sutta_words_df["Meaning"] = no_meaning_test
+
+	eg1_test = sutta_words_df[0].isin(no_eg1_list)
+	sutta_words_df["Eg1"] = ~eg1_test
 	
 	eg2_test = sutta_words_df[0].isin(no_eg2_list)
 	sutta_words_df["Eg2"] = ~eg2_test
@@ -813,9 +849,10 @@ def make_comparison_table():
 
 	inflection_test = commentary_words_df[0].isin(all_inflections_set)
 	commentary_words_df["Inflection"] = inflection_test
+
+	no_meaning_test = commentary_words_df[0].isin(no_meaning_list)
+	commentary_words_df["Meaning"] = no_meaning_test
 	
-
-
 	commentary_words_df.rename(columns={0 :"Pali"}, inplace=True)
 
 	commentary_words_df.drop_duplicates(subset=["Pali"], keep="first", inplace=True)
@@ -842,20 +879,26 @@ def html_find_and_replace():
 	for word in range(row, max_row):
 		pali_word = str(sutta_words_df.iloc[row, 0])
 		inflection_exists = str(sutta_words_df.iloc[row, 1])
-		eg2_exists = str(sutta_words_df.iloc[row, 2])
+		meaning_exists = str(sutta_words_df.iloc[row, 2])
+		eg1_exists = str(sutta_words_df.iloc[row, 3])
+		eg2_exists = str(sutta_words_df.iloc[row, 4])
 
 		if row % 250 == 0:
 			print(f"{row}/{max_row}\t{pali_word}")
 
 		row +=1
 
-		if inflection_exists == "False":
+		if meaning_exists == "False":
 
-			sutta_text = re.sub(fr"(^|\s)({pali_word})(\s|\n|$)", f"""\\1<span class = "inflection">\\2</span>\\3""", sutta_text)
+			sutta_text = re.sub(fr"(^|\s)({pali_word})(\s|\n|$)", f"""\\1<span class = "highlight">\\2</span>\\3""", sutta_text)
 
-		if eg2_exists == "False":
+		elif eg1_exists == "False":
 
-			sutta_text = re.sub(fr"(^|\s)({pali_word})(\s|\n|$)", f"""\\1<span class = "noeg2">\\2</span>\\3""", sutta_text)
+			sutta_text = re.sub(fr"(^|\s)({pali_word})(\s|\n|$)", f"""\\1<span class = "orange">\\2</span>\\3""", sutta_text)
+
+		elif eg2_exists == "False":
+
+			sutta_text = re.sub(fr"(^|\s)({pali_word})(\s|\n|$)", f"""\\1<span class = "red">\\2</span>\\3""", sutta_text)
 
 	print("~" * 40)
 	print("finding and replacing commentary html")
@@ -870,6 +913,7 @@ def html_find_and_replace():
 	for word in range(row, max_row):
 		pali_word = str(commentary_words_df.iloc[row, 0])
 		inflection_exists = str(commentary_words_df.iloc[row, 1])
+		meaning_exists = str(commentary_words_df.iloc[row, 2])
 
 		if row % 250 == 0:
 			print(f"{row}/{max_row}\t{pali_word}")
@@ -878,7 +922,12 @@ def html_find_and_replace():
 
 		if inflection_exists == "False":
 
-			commentary_text = re.sub(fr"(^|\s)({pali_word})(\s|\n|$)", f"""\\1<span class = "inflection">\\2</span>\\3""", commentary_text)
+			commentary_text = re.sub(fr"(^|\s)({pali_word})(\s|\n|$)", f"""\\1<span class = "highlight">\\2</span>\\3""", commentary_text)
+
+		elif meaning_exists == "False":
+
+			commentary_text = re.sub(fr"(^|\s)({pali_word})(\s|\n|$)", f"""\\1<span class = "orange">\\2</span>\\3""", commentary_text)
+
 
 def write_html():
 	
@@ -905,8 +954,8 @@ def write_html():
 	}
 
 body {
-	color: #270202;
-	background-color: #e9e9b5;
+	color: #9b794b;
+	background-color: #221a0e;
 	font-size: 15px;}
 
 ::-webkit-scrollbar {
@@ -920,13 +969,13 @@ body {
 	}
 
 ::-webkit-scrollbar-thumb {
-    background: #a59366;
+    background: #5d6726;
     border: 2px solid transparent;
     border-radius: 10px;
 	}
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #a59366;
+    background: #9b794b;
 	}
 
 ::-webkit-scrollbar-track:hover {
@@ -934,11 +983,11 @@ body {
 	}
 
 ::-webkit-scrollbar-thumb:active {
-    background: #a59366;
+    background: #9b794b;
 	}
 
 ::-webkit-scrollbar-track:active {
-    background: #c9b993;
+    background: #433730;
 	}
 
 ::-webkit-scrollbar-track {
@@ -952,14 +1001,19 @@ body {
 	border-radius: 10px;
 	}
 
-.inflection {
+.highlight {
 	color:#7e2801;
     background-color: #feffaa ;
 	}
 
-.noeg2{
+.red{
     border-radius: 5px;
-    color: #cf4e12;
+    color: #c22b45;
+	}
+
+.orange{
+    border-radius: 5px;
+    color: #d7551b;
 	}
 
 </style>
