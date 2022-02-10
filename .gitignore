@@ -8,3 +8,4 @@ test if inflection exists in sutta.sh
 sutta text/
 sandhi splitting strategies.ipynb
 sutta corespondence tables/
+inflection generator errorlog.txt
