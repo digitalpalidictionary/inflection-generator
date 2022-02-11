@@ -393,7 +393,8 @@ def generate_html_inflection_table():
 					else:
 						df = pd.read_csv(f"output/patterns/{pattern}.csv", sep="\t", index_col=0)
 						df.fillna("", inplace=True, axis=0)
-					
+						df.rename_axis(None, inplace=True) #delete pattern name
+
 						df_rows = df.shape[0]
 						df_columns = df.shape[1]
 
@@ -401,21 +402,17 @@ def generate_html_inflection_table():
 							for columns in range(0, df_columns, 2): #1 to 0
 							
 								html_cell = df.iloc[rows, columns]
-								syn_cell = df.iloc[rows, columns]	
+								syn_cell = df.iloc[rows, columns]
 
-								if html_cell == "sg" or html_cell == "pl":
-									pass
-
-								else:
-									html_cell = re.sub(r"(.+)", f"<b>\\1</b>", html_cell) # add bold
-									html_cell = re.sub(r"(.+)", f"{stem}\\1", html_cell) # add stem
-									html_cell = re.sub(r"\n", "<br>", html_cell) # add line breaks
-									df.iloc[rows, columns] = html_cell
-								
-									syn_cell = re.sub(r"(.+)", f"{stem}\\1", syn_cell)
-									search_string = re.compile("\n", re.M)
-									replace_string = " "
-									matches = re.sub(search_string, replace_string, syn_cell)
+								html_cell = re.sub(r"(.+)", f"<b>\\1</b>", html_cell) # add bold
+								html_cell = re.sub(r"(.+)", f"{stem}\\1", html_cell) # add stem
+								html_cell = re.sub(r"\n", "<br>", html_cell) # add line breaks
+								df.iloc[rows, columns] = html_cell
+							
+								syn_cell = re.sub(r"(.+)", f"{stem}\\1", syn_cell)
+								search_string = re.compile("\n", re.M)
+								replace_string = " "
+								matches = re.sub(search_string, replace_string, syn_cell)
 					
 						column_list = []
 						for i in range(1, df_columns, 2):
@@ -430,15 +427,15 @@ def generate_html_inflection_table():
 
 						if inflection_table_index_dict[pattern] != "":
 							if pos in declensions:
-								heading = (f"""<p><b>{headword_clean}</b> is <b>{pattern}</b> declension like <b>{inflection_table_index_dict[pattern]}</b></p>""")
+								heading = (f"""<p class ="heading"><b>{headword_clean}</b> is <b>{pattern}</b> declension like <b>{inflection_table_index_dict[pattern]}</b></p>""")
 							if pos in conjugations:
-								heading = (f"""<p><b>{headword_clean}</b> is <b>{pattern}</b> conjugation like <b>{inflection_table_index_dict[pattern]}</b></p>""")
+								heading = (f"""<p class ="heading"><b>{headword_clean}</b> is <b>{pattern}</b> conjugation like <b>{inflection_table_index_dict[pattern]}</b></p>""")
 
 						if inflection_table_index_dict[pattern] == "":
 							if pos in declensions:
-								heading = (f"""<p><b>{headword_clean}</b> is <b>{pattern}</b> irregular declension</p>""")
+								heading = (f"""<p class ="heading"><b>{headword_clean}</b> is <b>{pattern}</b> irregular declension</p>""")
 							if pos in conjugations:
-								heading = (f"""<p><b>{headword_clean}</b> is <b>{pattern}</b> irregular conjugation</p>""")
+								heading = (f"""<p class ="heading"><b>{headword_clean}</b> is <b>{pattern}</b> irregular conjugation</p>""")
 					
 						html = heading + table 
 						html_table.write(html)
@@ -780,6 +777,10 @@ def read_and_clean_sutta_text():
 	print("~" * 40)
 	print("reading and cleaning sutta file")
 	print("~" * 40)
+
+	global sutta_file
+	global commentary_file
+	global sub_commentary_file
 	
 	global input_path
 	input_path = "../pure-machine-readable-corpus/cscd/"
@@ -787,11 +788,18 @@ def read_and_clean_sutta_text():
 	global output_path
 	output_path = "output/html suttas/"
 
-	global sutta_file
-	sutta_file = input("paste sutta file name here: ")
+	sutta_dict = pd.read_csv('sutta corespondence tables/sutta correspondence tables.csv', sep="\t", index_col=0, squeeze=True).to_dict(orient='index',)
 
-	global commentary_file
-	commentary_file = input("paste commnetary file name here: ")
+	while True:
+		sutta_number = input ("enter sutta number: ")
+		if sutta_number in sutta_dict.keys():
+			sutta_file = sutta_dict.get(sutta_number).get("mūla")
+			commentary_file = sutta_dict.get(sutta_number).get("aṭṭhakathā")
+			sub_commentary_file = sutta_dict.get(sutta_number).get("ṭīkā")
+			break
+		elif sutta_number not in sutta_dict.keys():
+			print("sutta number not recognised, please try again")
+			continue
 
 	with open(f"{input_path}{sutta_file}", 'r') as input_file :
 		sutta_text = input_file.read()
