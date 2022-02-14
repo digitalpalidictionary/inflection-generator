@@ -1,5 +1,6 @@
 import warnings
 from modules import *
+import os
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -23,5 +24,6 @@ def inflection_exists_in_sutta():
 	make_comparison_table()
 	html_find_and_replace()
 	write_html()
+	open_in_browser()
 
 inflection_exists_in_sutta()

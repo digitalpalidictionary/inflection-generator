@@ -949,6 +949,7 @@ def write_html():
 <style>
 #content, html, body { 
 	height: 98%;
+	font-size: 1.2em;
 	}
 
 #left {
@@ -965,9 +966,9 @@ def write_html():
 	}
 
 body {
-	color: #gray;
+	color: #3b2e18;
 	background-color: #221a0e;
-	font-size: 15px;}
+	}
 
 ::-webkit-scrollbar {
     width: 10px;
@@ -980,7 +981,7 @@ body {
 	}
 
 ::-webkit-scrollbar-thumb {
-    background: #5d6726;
+    background: #46351d;
     border: 2px solid transparent;
     border-radius: 10px;
 	}
@@ -998,13 +999,13 @@ body {
 	}
 
 ::-webkit-scrollbar-track:active {
-    background: #433730;
+    background: #332715;
 	}
 
 ::-webkit-scrollbar-track {
     background: transparent;
     border: 0px none transparent;
-    border-radius: 0px;
+    border-radius: 10px;
 	}
 
 ::-webkit-scrollbar-corner {
@@ -1044,3 +1045,8 @@ body {
 	html_file.write(commentary_text)
 	html_file.write(html3)
 	html_file.close
+
+def open_in_browser():
+	os.popen('cd "output/html suttas"')
+	os.popen(f"{sutta_file}.html")
+
