@@ -756,6 +756,7 @@ def clean_machine(text):
 	text = re.sub("!", "", text)
 	text = re.sub("\?", "", text)
 	text = re.sub("\+", "", text)
+	text = re.sub("=", "", text)	
 	text = re.sub("﻿", "", text)
 	text = re.sub("§", " ", text)
 	text = re.sub("\(", "", text)
@@ -765,7 +766,7 @@ def clean_machine(text):
 	text = re.sub("\t", " ", text)
 	text = re.sub("…", " ", text)
 	text = re.sub("–", "", text)
-	text = re.sub("\n", " <br> ", text)
+	text = re.sub("\n", " \n ", text)
 	text = re.sub("  ", " ", text)
 	text = re.sub("^ ", "", text)
 	text = re.sub("^ ", "", text)
@@ -881,6 +882,10 @@ def html_find_and_replace():
 	global sutta_text
 	global commentary_text
 
+	no_meaning_string = ""
+	no_eg1_string = ""
+	no_eg2_string = ""
+
 	with open(f"{output_path}{sutta_file}", 'r') as input_file:
 		sutta_text = input_file.read()
 	
@@ -902,18 +907,28 @@ def html_find_and_replace():
 		if meaning_exists == "False":
 
 			sutta_text = re.sub(fr"(^|\s)({pali_word})(\s|\n|$)", f"""\\1<span class = "highlight">\\2</span>\\3""", sutta_text)
+			no_meaning_string += pali_word + " "
 
 		elif eg1_exists == "False":
 
 			sutta_text = re.sub(fr"(^|\s)({pali_word})(\s|\n|$)", f"""\\1<span class = "orange">\\2</span>\\3""", sutta_text)
+			no_eg1_string += pali_word + " "
 
 		elif eg2_exists == "False":
 
 			sutta_text = re.sub(fr"(^|\s)({pali_word})(\s|\n|$)", f"""\\1<span class = "red">\\2</span>\\3""", sutta_text)
+			no_eg2_string += pali_word + " "
+		
+	sutta_text = re.sub("\n", "<br><br>", sutta_text)
+	sutta_text += "<br><br>" + 'no meanings: <span class = "highlight">' + no_meaning_string + "</span>"
+	sutta_text += "<br><br>" + 'no eg1: <span class = "orange">' + no_eg1_string + "</span>"
+	sutta_text += "<br><br>" + 'no eg2: <span class = "red">' + no_eg2_string + "</span>"
 
 	print("~" * 40)
 	print("finding and replacing commentary html")
 	print("~" * 40)
+
+	no_meaning_string = ""
 
 	with open(f"{output_path}{commentary_file}", 'r') as input_file:
 		commentary_text = input_file.read()
@@ -938,6 +953,10 @@ def html_find_and_replace():
 		elif meaning_exists == "False":
 
 			commentary_text = re.sub(fr"(^|\s)({pali_word})(\s|\n|$)", f"""\\1<span class = "orange">\\2</span>\\3""", commentary_text)
+			no_meaning_string += pali_word + " "
+
+	commentary_text = re.sub("\n", "<br><br>", commentary_text)
+	commentary_text += "<br><br>" + 'no meanings: <span class = "highlight">' + no_meaning_string + "</span>"
 
 
 def write_html():
@@ -1045,8 +1064,3 @@ body {
 	html_file.write(commentary_text)
 	html_file.write(html3)
 	html_file.close
-
-def open_in_browser():
-	os.popen('cd "output/html suttas"')
-	os.popen(f"{sutta_file}.html")
-
