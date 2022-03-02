@@ -5,6 +5,26 @@ from pandas_ods_reader import read_ods
 import os
 from aksharamukha import transliterate
 
+def convert_dpd_ods_to_csv():
+	print("~" * 40)
+	print("converting dpd.ods to csv")
+
+	ods_file = "../dpd.ods"
+	csv_file = ""
+	sheet_index = 1
+	df = read_ods (ods_file, sheet_index, headers = False)
+
+	df.fillna("", inplace=True)
+	df = df.astype(str)		# make everting string
+	df = df.drop(index=0) 	#remove first row of numbers
+	new_header = df.iloc[0] 	#grab the first row for the header
+	df = df[1:] 	#take the data less the header row
+	df.columns = new_header 	#set the header row as the df header
+	df.reset_index(drop = True, inplace=True) 	#resets index to 0
+	df = df.replace(to_replace ="\.0", value = "", regex = True) #removes all flaots .0
+
+	df.to_csv("../csvs/dpd.csv", index = False, sep = "\t", encoding="utf-8")
+
 
 def create_inflection_table_index():
 
