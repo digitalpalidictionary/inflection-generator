@@ -121,6 +121,9 @@ def test_inflection_pattern_changed():
 	if pattern_changed != []:
 		print("~" * 40)
 		print(f"the following patterns have changes and will be generated\n{pattern_changed}")
+	
+	with open (f"../frequency maps/output/pickle tests/pattern_changed", "wb") as pattern_changed_pickle:
+			pickle.dump(pattern_changed, pattern_changed_pickle)
 
 
 def create_dpd_df():
@@ -252,6 +255,9 @@ def test_for_differences_in_stem_and_pattern():
 		print(changed_string)
 	if changed == []:
 		print("no headwords stems or patterns changed")
+	
+	with open("../frequency maps/output/pickle tests/stem_pattern_differences", "wb") as stem_pattern_differences_pickle:
+		pickle.dump(changed, stem_pattern_differences_pickle)
 
 
 def test_if_inflections_exist_suttas():
@@ -267,8 +273,6 @@ def test_if_inflections_exist_suttas():
 		headword = dpd_df.loc[row, "Pāli1"]
 		
 		try:
-			with open(f"output/inflections/{headword}", "rb") as syn_file:
-				pass
 			with open(f"output/inflections/{headword}", "rb") as syn_file:
 				pass
 		
