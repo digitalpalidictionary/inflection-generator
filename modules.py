@@ -25,6 +25,8 @@ def convert_dpd_ods_to_csv():
 
 	df.to_csv("../csvs/dpd.csv", index = False, sep = "\t", encoding="utf-8")
 
+	print(df)
+
 
 def create_inflection_table_index():
 
@@ -161,7 +163,7 @@ def test_for_missing_stem_and_pattern():
 	if missing_pattern_string != "":
 		print (f"words with missing patterns: {missing_pattern_string}")
 	if error == True:
-		input("there are stem & pattern errors, please fix them before continuiing")
+		input("there are stem & pattern errors, please fix them before continuing")
 	else:
 		print("no stem & pattern errors found")
 
