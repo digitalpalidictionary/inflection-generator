@@ -12,11 +12,14 @@ def inflection_generator_for_dpd():
 	test_for_wrong_patterns()
 	test_for_differences_in_stem_and_pattern()
 	test_if_inflections_exist_dpd()
+	test_if_inflections_exist_suttas() #nu
 	generate_changed_inflected_forms()
+	combine_old_and_new_dataframes()
 	generate_html_inflection_table()
 	transcribe_new_inflections()
 	combine_old_and_new_translit_dataframes()
 	export_translit_to_pickle()
+	export_inflections_to_pickle()
 
 if __name__ == "__main__":
    inflection_generator_for_dpd()
