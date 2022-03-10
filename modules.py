@@ -4,10 +4,27 @@ import pickle
 from pandas_ods_reader import read_ods
 import os
 from aksharamukha import transliterate
+from datetime import datetime
+
+def timeis():
+	global blue
+	global yellow
+	global green
+	global red
+	global white
+
+	blue = "\033[38;5;33m" #blue
+	green = "\033[38;5;34m" #green
+	red= "\033[38;5;160m" #red
+	yellow = "\033[38;5;220m" #yellow
+	white = "\033[38;5;251m" #white
+	now = datetime.now()
+	current_time = now.strftime("%Y-%m-%d %H:%M:%S")
+	return (f"{blue}{current_time}{white}")
 
 def convert_dpd_ods_to_csv():
-	print("~" * 40)
-	print("converting dpd.ods to csv")
+	print(f"{timeis()} {yellow}converting dpd.ods to csv")
+	print(f"{timeis()} ----------------------------------------")
 
 	ods_file = "../dpd.ods"
 	csv_file = ""
@@ -25,10 +42,11 @@ def convert_dpd_ods_to_csv():
 
 	df.to_csv("../csvs/dpd.csv", index = False, sep = "\t", encoding="utf-8")
 
-	print(df)
-
 
 def create_inflection_table_index():
+	print(f"{timeis()} {yellow}inflection generator")
+	print(f"{timeis()} ----------------------------------------") 
+	print(f"{timeis()} {green}creating inflection table index")
 
 	global inflection_table_index_df
 	inflection_table_index_df = pd.read_excel("declensions & conjugations.xlsx", sheet_name="index", dtype=str)
@@ -43,8 +61,7 @@ def create_inflection_table_index():
 
 
 def create_inflection_table_df():
-	print("~" * 40)
-	print("creating inflection_table_df")
+	print(f"{timeis()} {green}creating inflection table dataframe")
 
 	global inflection_table_df
 	inflection_table_df = pd.read_excel("declensions & conjugations.xlsx", sheet_name="declensions", dtype=str)
@@ -57,8 +74,7 @@ def create_inflection_table_df():
 
 
 def test_inflection_pattern_changed():
-	print("~" * 40)
-	print("test if inflection pattern have changed:")
+	print(f"{timeis()} {green}test if inflection patterns have changed")
 
 	global pattern_changed
 	pattern_changed = []
@@ -103,7 +119,7 @@ def test_inflection_pattern_changed():
 			old.fillna("", inplace=True)
 			old = old.rename(columns=lambda x: re.sub('Unnamed.*','',x))
 		except:
-			print(f"{inflection_name} - doesn't exist - added")
+			print(f"{timeis()} {red}{inflection_name} - doesn't exist - added")
 			pattern_changed.append(inflection_name)
 			inflection_table_df_filtered.to_csv(f"output/patterns/{inflection_name}.csv", sep="\t")
 
@@ -112,23 +128,20 @@ def test_inflection_pattern_changed():
 		elif inflection_name in pattern_changed:
 			continue
 		elif not inflection_table_df_filtered.equals(old):
-			print(f"{inflection_name} - different - updated")
+			print(f"{timeis()} {red}{inflection_name} - different - updated")
 			inflection_table_df_filtered.to_csv(f"output/patterns/{inflection_name}.csv", sep="\t")
 			pattern_changed.append(inflection_name)
 
-	if pattern_changed == []:
-		print("all patterns identical")
 	if pattern_changed != []:
-		print("~" * 40)
-		print(f"the following patterns have changes and will be generated\n{pattern_changed}")
+		print(f"{timeis()} {red}the following patterns have changes and will be generated")
+		print(f"{timeis()} {red}{pattern_changed}")
 	
 	with open (f"../frequency maps/output/pickle tests/pattern_changed", "wb") as pattern_changed_pickle:
 			pickle.dump(pattern_changed, pattern_changed_pickle)
 
 
 def create_dpd_df():
-	print("~" * 40)
-	print("create dpd_df")
+	print(f"{timeis()} {green}creating dpd dataframe")
 	
 	global dpd_df
 	
@@ -141,8 +154,7 @@ def create_dpd_df():
 
 
 def test_for_missing_stem_and_pattern():
-	print("~" * 40)
-	print(f"test for missing stems and patterns:")
+	print(f"{timeis()} {green}test for missing stems and patterns")
 
 	error = False
 	missing_stem_string = ""
@@ -162,19 +174,15 @@ def test_for_missing_stem_and_pattern():
 			error = True
 
 	if missing_stem_string != "":
-		print (f"words with missing stems: {missing_stem_string}")
+		print(f"{timeis()} {red}words with missing stems: {missing_stem_string}")
 	if missing_pattern_string != "":
-		print (f"words with missing patterns: {missing_pattern_string}")
+		print(f"{timeis()} {red}words with missing patterns: {missing_pattern_string}")
 	if error == True:
-		input("there are stem & pattern errors, please fix them before continuing")
-	else:
-		print("no stem & pattern errors found")
+		input(f"{timeis()} {red}there are stem & pattern errors, please fix them before continuing")
 
 
 def test_for_wrong_patterns():
-
-	print("~" * 40)
-	print("testing for wrong patterns:")
+	print(f"{timeis()} {green}testing for wrong patterns")
 
 	index_patterns = inflection_table_index_df["inflection name"].values.tolist()
 
@@ -200,16 +208,14 @@ def test_for_wrong_patterns():
 			pass
 
 	if wrong_patten_string != "":
-		print(f"wrong patterns: {wrong_patten_string}")
+		print(f"{timeis()} {red}wrong patterns: {wrong_patten_string}")
 	if error == True:
-		input("wrong patterns - fix 'em!")
-	if error == False:
-		print("no wrong patterns found")
+		input(f"{timeis()} {red}wrong patterns - fix 'em!")
+
 
 
 def test_for_differences_in_stem_and_pattern():
-	print("~" * 40)
-	print("testing for changes in stem and pattern:")
+	print(f"{timeis()} {green}testing for changes in stem and pattern")
 
 	global changed
 	changed = []
@@ -246,28 +252,22 @@ def test_for_differences_in_stem_and_pattern():
 			pickle_file.close()
 
 	if added_string != "":
-		print(f"headword / stem / pattern doesnt exist and will be added:")
-		print("~" * 40)
-		print(added_string)
+		print(f"{timeis()} {red}headword / stem / pattern doesnt exist and will be added")
+		print(f"{timeis()} {red}{added_string}")
 	if changed_string != "":
-		print(f"headword / stem / pattern has changed and will be updated")
-		print("~" * 40)
-		print(changed_string)
-	if changed == []:
-		print("no headwords stems or patterns changed")
+		print(f"{timeis()} {red}headword / stem / pattern has changed and will be updated")
+		print(f"{timeis()} {red}{changed_string}")
 	
 	with open("../frequency maps/output/pickle tests/stem_pattern_differences", "wb") as stem_pattern_differences_pickle:
 		pickle.dump(changed, stem_pattern_differences_pickle)
 
 
 def test_if_inflections_exist_suttas():
+	print(f"{timeis()} {green}testing if inflections exists (for suttas)")
 
 	global inflections_not_exist
 	inflections_not_exist = []
 	inflections_not_exists_string = ""
-
-	print("~"*40)
-	print("test if inflections exists")
 
 	for row in range(dpd_df_length): #dpd_df_length
 		headword = dpd_df.loc[row, "Pāli1"]
@@ -281,22 +281,15 @@ def test_if_inflections_exist_suttas():
 			inflections_not_exist.append(headword)
 
 	if inflections_not_exists_string != "":
-		print("~"*40)
-		print(f"inflection file doesn't exist for:\n{inflections_not_exists_string}")
-		print("~"*40)
-
-	if inflections_not_exist == []:
-		print("no missing inflection files")
+		print(f"{timeis()} {red}inflection file doesn't exist for")
+		print(f"{timeis()} {red}{inflections_not_exists_string}")
 
 
 def test_if_inflections_exist_dpd():
-
+	print(f"{timeis()} {green}testing if inflections exists (for dpd)")
 	global inflections_not_exist
 	inflections_not_exist = []
 	inflections_not_exists_string = ""
-
-	print("~"*40)
-	print("test if inflections exists")
 
 	for row in range(dpd_df_length): #dpd_df_length
 		headword = dpd_df.loc[row, "Pāli1"]
@@ -310,16 +303,14 @@ def test_if_inflections_exist_dpd():
 			inflections_not_exist.append(headword)
 
 	if inflections_not_exists_string != "":
-		print("~"*40)
-		print(f"inflection file doesn't exist for:\n{inflections_not_exists_string}")
-	if inflections_not_exist == []:
-		print("no missing inflection files")
+		print(f"{timeis()} {red}inflection file doesn't exist for")
+		print(f"{timeis()} {red}{inflections_not_exists_string}")
+
 
 
 def generate_changed_inflected_forms():
 
-	print("~" * 40)
-	print("generating changed inflected forms:")
+	print(f"{timeis()} {green}generating changed inflected forms")
 
 	global new_inflections_dict
 	new_inflections_dict = {}
@@ -369,7 +360,7 @@ def generate_changed_inflected_forms():
 				except:
 					with open("inflection generator errorlog.txt", "a") as error_log:
 						error_log.write(f"error on: {headword}\n")
-						print(f"error on: {headword}\n")
+						print(f"{timeis()} {red}error on: {headword}\n")
 
 			this_word_inflections = {headword : inflections_string}
 			new_inflections_dict.update(this_word_inflections)
@@ -378,14 +369,9 @@ def generate_changed_inflected_forms():
 		new_inflections_df = pd.DataFrame.from_dict(new_inflections_dict, orient='index')
 		new_inflections_df.to_csv("output/new inflections.csv", sep="\t", header=False)
 
-	else:
-		print("no new inflections")
-
 
 def generate_html_inflection_table():
-	print("~" * 40)
-	print("generating html inflection tables")
-	print("~" * 40)
+	print(f"{timeis()} {green}generating html inflection tables")
 
 	indeclinables = ["abbrev", "abs", "ger", "ind", "inf", "prefix"]
 	conjugations = ["aor", "cond", "fut", "imp", "imperf", "opt", "perf", "pr"]
@@ -405,7 +391,7 @@ def generate_html_inflection_table():
 		meaning = dpd_df.loc[row, "Meaning IN CONTEXT"]
 
 		if headword in changed or pattern in pattern_changed or headword in inflections_not_exist:
-			print(f"{row}\t{headword}")
+			print(f"{timeis()} {row}/{dpd_df_length}\t{headword}")
 
 			try:
 				with open(f"output/html tables/{headword}.html", "w") as html_table:
@@ -467,13 +453,14 @@ def generate_html_inflection_table():
 						html_table.write(html)
 			
 			except:
-				print (f"error! pattern {pattern} does not exist - fix it!")
+				
+				print(f"{timeis()} {red}error! pattern {pattern} does not exist - fix it!")
 				continue
 
 
 def transcribe_new_inflections():
 	if new_inflections_dict != {}:
-		print("~" * 40)
+		print(f"{timeis()} {green}transliterating new inflection")
 
 		new_inflections = open("output/new inflections.csv", "r")
 		new_inflections_read = new_inflections.read()
@@ -481,10 +468,10 @@ def transcribe_new_inflections():
 
 		new_inflections_translit = open("output/new inflections translit.csv", "w")
 
-		print("converting inflections to sinhala")
+		print(f"{timeis()} converting inflections to sinhala")
 		sinhala = transliterate.process("IAST","Sinhala", new_inflections_read, post_options =['SinhalaPali', 'SinhalaConjuncts'])
 
-		print("converting inflections to devanagari")
+		print(f"{timeis()} converting inflections to devanagari")
 		devanagari = transliterate.process("IAST","Devanagari",new_inflections_read, post_options = ['DevanagariAnusvara'])
 
 		roman = new_inflections_read.split("\n")[:-1]
@@ -496,13 +483,9 @@ def transcribe_new_inflections():
 
 		new_inflections_translit.close()
 	
-	else:
-		print("no new inflections to transcribe")
-
 
 def combine_old_and_new_translit_dataframes():
-	print("~" * 40)
-	print("combing old and new dataframes:")
+	print(f"{timeis()} {green}combing old and new dataframes")
 
 	global diff
 	diff = pd.DataFrame()
@@ -535,15 +518,11 @@ def combine_old_and_new_translit_dataframes():
 
 		diff.drop(columns=["1_y", "exists"], inplace=True)
 		diff.to_csv("output/all inflections translit.csv", sep="\t", index=None, header=False)
-		print("all inflections translit.csv updated")
-
-	else:
-		print("all inflections translit.csv unchanged")
+		print(f"{timeis()} all inflections translit.csv updated")
 
 
 def export_translit_to_pickle():
-	print("~" * 40)
-	print("exporting inflections translit to pickle")
+	print(f"{timeis()} {green}exporting inflections translit to pickle")
 
 	all_inflections = diff
 
@@ -557,7 +536,7 @@ def export_translit_to_pickle():
 		# fixme !!! how to delete headword when no longer exists	??? 
 		
 		if headword in new_inflections_dict.keys():
-			print(headword)
+			print(f"{timeis()} {headword}")
 
 			inflections_list = inflections.split()
 
@@ -575,8 +554,7 @@ def export_translit_to_pickle():
 
 
 def combine_old_and_new_dataframes():
-	print("~" * 40)
-	print("combinging old and new dataframes:")
+	print(f"{timeis()} {green}combinging old and new dataframes")
 
 	global diff
 	diff = pd.DataFrame()
@@ -611,16 +589,12 @@ def combine_old_and_new_dataframes():
 
 		diff.to_csv("output/all inflections.csv", sep="\t", index=None, header=False)
 
-		print("all inflections.csv updated")
-
-	else:
-		print("all inflections.csv unchanged")
+		print(f"{timeis()} all inflections.csv updated")
 
 
 def export_inflections_to_pickle():
 
-	print("~" * 40)
-	print("exporting inflections to pickle")
+	print(f"{timeis()} {green}exporting inflections to pickle")
 
 	all_inflections = diff
 
@@ -634,7 +608,7 @@ def export_inflections_to_pickle():
 		# !!! how to delete headword when no longer exists	??? 
 		
 		if headword in new_inflections_dict.keys():
-			print(headword)
+			print(f"{timeis()} {headword}")
 
 			inflections_list = inflections.split()
 
@@ -647,25 +621,23 @@ def export_inflections_to_pickle():
 
 
 def make_list_of_all_inflections():
-	print("~" * 40)
-	print("creating all inflections df")
+	print(f"{timeis()} {green}creating all inflections df")
 
 	global all_inflections_df
 	all_inflections_df = pd.read_csv("output/all inflections.csv", header=None, sep="\t")
 
-	print("~" * 40)
-	print("making master list of all inflections")
-	print("~" * 40)
+	print(f"{timeis()} making master list of all inflections")
 
 	# global all_inflections_list
 	all_inflections_string = ""
-	for row in range (all_inflections_df.shape[0]):
+	all_inflections_length = all_inflections_df.shape[0]
+	for row in range (all_inflections_length):
 		headword = all_inflections_df.iloc[row, 0]
 		inflections = all_inflections_df.iloc[row, 1]
 		all_inflections_string += inflections
 		
 		if row %5000 == 0:
-			print(f"{row} {headword}")
+			print(f"{timeis()} {row}/{all_inflections_length}\t{headword}")
 
 	all_inflections_list = all_inflections_string.split()
 	all_inflections_list = list(dict.fromkeys(all_inflections_list))
@@ -676,9 +648,7 @@ def make_list_of_all_inflections():
 
 def make_list_of_all_inflections_no_meaning():
 
-	print("~" * 40)
-	print("making list of all inflections with no meaning")
-	print("~" * 40)
+	print(f"{timeis()} {green}making list of all inflections with no meaning")
 
 	global no_meaning_list
 
@@ -698,12 +668,14 @@ def make_list_of_all_inflections_no_meaning():
 	no_meaning_df = all_inflections_df[all_inflections_df[0].isin(no_meaning_headword_list)]
 
 	no_meaning_string = ""
-	for row in range (all_inflections_df.shape[0]):
+	all_inflections_length = all_inflections_df.shape[0]
+	for row in range (all_inflections_length):
 		headword = all_inflections_df.iloc[row, 0]
 		inflections = all_inflections_df.iloc[row, 1]
 
+
 		if row %5000 == 0:
-			print(f"{row} {headword}")
+			print(f"{timeis()} {row}/{all_inflections_length}/t{headword}")
 
 		if headword in no_meaning_headword_list:
 			no_meaning_string += inflections
@@ -713,10 +685,7 @@ def make_list_of_all_inflections_no_meaning():
 
 
 def make_list_of_all_inflections_no_eg1():
-
-	print("~" * 40)
-	print("making list of all inflections with no eg1")
-	print("~" * 40)
+	print(f"{timeis()} {green}making list of all inflections with no eg1")
 
 	global no_eg1_list
 
@@ -728,12 +697,13 @@ def make_list_of_all_inflections_no_eg1():
 	no_eg1_df = all_inflections_df[all_inflections_df[0].isin(no_eg1_headword_list)]
 
 	no_eg1_string = ""
-	for row in range (all_inflections_df.shape[0]):
+	all_inflections_length = all_inflections_df.shape[0]
+	for row in range (all_inflections_length):
 		headword = all_inflections_df.iloc[row, 0]
 		inflections = all_inflections_df.iloc[row, 1]
 
 		if row %5000 == 0:
-			print(f"{row} {headword}")
+			print(f"{timeis()} {row}/{all_inflections_length}\t{headword}")
 
 		if headword in no_eg1_headword_list:
 			no_eg1_string += inflections
@@ -744,9 +714,7 @@ def make_list_of_all_inflections_no_eg1():
 
 def make_list_of_all_inflections_no_eg2():
 
-	print("~" * 40)
-	print("making list of all inflections with no eg2")
-	print("~" * 40)
+	print(f"{timeis()} {green}making list of all inflections with no eg2")
 
 	global no_eg2_list
 
@@ -758,12 +726,13 @@ def make_list_of_all_inflections_no_eg2():
 	no_eg2_df = all_inflections_df[all_inflections_df[0].isin(no_eg2_headword_list)]
 
 	no_eg2_string = ""
-	for row in range (all_inflections_df.shape[0]):
+	all_inflections_length = all_inflections_df.shape[0]
+	for row in range (all_inflections_length):
 		headword = all_inflections_df.iloc[row, 0]
 		inflections = all_inflections_df.iloc[row, 1]
 
 		if row %5000 == 0:
-			print(f"{row} {headword}")
+			print(f"{timeis()} {row}/{all_inflections_length}\t{headword}")
 
 		if headword in no_eg2_headword_list:
 			no_eg2_string += inflections
@@ -801,9 +770,7 @@ def clean_machine(text):
 
 def read_and_clean_sutta_text():
 
-	print("~" * 40)
-	print("reading and cleaning sutta file")
-	print("~" * 40)
+	print(f"{timeis()} {green}reading and cleaning sutta file")
 
 	global sutta_file
 	global commentary_file
@@ -818,14 +785,14 @@ def read_and_clean_sutta_text():
 	sutta_dict = pd.read_csv('sutta corespondence tables/sutta correspondence tables.csv', sep="\t", index_col=0, squeeze=True).to_dict(orient='index',)
 
 	while True:
-		sutta_number = input ("enter sutta number: ")
+		sutta_number = input (f"{timeis()} enter sutta number:{green} ")
 		if sutta_number in sutta_dict.keys():
 			sutta_file = sutta_dict.get(sutta_number).get("mūla")
 			commentary_file = sutta_dict.get(sutta_number).get("aṭṭhakathā")
 			sub_commentary_file = sutta_dict.get(sutta_number).get("ṭīkā")
 			break
 		elif sutta_number not in sutta_dict.keys():
-			print("sutta number not recognised, please try again")
+			print(f"{timeis()} {red}sutta number not recognised, please try again")
 			continue
 
 	with open(f"{input_path}{sutta_file}", 'r') as input_file :
@@ -848,8 +815,7 @@ def read_and_clean_sutta_text():
 
 def make_comparison_table():
 
-	print("~" * 40)
-	print("making sutta comparison table")
+	print(f"{timeis()} {green}making sutta comparison table")
 
 	with open(f"{output_path}{sutta_file}") as text_to_split:
 		word_llst=[word for line in text_to_split for word in line.split(" ")]
@@ -876,8 +842,7 @@ def make_comparison_table():
 	with open(f"{output_path}{sutta_file}.csv", 'w') as txt_file:
 		sutta_words_df.to_csv(txt_file, header=True, index=True, sep="\t")
 
-	print("~" * 40)
-	print("making commentary comparison table")
+	print(f"{timeis()} {green}making commentary comparison table")
 
 	with open(f"{output_path}{commentary_file}") as text_to_split:
 		word_llst=[word for line in text_to_split for word in line.split(" ")]
@@ -901,9 +866,7 @@ def make_comparison_table():
 
 def html_find_and_replace():
 
-	print("~" * 40)
-	print("finding and replacing sutta html")
-	print("~" * 40)
+	print(f"{timeis()} {green}finding and replacing sutta html")
 
 	global sutta_text
 	global commentary_text
@@ -926,7 +889,7 @@ def html_find_and_replace():
 		eg2_exists = str(sutta_words_df.iloc[row, 4])
 
 		if row % 250 == 0:
-			print(f"{row}/{max_row}\t{pali_word}")
+			print(f"{timeis()} {row}/{max_row}\t{pali_word}")
 
 		row +=1
 
@@ -950,9 +913,7 @@ def html_find_and_replace():
 	sutta_text += "<br><br>" + 'no eg1: <span class = "orange">' + no_eg1_string + "</span>"
 	sutta_text += "<br><br>" + 'no eg2: <span class = "red">' + no_eg2_string + "</span>"
 
-	print("~" * 40)
-	print("finding and replacing commentary html")
-	print("~" * 40)
+	print(f"{timeis()} {green}finding and replacing commentary html")
 
 	no_meaning_string = ""
 
@@ -968,7 +929,7 @@ def html_find_and_replace():
 		meaning_exists = str(commentary_words_df.iloc[row, 2])
 
 		if row % 250 == 0:
-			print(f"{row}/{max_row}\t{pali_word}")
+			print(f"{timeis()} {row}/{max_row}\t{pali_word}")
 
 		row +=1
 
@@ -986,6 +947,7 @@ def html_find_and_replace():
 
 
 def write_html():
+	print(f"{timeis()} {green}writing html file")
 	
 	html1 = """
 <!DOCTYPE html>
@@ -1090,3 +1052,6 @@ body {
 	html_file.write(commentary_text)
 	html_file.write(html3)
 	html_file.close
+
+print(f"{timeis()} fin")
+print(f"{timeis()} ----------------------------------------")
