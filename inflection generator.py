@@ -20,6 +20,8 @@ def inflection_generator_for_dpd():
 	combine_old_and_new_translit_dataframes()
 	export_translit_to_pickle()
 	export_inflections_to_pickle()
+	print(f"{timeis()} ----------------------------------------")
+
 
 if __name__ == "__main__":
    inflection_generator_for_dpd()

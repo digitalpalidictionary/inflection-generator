@@ -1053,5 +1053,4 @@ body {
 	html_file.write(html3)
 	html_file.close
 
-print(f"{timeis()} fin")
 print(f"{timeis()} ----------------------------------------")
