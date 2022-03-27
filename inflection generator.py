@@ -16,10 +16,16 @@ def inflection_generator_for_dpd():
 	generate_changed_inflected_forms()
 	combine_old_and_new_dataframes()
 	generate_html_inflection_table()
+	generate_inflections_in_table_list()
 	transcribe_new_inflections()
 	combine_old_and_new_translit_dataframes()
 	export_translit_to_pickle()
 	export_inflections_to_pickle()
+	delete_unused_inflection_patterns()
+	delete_old_pickle_files()
+	delete_unused_html_tables()
+	delete_unused_inflections()
+	delete_unused_inflections_translit()
 	print(f"{timeis()} ----------------------------------------")
 
 
