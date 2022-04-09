@@ -497,7 +497,7 @@ def generate_inflections_in_table_list():
 
 def transcribe_new_inflections():
 	if new_inflections_dict != {}:
-		print(f"{timeis()} {green}transliterating new inflection")
+		print(f"{timeis()} {green}transliterating new inflections")
 
 		new_inflections = open("output/new inflections.csv", "r")
 		new_inflections_read = new_inflections.read()
@@ -511,15 +511,19 @@ def transcribe_new_inflections():
 		print(f"{timeis()} converting inflections to devanagari")
 		devanagari = transliterate.process("IAST","Devanagari",new_inflections_read, post_options = ['DevanagariAnusvara'])
 
+		print(f"{timeis()} converting inflections to thai")
+		thai = transliterate.process("IAST","Thai",new_inflections_read)
+
 		roman = new_inflections_read.split("\n")[:-1]
 		sinhala = sinhala.split("\n")
 		devanagari = devanagari.split("\n")
+		thai = thai.split("\n")
 
-		for i in zip(roman, sinhala, devanagari):	
-			new_inflections_translit.write(i[0]+i[1].split("\t")[1]+i[2].split("\t")[1]+"\n")
+		for i in zip(roman, sinhala, devanagari, thai):	
+			new_inflections_translit.write(i[0]+i[1].split("\t")[1]+i[2].split("\t")[1]+i[3].split("\t")[1]+"\n")
 
 		new_inflections_translit.close()
-	
+
 
 def combine_old_and_new_translit_dataframes():
 	print(f"{timeis()} {green}combing old and new dataframes")
@@ -822,7 +826,7 @@ def read_and_clean_sutta_text():
 	sutta_dict = pd.read_csv('sutta corespondence tables/sutta correspondence tables.csv', sep="\t", index_col=0, squeeze=True).to_dict(orient='index',)
 
 	while True:
-		sutta_number = input (f"{timeis()} enter sutta number:{green} ")
+		sutta_number = input (f"{timeis()} enter sutta number:{blue} ")
 		if sutta_number in sutta_dict.keys():
 			sutta_file = sutta_dict.get(sutta_number).get("mūla")
 			commentary_file = sutta_dict.get(sutta_number).get("aṭṭhakathā")
