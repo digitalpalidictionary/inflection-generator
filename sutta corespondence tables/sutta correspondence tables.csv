@@ -19,5 +19,13 @@ mn11	s0201m.mul1.xml.original.txt	s0201a.att2.xml.original.txt	s0201t.tik2.xml.o
 mn21	s0201m.mul2.xml.original.txt	s0201a.att3.xml.original.txt	s0201t.tik3.xml.original.txt
 mn31	s0201m.mul3.xml.original.txt	s0201a.att4.xml.original.txt	s0201t.tik4.xml.original.txt
 mn41	s0201m.mul4.xml.original.txt	s0201a.att5.xml.original.txt	s0201t.tik5.xml.original.txt
-			
+mn51	s0202m.mul0.xml.original.txt	s0202a.att0.xml.original.txt	s0202t.tik0.xml.original.txt
+mn61	s0202m.mul1.xml.original.txt	s0202a.att1.xml.original.txt	s0202t.tik1.xml.original.txt
+mn71	s0202m.mul2.xml.original.txt	s0202a.att2.xml.original.txt	s0202t.tik2.xml.original.txt
+mn81	s0202m.mul3.xml.original.txt	s0202a.att3.xml.original.txt	s0202t.tik3.xml.original.txt
+mn91	s0202m.mul4.xml.original.txt	s0202a.att4.xml.original.txt	s0202t.tik4.xml.original.txt
+mn101	s0203m.mul0.xml.original.txt	s0203a.att0.xml.original.txt	s0203t.tik0.xml.original.txt
+mn111	s0203m.mul1.xml.original.txt	s0203a.att1.xml.original.txt	s0203t.tik1.xml.original.txt
+mn121	s0203m.mul2.xml.original.txt	s0203a.att2.xml.original.txt	s0203t.tik2.xml.original.txt
 mn131	s0203m.mul3.xml.original.txt	s0203a.att3.xml.original.txt	s0203t.tik3.xml.original.txt
+mn141	s0203m.mul4.xml.original.txt	s0203a.att4.xml.original.txt	s0203t.tik4.xml.original.txt
