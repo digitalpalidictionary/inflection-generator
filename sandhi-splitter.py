@@ -19,7 +19,7 @@ print(f"{timeis()} {line}")
 print(f"{timeis()} {yellow}sandhi splitter")
 print(f"{timeis()} {line}")
 
-inflection_exceptions = {"ne", "ātu", "vidaṃ", "ale", "asu", "ye", "aye", "veso", "ara", "arā", "araṃ", "em", "asa", "me", "ve", "ssa", "haṃ", "ti", "pi", "va", "yāti", "sīti", "ala", "tā", "nīti", "appe", "mahaṃ", "amahaṃ", "santi", "kampi", "āyāti", "vāti", "akampi", "ana", "nāva", "aṇanti", "ñña", "anīti", "āyaṃ", "itaṃ", "aya", "eti", "bha", "asīti", "vāhaṃ", "veti", "aveti", "ci", "āye", "māni", "rome", "ananti", "sapi", "ese", "e", "ita", "daṃ", "namha", "nametaṃ", "si", "manti", "theva", "ma", "mābhi", "mahāni", "he", "ha", "abhidaṃ", "naṃ", "hā", "ayasmā", "āna", "pā", "pa", "issa", "umaṃ", "āyatu", "paṃ", "po", "assunā", "isataṃ", "asataṃ", "u", "nā", "ite", "pāyaṃ", "apāyaṃ", "tv", "pe", "ape", "ṇaṃ"}
+inflection_exceptions = {"ne", "ṇa", "ṭṭhā", "ātu", "vidaṃ", "ale", "asu", "ye", "aye", "veso", "ara", "arā", "araṃ", "em", "asa", "me", "ve", "ssa", "haṃ", "ti", "pi", "va", "yāti", "sīti", "ala", "tā", "nīti", "appe", "mahaṃ", "amahaṃ", "santi", "kampi", "āyāti", "vāti", "akampi", "ana", "nāva", "aṇanti", "ñña", "anīti", "āyaṃ", "itaṃ", "aya", "eti", "bha", "asīti", "vāhaṃ", "veti", "aveti", "ci", "āye", "māni", "rome", "ananti", "sapi", "ese", "e", "ita", "daṃ", "namha", "nametaṃ", "si", "manti", "theva", "ma", "mābhi", "mahāni", "he", "ha", "abhidaṃ", "naṃ", "hā", "ayasmā", "āna", "pā", "pa", "issa", "umaṃ", "āyatu", "paṃ", "po", "assunā", "isataṃ", "asataṃ", "u", "nā", "ite", "pāyaṃ", "apāyaṃ", "tv", "pe", "ape", "ṇaṃ", "adi", "aṇa", "da", "sat", "āya"}
 
 inflection_additions = {"an", "na"}
 
@@ -248,7 +248,7 @@ def two_word_sandhi():
 					word1 in all_inflections_set and \
 					word2 in all_inflections_set:
 						matches2.append(word)
-						f1.write(f"\t{word1}\t{word2}\tmatch\t{rule+2}\t-\n")
+						f1.write(f"\t{word1}\t{word2}\t{rule+2}\t-\tmatch\n")
 						f2.write(f"{word}\t{word1} + {word2}\ttwo-word\t{rule+2}\t-\t-\n")
 						
 		counter += 1
@@ -282,7 +282,7 @@ def three_word_sandhi():
 
 	for word in unmatched2:
 		
-		if counter % 100 == 0:
+		if counter % 250 == 0:
 			print(f"{timeis()} {counter}/{length}\t{word}")
 		
 		f1.write(f"{counter}\t{word}\n")
@@ -308,15 +308,12 @@ def three_word_sandhi():
 				wordC in all_inflections_set:
 
 					matches3.append(word)
-					f1.write(f"\t{wordA}\t{wordB}\t{wordC}\tmatch\t-\t-\n")
+					f1.write(f"\t{wordA}\t{wordB}\t{wordC}\t-\t-\tmatch\n")
 					f2.write(f"{word}\t{wordA} + {wordB} + {wordC}\tthree-word\t-\t-\t-\n")
 
 				# blah bla* *lah
 
-				if \
-				wordA in all_inflections_set and \
-				wordB not in all_inflections_set and \
-				wordC not in all_inflections_set:
+				if wordA in all_inflections_set:
 					
 					for rule in rules:
 						chA = rules[rule].get("chA")
@@ -329,22 +326,18 @@ def three_word_sandhi():
 						wordC_firstletter == chB:
 							word2 = wordB[:-1] + ch1
 							word3 = ch2 + wordC[1:]
-							f1.write(f"\t{wordA}\t{word2}\t{word3}\tA23\n")
 
 							if \
 							wordA in all_inflections_set and \
 							word2 in all_inflections_set and \
 							word3 in all_inflections_set:
 								matches3.append(word)
-								f1.write(f"\t{wordA}\t{word2}\t{word3}\tmatch\t-\t{rule+2}\n")
+								f1.write(f"\t{wordA}\t{word2}\t{word3}\t-\t{rule+2}\tmatch\n")
 								f2.write(f"{word}\t{wordA} + {word2} + {word3}\tthree-word\t-\t{rule+2}\n")
 				
 				# bla* *lah blah
 
-				if \
-				wordA not in all_inflections_set and \
-				wordB not in all_inflections_set and \
-				wordC in all_inflections_set:
+				if wordC in all_inflections_set:
 
 					for rule in rules:
 						chA = rules[rule].get("chA")
@@ -357,14 +350,13 @@ def three_word_sandhi():
 						wordB_firstletter == chB:
 							word1 = wordA[:-1] + ch1
 							word2 = ch2 + wordB[1:]
-							f1.write(f"\t{word1}\t{word2}\t{wordC}\t12C\n")
 
 							if \
 							word1 in all_inflections_set and \
 							word2 in all_inflections_set and \
 							wordC in all_inflections_set:
 								matches3.append(word)
-								f1.write(f"\t{word1}\t{word2}\t{wordC}\tmatch\t{rule+2}\t-\n")
+								f1.write(f"\t{word1}\t{word2}\t{wordC}\t{rule+2}\t-\tmatch\n")
 								f2.write(f"{word}\t{word1} + {word2} + {wordC}\tthree-word\t{rule+2}\t-\t-\n")
 
 				# bla* *la* *lah
@@ -380,7 +372,6 @@ def three_word_sandhi():
 					wordB_firstletter == chBx:
 						word1 = wordA[:-1] + ch1x
 						word2 = ch2x + wordB[1:]
-						f1.write(f"\t{word1}\t{word2}\t{wordC}\t{rulex+2}\t-\t-\n")
 					
 						for ruley in rules:
 							chAy = rules[ruley].get("chA")
@@ -393,15 +384,14 @@ def three_word_sandhi():
 							wordC_firstletter == chBy:
 								word2 = (ch2x + wordB[1:])[:-1] + ch1y
 								word3 = ch2y + wordC[1:]
-								f1.write(f"\t{word1}\t{word2}\t{word3}\t{rulex+2}\t{ruley+2}\n")
 
 								if \
 								word1 in all_inflections_set and \
 								word2 in all_inflections_set and \
 								word3 in all_inflections_set:
 									matches3.append(word)
-									f1.write(f"\t{word1}\t{word2}\t{word3}\tmatch\t{rulex+2}\t{ruley+2}\n")
-									f2.write(f"{word}\t{word1} + {word2} + {word3}\tthree-word\t{rulex+2}\t{ruley+2}\n")
+									f1.write(f"\t{word1}\t{word2}\t{word3}\t{rulex+2}\t{ruley+2}\tmatch\n")
+									f2.write(f"{word}\t{word1} + {word2} + {word3}\tthree-word\t{rulex+2}\t{ruley+2}\t-\n")
 								
 		counter += 1
 
@@ -434,7 +424,7 @@ def four_word_sandhi():
 
 	for word in unmatched3:
 
-		if counter % 50 == 0:
+		if counter % 100 == 0:
 			print(f"{timeis()} {counter}/{length}\t{word}")
 
 		f1.write(f"{counter}\t{word}\n")
@@ -456,7 +446,7 @@ def four_word_sandhi():
 					wordC_lastletter = wordC[len(wordC)-1]
 					wordD = word[-1-z:]
 					wordD_firstletter = wordD[0]
-					f1.write(f"\t{wordA}\t{wordB}\t{wordC}\t{wordD}\t{wordA_lastletter}|{wordB_firstletter}|{wordB_lastletter}|{wordC_firstletter}{wordC_lastletter}{wordD_firstletter}\n")
+					f1.write(f"\t{wordA}\t{wordB}\t{wordC}\t{wordD}\n") # \t{wordA_lastletter}|{wordB_firstletter}|{wordB_lastletter}|{wordC_firstletter}|{wordC_lastletter}|{wordD_firstletter}\n")
 
 					# blah blah blah blah
 
@@ -465,7 +455,6 @@ def four_word_sandhi():
 					wordB in all_inflections_set and \
 					wordC in all_inflections_set and \
 					wordD in all_inflections_set:
-
 						matches4.append(word)
 						f1.write(f"\t{wordA}\t{wordB}\t{wordC}\t{wordD}\t-\t-\t-\tmatch\n")
 						f2.write(f"{word}\t{wordA} + {wordB} + {wordC} + {wordD}\tfour-word\t-\t-\t-\n")
@@ -474,9 +463,7 @@ def four_word_sandhi():
 
 					if \
 					wordA in all_inflections_set and \
-					wordB in all_inflections_set and \
-					wordC not in all_inflections_set and \
-					wordD not in all_inflections_set:
+					wordB in all_inflections_set:
 					
 						for rule in rules:
 							chA = rules[rule].get("chA")
@@ -487,8 +474,8 @@ def four_word_sandhi():
 							if \
 							wordC_lastletter == chA and \
 							wordD_firstletter == chB:
-								word3 = word[:-x-2] + ch1
-								word4 = ch2 + word[-x:]
+								word3 = wordC[:-1] + ch1
+								word4 = ch2 + wordD[1:]
 
 								if \
 								word3 in all_inflections_set and \
@@ -500,8 +487,6 @@ def four_word_sandhi():
 					# bla* *lah blah blah
 
 					if \
-					wordA not in all_inflections_set and \
-					wordB not in all_inflections_set and \
 					wordC in all_inflections_set and \
 					wordD in all_inflections_set:
 
@@ -514,23 +499,20 @@ def four_word_sandhi():
 							if \
 							wordA_lastletter == chA and \
 							wordB_firstletter == chB:
-								word1 = word[:-x-2] + ch1
-								word2 = ch2 + word[-x:]
+								word1 = wordA[:-1] + ch1
+								word2 = ch2 + wordB[1:]
 
 								if \
 								word1 in all_inflections_set and \
 								word2 in all_inflections_set:
 									matches4.append(word)
 									f1.write(f"\t{word1}\t{word2}\t{wordC}\t{wordD}\t{rule+2}-\t-\t\tmatch\n")
-									f2.write(
-										f"{word}\t{word1} + {word2} + {wordC} + {wordD}\tfour-word\t{rule+2}\t-\t-\n")
+									f2.write(f"{word}\t{word1} + {word2} + {wordC} + {wordD}\tfour-word\t{rule+2}\t-\t-\n")
 
 					# blah bla* *lah blah
 
 					if \
 					wordA in all_inflections_set and \
-					wordB not in all_inflections_set and \
-					wordC not in all_inflections_set and \
 					wordD in all_inflections_set:
 
 						for rule in rules:
@@ -542,25 +524,19 @@ def four_word_sandhi():
 							if \
 							wordB_lastletter == chA and \
 							wordC_firstletter == chB:
-								word2 = word[:-x-2] + ch1
-								word3 = ch2 + word[-x:]
+								word2 = wordB[:-1] + ch1
+								word3 = ch2 + wordC[1:]
 
 								if \
 								word2 in all_inflections_set and \
 								word3 in all_inflections_set:
 									matches4.append(word)
-									f1.write(
-										f"\t{wordA}\t{word2}\t{word3}\t{wordD}\t-\t{rule+2}\t-\tmatch\n")
-									f2.write(
-										f"{word}\t{wordA} + {word2} + {word3} + {wordD}\tfour-word\t-\t{rule+2}\t-\n")
+									f1.write(f"\t{wordA}\t{word2}\t{word3}\t{wordD}\t-\t{rule+2}\t-\tmatch\n")
+									f2.write(f"{word}\t{wordA} + {word2} + {word3} + {wordD}\tfour-word\t-\t{rule+2}\t-\n")
 					
 					# blah bla* *la* *lah
 
-					if \
-					wordA in all_inflections_set and \
-					wordB not in all_inflections_set and \
-					wordC not in all_inflections_set and \
-					wordD not in all_inflections_set:
+					if wordA in all_inflections_set:
 
 						for rulex in rules:
 							chAx = rules[rulex].get("chA")
@@ -573,7 +549,6 @@ def four_word_sandhi():
 							wordC_firstletter == chBx:
 								word2 = wordA[:-1] + ch1x
 								word3 = ch2x + wordB[1:]
-								f1.write(f"\t{wordA}\t{word2}\t{word3}\t{wordD}\t-\t{rulex+2}\t-\n")
 
 								for ruley in rules:
 									chAy = rules[ruley].get("chA")
@@ -586,25 +561,18 @@ def four_word_sandhi():
 									wordD_firstletter == chBy:
 										word3 = (ch2x + wordB[1:])[:-1] + ch1y
 										word4 = ch2y + wordC[1:]
-										f1.write(f"\t{wordA}\t{word2}\t{word3}\t{word4}\t-\t{rulex+2}\t{ruley+2}\n")
 
 										if \
 										word2 in all_inflections_set and \
 										word3 in all_inflections_set and \
 										word4 in all_inflections_set:
 											matches4.append(word)
-											f1.write(
-												f"\t{wordA}\t{word2}\t{word3}\t{word4}\t-\t{rulex+2}\t{ruley+2}\tmatch\n")
-											f2.write(
-												f"{word}\t{wordA} + {word2} + {word3} + {word4}\tfour-word\t-\t{rulex+2}\t{ruley+2}\n")
+											f1.write(f"\t{wordA}\t{word2}\t{word3}\t{word4}\t-\t{rulex+2}\t{ruley+2}\tmatch\n")
+											f2.write(f"{word}\t{wordA} + {word2} + {word3} + {word4}\tfour-word\t-\t{rulex+2}\t{ruley+2}\n")
 
 					# bla* *la* *lah blah
 
-					if \
-					wordA not in all_inflections_set and \
-					wordB not in all_inflections_set and \
-					wordC not in all_inflections_set and \
-					wordD in all_inflections_set:
+					if wordD in all_inflections_set:
 
 						for rulex in rules:
 							chAx = rules[rulex].get("chA")
@@ -617,7 +585,6 @@ def four_word_sandhi():
 							wordB_firstletter == chBx:
 								word1 = wordA[:-1] + ch1x
 								word2 = ch2x + wordB[1:]
-								f1.write(f"\t{word1}\t{word2}\t{wordC}\t{wordD}\t{rulex+2}\t-\t-\n")
 
 								for ruley in rules:
 									chAy = rules[ruley].get("chA")
@@ -630,17 +597,14 @@ def four_word_sandhi():
 									wordC_firstletter == chBy:
 										word2 = (ch2x + wordB[1:])[:-1] + ch1y
 										word3 = ch2y + wordC[1:]
-										f1.write(f"\t{word1}\t{word2}\t{word3}\t{wordD}\t-\t{rulex+2}\t{ruley+2}\n")
 
 										if \
 										word1 in all_inflections_set and \
 										word2 in all_inflections_set and \
 										word3 in all_inflections_set:
 											matches4.append(word)
-											f1.write(
-												f"\t{word1}\t{word2}\t{word3}\t{wordD}\t{rulex+2}\t{ruley+2}\t-\tmatch\n")
-											f2.write(
-												f"{word}\t{word1} + {word2} + {word3} + {wordD}\tfour-word\t{rulex+2}\t{ruley+2}\t-\n")
+											f1.write(f"\t{word1}\t{word2}\t{word3}\t{wordD}\t{rulex+2}\t{ruley+2}\t-\tmatch\n")
+											f2.write(f"{word}\t{word1} + {word2} + {word3} + {wordD}\tfour-word\t{rulex+2}\t{ruley+2}\t-\n")
 
 					# bla* *la* *la* *lah
 
@@ -655,7 +619,6 @@ def four_word_sandhi():
 						wordB_firstletter == chBx:
 							word1 = wordA[:-1] + ch1x
 							word2 = ch2x + wordB[1:]
-							f1.write(f"\t{word1}\t{word2}\t{wordC}\t{wordD}\t{rulex+2}\t-\t-\n")
 
 							for ruley in rules:
 								chAy = rules[ruley].get("chA")
@@ -668,7 +631,6 @@ def four_word_sandhi():
 								wordC_firstletter == chBy:
 									word2 = (ch2x + wordB[1:])[:-1] + ch1y
 									word3 = ch2y + wordC[1:]
-									f1.write(f"\t{word1}\t{word2}\t{word3}d\t{wordD}\t{rulex+2}\t{ruley+2}\t-\n")
 
 									for rulez in rules:
 										chAz = rules[rulez].get("chA")
@@ -679,9 +641,8 @@ def four_word_sandhi():
 										if \
 										wordC_lastletter == chAz and \
 										wordD_firstletter == chBz:
-											word3 = ch2y + wordC[1:][:-1] + ch1z
+											word3 =(ch2y + wordC[1:])[:-1] + ch1z
 											word4 = ch2z + wordD[1:]
-											f1.write(f"\t{word1}\t{word2}\t{word3}d\t{word4}\t{rulex+2}\t{ruley+2}\t{rulez+2}\n")
 
 											if \
 											word1 in all_inflections_set and \
