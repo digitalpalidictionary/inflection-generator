@@ -19,7 +19,7 @@ print(f"{timeis()} {line}")
 print(f"{timeis()} {yellow}sandhi splitter")
 print(f"{timeis()} {line}")
 
-inflection_exceptions = {"ne", "ṇa", "ṭṭhā", "ātu", "vidaṃ", "ale", "asu", "ye", "aye", "veso", "ara", "arā", "araṃ", "em", "asa", "me", "ve", "ssa", "haṃ", "ti", "pi", "va", "yāti", "sīti", "ala", "tā", "nīti", "appe", "mahaṃ", "amahaṃ", "santi", "kampi", "āyāti", "vāti", "akampi", "ana", "nāva", "aṇanti", "ñña", "anīti", "āyaṃ", "itaṃ", "aya", "eti", "bha", "asīti", "vāhaṃ", "veti", "aveti", "ci", "āye", "māni", "rome", "ananti", "sapi", "ese", "e", "ita", "daṃ", "namha", "nametaṃ", "si", "manti", "theva", "ma", "mābhi", "mahāni", "he", "ha", "abhidaṃ", "naṃ", "hā", "ayasmā", "āna", "pā", "pa", "issa", "umaṃ", "āyatu", "paṃ", "po", "assunā", "isataṃ", "asataṃ", "u", "nā", "ite", "pāyaṃ", "apāyaṃ", "tv", "pe", "ape", "ṇaṃ", "adi", "aṇa", "da", "sat", "āya"}
+inflection_exceptions = {"ne", "ṇa", "ṭṭhā", "ātu", "vidaṃ", "ale", "asu", "ye", "aye", "veso", "ara", "arā", "araṃ", "em", "asa", "me", "ve", "ssa", "haṃ", "ti", "pi", "va", "yāti", "sīti", "ala", "tā", "nīti", "appe", "mahaṃ", "amahaṃ", "santi", "kampi", "āyāti", "vāti", "akampi", "ana", "nāva", "aṇanti", "ñña", "anīti", "āyaṃ", "itaṃ", "aya", "eti", "bha", "asīti", "vāhaṃ", "veti", "aveti", "ci", "āye", "māni", "rome", "ananti", "sapi", "ese", "e", "ita", "daṃ", "namha", "nametaṃ", "si", "manti", "theva", "ma", "mābhi", "mahāni", "he", "ha", "abhidaṃ", "naṃ", "hā", "	", "āna", "pā", "pa", "issa", "umaṃ", "āyatu", "paṃ", "po", "assunā", "isataṃ", "asataṃ", "u", "nā", "ite", "pāyaṃ", "apāyaṃ", "tv", "pe", "ape", "ṇaṃ", "adi", "aṇa", "da", "sat", "āya"}
 
 inflection_additions = {"an", "na"}
 
@@ -547,8 +547,8 @@ def four_word_sandhi():
 							if \
 							wordB_lastletter == chAx and \
 							wordC_firstletter == chBx:
-								word2 = wordA[:-1] + ch1x
-								word3 = ch2x + wordB[1:]
+								word2 = wordB[:-1] + ch1x
+								word3 = ch2x + wordC[1:]
 
 								for ruley in rules:
 									chAy = rules[ruley].get("chA")
@@ -769,6 +769,7 @@ def unzip_and_copy():
 	print(f"{timeis()} {green}{line}")
 
 def sanity_test():
+
 	print(f"{timeis()} {green}sanity test")
 	print(f"{timeis()} {green}{green}{line}")
 
