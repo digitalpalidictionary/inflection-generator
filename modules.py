@@ -306,7 +306,6 @@ def generate_changed_inflected_forms():
 			stem = ""
 		pattern = dpd_df.loc[row, "Pattern"]
 		pos = dpd_df.loc[row, "POS"]
-		metadata = dpd_df.loc[row, "Metadata"]
 		meaning = dpd_df.loc[row, "Meaning IN CONTEXT"]
 		variant = dpd_df.loc[row, "Variant – same constr or diff reading"]
 
@@ -368,7 +367,6 @@ def generate_html_inflection_table():
 			stem = ""
 		pattern = dpd_df.loc[row, "Pattern"]
 		pos = dpd_df.loc[row, "POS"]
-		metadata = dpd_df.loc[row, "Metadata"]
 		meaning = dpd_df.loc[row, "Meaning IN CONTEXT"]
 
 		if headword in changed or pattern in pattern_changed or headword in inflections_not_exist:
@@ -454,11 +452,10 @@ def generate_inflections_in_table_list():
 
 		pattern = dpd_df.loc[row, "Pattern"]
 		pos = dpd_df.loc[row, "POS"]
-		metadata = dpd_df.loc[row, "Metadata"]
 		meaning = dpd_df.loc[row, "Meaning IN CONTEXT"]
 
 		if headword in changed or pattern in pattern_changed or headword in inflections_not_exist:
-			if pos not in indeclinables and pos != "idiom" and pos != "sandhi" and metadata == "":
+			if pos not in indeclinables and pos != "idiom" and pos != "sandhi":
 				if row %1000 == 0:
 					print(f"{timeis()} {row}/{dpd_df_length}\t{headword}")
 				
@@ -686,6 +683,9 @@ def make_list_of_all_inflections():
 	global all_inflections_set
 	all_inflections_set = set(dict.fromkeys(all_inflections_list))
 
+	with open(f"output/all inflections list", "wb") as p:
+		pickle.dump(all_inflections_set, p)
+
 
 def make_list_of_all_inflections_no_meaning():
 
@@ -699,8 +699,7 @@ def make_list_of_all_inflections_no_meaning():
 	test4 = dpd_df["POS"] != "cs"
 	test5 = dpd_df["POS"] != "ve"
 	test6 = dpd_df["POS"] != "idiom"
-	test7 = dpd_df["Metadata"] != "yes"
-	filter = test1 & test2 & test3 & test4 & test5 & test6 & test7
+	filter = test1 & test2 & test3 & test4 & test5 & test6
 
 	no_meaning_df = dpd_df[filter]
 
@@ -807,6 +806,10 @@ def clean_machine(text):
 	text = re.sub("^ ", "", text)
 	text = re.sub("^ ", "", text)
 	text = re.sub("^ ", "", text)
+	text = re.sub("॰", "", text)
+	text = re.sub("ï", "i", text)
+	text = re.sub("ü", "u", text)
+	
 	return text
 
 def read_and_clean_sutta_text():
@@ -918,6 +921,8 @@ def html_find_and_replace():
 
 	with open(f"{output_path}{sutta_file}", 'r') as input_file:
 		sutta_text = input_file.read()
+
+	sandhi_df = pd.read_csv("output/sandhi/sandhi_df.csv", sep = "\t", dtype = str)
 	
 	max_row = sutta_words_df.shape[0]
 	row=0
@@ -954,6 +959,19 @@ def html_find_and_replace():
 	sutta_text += "<br><br>" + 'no eg1: <span class = "orange">' + no_eg1_string + "</span>"
 	sutta_text += "<br><br>" + 'no eg2: <span class = "red">' + no_eg2_string + "</span>"
 
+	print(f"{timeis()} {green}finding and replacing sandhi")
+
+	for row in range(len(sandhi_df)):
+		sandhi = sandhi_df.loc[row, "sandhi"]
+		construction = sandhi_df.loc[row, "construction"]
+		construction = re.sub("{|}", "", construction)
+		construction = re.sub("'", "", construction)
+
+		if row % 250 == 0:
+			print(f"{timeis()} {row}/{len(sandhi_df)}\t{sandhi}")
+
+		sutta_text = re.sub(fr"(^|\s|<|>)({sandhi})(<|>|\s|\n|$)", f"""\\1<abbr title="{construction}">\\2</abbr>\\3""", sutta_text)
+
 	print(f"{timeis()} {green}finding and replacing commentary html")
 
 	no_meaning_string = ""
@@ -985,6 +1003,8 @@ def html_find_and_replace():
 
 	commentary_text = re.sub("\n", "<br><br>", commentary_text)
 	commentary_text += "<br><br>" + 'no meanings: <span class = "highlight">' + no_meaning_string + "</span>"
+
+
 
 
 def write_html():
@@ -1158,4 +1178,4 @@ def delete_unused_inflections_translit():
 				print(f"{timeis()} {red}{file} not found")
 
 
-print(f"{timeis()} ----------------------------------------")
+# print(f"{timeis()} ----------------------------------------")
