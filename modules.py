@@ -922,7 +922,8 @@ def html_find_and_replace():
 	with open(f"{output_path}{sutta_file}", 'r') as input_file:
 		sutta_text = input_file.read()
 
-	sandhi_df = pd.read_csv("output/sandhi/sandhi_df.csv", sep = "\t", dtype = str)
+	sandhi_df = pd.read_csv(
+		"output/sandhi/matches_df.csv", sep="\t", dtype=str)
 	
 	max_row = sutta_words_df.shape[0]
 	row=0
@@ -959,7 +960,7 @@ def html_find_and_replace():
 	sutta_text += "<br><br>" + 'no eg1: <span class = "orange">' + no_eg1_string + "</span>"
 	sutta_text += "<br><br>" + 'no eg2: <span class = "red">' + no_eg2_string + "</span>"
 
-	print(f"{timeis()} {green}finding and replacing sandhi")
+	print(f"{timeis()} {green}finding and replacing sutta sandhi")
 
 	for row in range(len(sandhi_df)):
 		sandhi = sandhi_df.loc[row, "sandhi"]
@@ -975,6 +976,7 @@ def html_find_and_replace():
 	print(f"{timeis()} {green}finding and replacing commentary html")
 
 	no_meaning_string = ""
+	no_inflection_string = ""
 
 	with open(f"{output_path}{commentary_file}", 'r') as input_file:
 		commentary_text = input_file.read()
@@ -995,6 +997,7 @@ def html_find_and_replace():
 		if inflection_exists == "False":
 
 			commentary_text = re.sub(fr"(^|\s)({pali_word})(\s|\n|$)", f"""\\1<span class = "highlight">\\2</span>\\3""", commentary_text)
+			no_inflection_string += pali_word + " "
 
 		elif meaning_exists == "False":
 
@@ -1002,8 +1005,21 @@ def html_find_and_replace():
 			no_meaning_string += pali_word + " "
 
 	commentary_text = re.sub("\n", "<br><br>", commentary_text)
-	commentary_text += "<br><br>" + 'no meanings: <span class = "highlight">' + no_meaning_string + "</span>"
+	commentary_text += "<br><br>" + 'no inflection: <span class = "highlight">' + no_inflection_string + "</span>"
+	commentary_text += "<br><br>" + 'no meanings: <span class = "orange">' + no_meaning_string + "</span>"
 
+	print(f"{timeis()} {green}finding and replacing commentary sandhi")
+
+	for row in range(len(sandhi_df)):
+		sandhi = sandhi_df.loc[row, "sandhi"]
+		construction = sandhi_df.loc[row, "construction"]
+		construction = re.sub("{|}", "", construction)
+		construction = re.sub("'", "", construction)
+
+		if row % 250 == 0:
+			print(f"{timeis()} {row}/{len(sandhi_df)}\t{sandhi}")
+
+		commentary_text = re.sub(fr"(^|\s|<|>)({sandhi})(<|>|\s|\n|$)", f"""\\1<abbr title="{construction}">\\2</abbr>\\3""", commentary_text)
 
 
 
@@ -1105,14 +1121,13 @@ body {
 
 	html3 = """</div></div>"""
 
-	html_file = open(f"{output_path}{sutta_file}.html", "w")
-	html_file = open(f"{output_path}{sutta_file}.html", "a")
-	html_file.write(html1)
-	html_file.write(sutta_text)
-	html_file.write(html2)
-	html_file.write(commentary_text)
-	html_file.write(html3)
-	html_file.close
+	with open (f"{output_path}{sutta_file}.html", "w") as html_file:
+		html_file.write(html1)
+		html_file.write(sutta_text)
+		html_file.write(html2)
+		html_file.write(commentary_text)
+		html_file.write(html3)
+		html_file.close
 
 def delete_old_pickle_files():
 	print(f"{timeis()} {green}deleting old pickle files ")
