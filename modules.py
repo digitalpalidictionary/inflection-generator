@@ -963,9 +963,9 @@ def html_find_and_replace():
 	print(f"{timeis()} {green}finding and replacing sutta sandhi")
 
 	for row in range(len(sandhi_df)):
-		sandhi = sandhi_df.loc[row, "sandhi"]
-		construction = sandhi_df.loc[row, "construction"]
-		construction = re.sub("{|}", "", construction)
+		sandhi = sandhi_df.loc[row, "word"]
+		construction = sandhi_df.loc[row, "split"]
+		construction = re.sub("[|]", "", construction)
 		construction = re.sub("'", "", construction)
 
 		if row % 250 == 0:
@@ -1011,9 +1011,9 @@ def html_find_and_replace():
 	print(f"{timeis()} {green}finding and replacing commentary sandhi")
 
 	for row in range(len(sandhi_df)):
-		sandhi = sandhi_df.loc[row, "sandhi"]
-		construction = sandhi_df.loc[row, "construction"]
-		construction = re.sub("{|}", "", construction)
+		sandhi = sandhi_df.loc[row, "word"]
+		construction = sandhi_df.loc[row, "split"]
+		construction = re.sub("[|]", "", construction)
 		construction = re.sub("'", "", construction)
 
 		if row % 250 == 0:
