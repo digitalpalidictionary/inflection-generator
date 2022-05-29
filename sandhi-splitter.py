@@ -19,13 +19,12 @@ from simsapa.app.stardict import export_words_as_stardict_zip, ifo_from_opts, Di
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 
-log = open("output/sandhi/log.txt", "a")
-
 print(f"{timeis()} {line}")
 print(f"{timeis()} {yellow}sandhi splitter")
 print(f"{timeis()} {line}")
 
 vowels = ["a", "ā", "i", "ī", "u", "ū", "o", "e"]
+
 
 def make_text_set():
 
@@ -49,36 +48,111 @@ def make_text_set():
 	with open(f"output/set text", "wb") as p:
 		pickle.dump(text_set, p)
 
+
+def make_spelling_mistakes_set():
+	global spelling_mistakes_set
+	print(f"{timeis()} {green}making spelling mistakes set", end=" ")
+	sp_mistakes_df = pd.read_csv(
+		"sandhi/spelling mistakes.csv", dtype=str, header=None, sep="\t")
+	sp_mistakes_df.fillna("", inplace=True)
+
+	spelling_mistakes_set = set(sp_mistakes_df[0].tolist())
+	print(f"{white}{len(spelling_mistakes_set)}")
+
+
+def make_abbreviations_set():
+	
+	print(f"{timeis()} {green}making abbreviations set", end=" ")
+		
+	global dpd_df
+	global dpd_df_length
+	global abbreviations_set
+	abbreviations_set = []
+
+	dpd_df = pd.read_csv("../csvs/dpd-full.csv", sep="\t", dtype=str)
+	dpd_df.fillna("", inplace=True)
+	dpd_df_length = len(dpd_df)
+
+	for row in range(dpd_df_length):  # dpd_df_length
+		headword = dpd_df.loc[row, "Pāli1"]
+		headword_clean = re.sub(r" \d*$", "", headword)
+		pos = dpd_df.loc[row, "POS"]
+
+		if pos == "abbrev":
+			abbreviations_set.append(headword_clean)
+
+	abbreviations_set = set(abbreviations_set)
+	
+	print(f"{white}{len(abbreviations_set)}")
+
+
+def make_manual_corrections_set():
+	
+	print(f"{timeis()} {green}making manual corrections set", end=" ")
+	
+	global manual_corrections_set
+	manual_corrections_df = pd.read_csv("sandhi/manual corrections.csv", dtype=str, header=None, sep="\t")
+	manual_corrections_df.fillna("", inplace=True)
+
+	manual_corrections_set = set(manual_corrections_df[0].tolist())
+	print(f"{white}{len(manual_corrections_set)}")
+
+	f2 = open("output/sandhi/matches.csv", "w")
+	f2.write(f"word\tsplit\tprocess\trules\n")
+
+	for row in range(len(manual_corrections_df)):
+		sandhi = manual_corrections_df.loc[row, 0]
+		split = manual_corrections_df.loc[row, 1]
+		f2.write(f"{sandhi}\t{split}\tmanual\tm\n")
+	f2.close()
+
+
+def make_shortlist_set():
+
+	global shortlist_set
+	print(f"{timeis()} {green}making shortlist set", end=" ")
+	
+	shortlist_df = pd.read_csv("sandhi/shortlist.csv", dtype=str, header=None, sep="\t")
+	shortlist_df.fillna("", inplace=True)
+
+	shortlist_set = set(shortlist_df[0].tolist())
+	print(f"{white}{len(shortlist_set)}")
+
+
 def import_text_set():
 
-	print(f"{timeis()} {green}importing text set", end=" ")
-	
 	global text_set
+	print(f"{timeis()} {green}importing text set", end=" ")
+
 	with open(f"output/set text", "rb") as p:
 		text_set = pickle.load(p)
 
 	text_set.add("chedanaviniyogavinayakiriyālesantarakappataṇhādiṭṭhiasaṅkhyeyyakappamahākappādīsu")
+	text_set = text_set - spelling_mistakes_set
+	text_set = text_set - abbreviations_set
+	text_set = text_set - manual_corrections_set
 
 	print(f"{white}{len(text_set)}")
 	
+
 def generate_inflected_forms_for_sandhi():
 
 	global all_inflections_set
+	
 	all_inflections_set = []
+	exceptions_list = ["abbrev", "cs", "idiom", "letter", "prefix", "root", "sandhi", "suffix", "ve"]
+
 	
 	yn = input(f"{timeis()} {green}generate all inflected forms? (y/n){white} ")
 
 	if yn == "y":
-	
-		dpd_df = pd.read_csv("../csvs/dpd-full.csv", sep="\t", dtype=str)
-		dpd_df.fillna("", inplace=True)
-		dpd_df_length = len(dpd_df)
 
 		inflections_string = ""
 
 		for row in range(dpd_df_length):  # dpd_df_length
 			headword = dpd_df.loc[row, "Pāli1"]
 			headword_clean = re.sub(r" \d*$", "", headword)
+			pos = dpd_df.loc[row, "POS"]
 			stem = dpd_df.loc[row, "Stem"]
 			if re.match("!.+", stem) != None:
 				stem = "!"
@@ -89,8 +163,6 @@ def generate_inflected_forms_for_sandhi():
 
 			if row % 5000 == 0:
 				print(f"{timeis()} {row}/{len(dpd_df)}\t{headword}")
-
-			exceptions_list = ["abbrev", "cs", "idiom", "letter", "prefix", "root", "sandhi", "suffix", "ve"]
 
 			if pos not in exceptions_list:
 
@@ -131,6 +203,7 @@ def generate_inflected_forms_for_sandhi():
 	else:
 		pass
 
+
 def import_all_inflections_set():
 	
 	print(f"{timeis()} {green}importing all inflections set", end = " ")
@@ -139,7 +212,10 @@ def import_all_inflections_set():
 	with open(f"output/set all inflections", "rb") as p:
 		all_inflections_set = sorted(pickle.load(p))
 	
+
+	
 	print(f"{white}{len(all_inflections_set)}")
+
 
 def generate_all_inflections_string():
 
@@ -148,8 +224,9 @@ def generate_all_inflections_string():
 	global all_inflections_string
 	all_inflections_string = ""
 	all_inflections_string = ",".join(all_inflections_set) + ","
-	print(f"ok")
+	print(f"{white}ok")
 	# print(all_inflections_string[:500])
+
 
 def make_unmatched_set():
 
@@ -160,11 +237,12 @@ def make_unmatched_set():
 	
 	print(f"{white}{len(unmatched_set)}")
 
+
 def import_sandhi_rules():
 
 	print(f"{timeis()} {green}importing sandhi rules", end=" ")
 	
-	rules_df = pd.read_csv("sandhi rules.csv", sep="\t", dtype = str)
+	rules_df = pd.read_csv("sandhi/sandhi rules.csv", sep="\t", dtype = str)
 	rules_df.fillna("", inplace = True)
 	
 	print(f"{white}{len(rules_df)}")
@@ -201,11 +279,12 @@ def import_sandhi_rules():
 		print(f"{white}ok")
 
 
+
 def remove_exceptions():
 
 	print(f"{timeis()} {green}removing exceptions", end=" ")
 
-	exceptions_df = pd.read_csv("sandhi exceptions.csv", header = None)
+	exceptions_df = pd.read_csv("sandhi/sandhi exceptions.csv", header = None)
 	exceptions_set = set(exceptions_df[0].tolist())
 	
 	global unmatched_set
@@ -217,6 +296,7 @@ def remove_exceptions():
 	print(f"{white}{len(exceptions_set)}")
 
 
+
 def two_word_sandhi():
 
 	print(f"{timeis()} {green}{line}")
@@ -224,8 +304,7 @@ def two_word_sandhi():
 	print(f"{timeis()} {green}{line}")
 
 	f1 = open("output/sandhi/process2.csv", "w")
-	f2 = open("output/sandhi/matches.csv", "w")
-	f2.write(f"word\tsplit\tprocess\trules\n")
+	f2 = open("output/sandhi/matches.csv", "a")
 
 	global matches2
 	matches2 = []
@@ -291,6 +370,7 @@ def two_word_sandhi():
 			f.write(f"{word}\n")
 
 	print(f"{timeis()} {green}two word unmatched {white}{len(unmatched2)}")
+
 
 def three_word_sandhi():
 
@@ -430,6 +510,7 @@ def three_word_sandhi():
 			f.write(f"{word}\n")
 
 	print(f"{timeis()} {green}three word unmatched {white}{len(unmatched3)}")
+
 
 def four_word_sandhi():
 
@@ -708,6 +789,7 @@ def four_word_sandhi():
 	print(f"{timeis()} {green}four word unmatched {white}{len(unmatched4)}")
 
 
+
 def split_from_front_and_back(word_initial, word_front, word, word_back, comment, rules_front, rules_back):
 
 	f1 = open("output/sandhi/processxfront.csv", "a")
@@ -897,19 +979,22 @@ def split_from_front_and_back(word_initial, word_front, word, word_back, comment
 				lwff_fuzzy_list = fuzzy_list[0]
 				lwfb_fuzzy_list = fuzzy_list[1]
 
-				# prune the lists - use first 3
+				# prune the lists - use first 2
 				
-				if len(lwff_fuzzy_list) > 1:
-					lwff_fuzzy_list = lwff_fuzzy_list[0:1]
+				# if len(lwff_fuzzy_list) > 1:
+				# 	lwff_fuzzy_list = lwff_fuzzy_list[0:2]
 
-				if len(lwfb_fuzzy_list) > 1:
-					lwfb_fuzzy_list = lwfb_fuzzy_list[0:1]
+				# if len(lwfb_fuzzy_list) > 1:
+				# 	lwfb_fuzzy_list = lwfb_fuzzy_list[0:2]
 
 
 				# split fuzzy front, run rules and recurse
 
 				for lwff_fuzzy in lwff_fuzzy_list:
-					if len(lwff_fuzzy) > 2:
+
+					if (len(lwff_fuzzy) > 2 and \
+                    lwff_fuzzy == lwff_fuzzy_list[0]) or \
+					lwff_fuzzy in shortlist_set:
 					
 						f1.write(f"\n\tlwff_fuzzy\t{lwff_fuzzy}\n")
 						if printme:
@@ -970,7 +1055,9 @@ def split_from_front_and_back(word_initial, word_front, word, word_back, comment
 				# split fuzzy back, run rules and recurse
 
 				for lwfb_fuzzy in lwfb_fuzzy_list:
-					if len(lwfb_fuzzy) > 3:
+					if (len(lwfb_fuzzy) > 2 and \
+                    lwfb_fuzzy == lwfb_fuzzy_list[0]) or \
+					lwfb_fuzzy in shortlist_set:
 
 						f1.write(f"\n\tlwfb_fuzzy\t{lwfb_fuzzy}\n")
 						if printme:
@@ -1070,17 +1157,19 @@ def split_from_front_and_back(word_initial, word_front, word, word_back, comment
 
 				# prune lists - use first 3
 
-				if len(lwff_clean_list) > 1:
-					lwff_clean_list = lwff_clean_list[0:1]
+				# if len(lwff_clean_list) > 1:
+				# 	lwff_clean_list = lwff_clean_list[0:2]
 
-				if len(lwfb_clean_list) > 1:
-					lwfb_clean_list = lwfb_clean_list[0:1]
+				# if len(lwfb_clean_list) > 1:
+				# 	lwfb_clean_list = lwfb_clean_list[0:2]
 
 				# split clean front, run rules and recurse
 
 				for lwff_clean in lwff_clean_list:
 					
-					if len(lwff_clean) > 2:
+					if (len(lwff_clean) > 2 and \
+                    lwff_clean == lwff_clean_list[0]) or \
+					lwff_clean in shortlist_set:
 
 						wordA = lwff_clean
 						wordB = re.sub(f"^{wordA}", "", word)
@@ -1108,7 +1197,9 @@ def split_from_front_and_back(word_initial, word_front, word, word_back, comment
 
 				for lwfb_clean in lwfb_clean_list:
 
-					if len(lwfb_clean) > 3:
+					if (len(lwfb_clean) > 3 and \
+					lwfb_clean == lwfb_clean_list[0]) or \
+					lwfb_clean in shortlist_set:
 
 						wordB = lwfb_clean
 						wordA = re.sub(f"{wordB}$", "", word)
@@ -1140,6 +1231,7 @@ def split_from_front_and_back(word_initial, word_front, word, word_back, comment
 	f1.close()
 	f2.close()
 
+
 def x_word_sandhi_from_front_and_back():
 
 	print(f"{timeis()} {green}{line}")
@@ -1166,7 +1258,6 @@ def x_word_sandhi_from_front_and_back():
 	matchesx = []
 	counter = 0
 	
-		
 	if testme == True:
 		data_set = unmatched2
 		length = len(unmatched2)
@@ -1209,6 +1300,7 @@ def x_word_sandhi_from_front_and_back():
 	print(f"{timeis()} {green}x word matches {white}{len(matchesx)} {green}(including duplicates)")
 	print(f"{timeis()} {green}x word unmatched from the front {white}{len(unmatchedxfront)}")
 
+
 def summary():
 
 	print(f"{timeis()} {green}{line}")
@@ -1237,6 +1329,7 @@ def summary():
 	
 	with open("output/sandhi/stats.csv", "a") as f:
 		f.write(f"{len(text_set)}\t{len(unmatched_set)}\t{len(matches2)}\t{len(unmatched2)}\t{len(matches3)}\t{len(unmatched3)}\t{len(matches4)}\t{len(unmatched4)}\t{len(matchesx)}\t{len(unmatchedxfront)}\t{perc_sandhi}\t{perc_all}\n")
+
 
 def make_sandhi_dict():
 
@@ -1286,6 +1379,7 @@ def make_sandhi_dict():
 	
 	print(f"{white}ok")
 
+
 def make_golden_dict():
 
 	print(f"{timeis()} {green}generating goldendict", end=" ")
@@ -1332,6 +1426,7 @@ def make_golden_dict():
 
 	print(f"{white}ok")
 
+
 def unzip_and_copy():
 
 	print(f"{timeis()} {green}unipping and copying goldendict", end = " ")
@@ -1340,6 +1435,7 @@ def unzip_and_copy():
 	
 	print(f"{white}ok")
 	print(f"{timeis()} {green}{line}")
+
 
 def value_counts():
 
@@ -1359,6 +1455,100 @@ def value_counts():
 	
 	counts = rules_df.value_counts()
 	counts.to_csv(f"output/sandhi/counts", sep="\t")
+
+	print(f"{white}ok")
+
+def word_counts():
+
+	print(f"{timeis()} {green}saving word counts", end=" ") 
+
+	df = pd.read_csv("output/sandhi/matches.csv", sep = "\t", dtype = str)
+	df.drop_duplicates(subset=['word', 'split'], keep='first', inplace=True, ignore_index=True)
+
+	masterlist = []
+
+	for row in range(len(df)):
+		split = df.loc[row, "split"]
+		words = re.findall("[^ + |-]+", split)
+		for word in words:
+			masterlist.append(word)
+
+	letters1 = []
+	letters2 = []
+	letters3 = []
+	letters4 = []
+	letters5 = []
+	letters6 = []
+	letters7 = []
+	letters8 = []
+	letters9 = []
+	letters10plus = []
+
+	for word in masterlist:
+		if len(word) == 1:
+			letters1.append(word)
+		if len(word) == 2:
+			letters2.append(word)
+		if len(word) == 3:
+			letters3.append(word)
+		if len(word) == 4:
+			letters4.append(word)
+		if len(word) == 5:
+			letters5.append(word)
+		if len(word) == 6:
+			letters6.append(word)
+		if len(word) == 7:
+			letters7.append(word)
+		if len(word) == 8:
+			letters8.append(word)
+		if len(word) == 9:
+			letters9.append(word)
+		if len(word) >= 10:
+			letters10plus.append(word)
+
+	letters_df = pd.DataFrame(masterlist)
+	letters_counts = letters_df.value_counts()
+	letters_counts.to_csv(f"output/sandhi/letters", sep="\t", header=None)
+	
+	letters1_df = pd.DataFrame(letters1)
+	letters1_counts = letters1_df.value_counts()
+	letters1_counts.to_csv(f"output/sandhi/letters1", sep="\t", header=None)
+	
+	letters2_df = pd.DataFrame(letters2)
+	letters2_counts = letters2_df.value_counts()
+	letters2_counts.to_csv(f"output/sandhi/letters2", sep="\t", header = None)
+
+	letters3_df = pd.DataFrame(letters3)
+	letters3_counts = letters3_df.value_counts()
+	letters3_counts.to_csv(f"output/sandhi/letters3", sep="\t", header=None)
+
+	letters4_df = pd.DataFrame(letters4)
+	letters4_counts = letters4_df.value_counts()
+	letters4_counts.to_csv(f"output/sandhi/letters4", sep="\t", header=None)
+
+	letters5_df = pd.DataFrame(letters5)
+	letters5_counts = letters5_df.value_counts()
+	letters5_counts.to_csv(f"output/sandhi/letters5", sep="\t", header=None)
+
+	letters6_df = pd.DataFrame(letters6)
+	letters6_counts = letters6_df.value_counts()
+	letters6_counts.to_csv(f"output/sandhi/letters6", sep="\t", header=None)
+
+	letters7_df = pd.DataFrame(letters7)
+	letters7_counts = letters7_df.value_counts()
+	letters7_counts.to_csv(f"output/sandhi/letters7", sep="\t", header=None)
+
+	letters8_df = pd.DataFrame(letters8)
+	letters8_counts = letters8_df.value_counts()
+	letters8_counts.to_csv(f"output/sandhi/letters8", sep="\t", header=None)
+
+	letters9_df = pd.DataFrame(letters9)
+	letters9_counts = letters9_df.value_counts()
+	letters9_counts.to_csv(f"output/sandhi/letters9", sep="\t", header=None)
+
+	letters10plus_df = pd.DataFrame(letters10plus)
+	letters10plus_counts = letters10plus_df.value_counts()
+	letters10plus_counts.to_csv(f"output/sandhi/letters10+", sep="\t", header=None)
 
 	print(f"{white}ok")
 
@@ -1433,6 +1623,10 @@ def sanity_test():
 
 
 make_text_set()
+make_spelling_mistakes_set()
+make_abbreviations_set()
+make_manual_corrections_set()
+make_shortlist_set()
 import_text_set()
 generate_inflected_forms_for_sandhi()
 import_all_inflections_set()
@@ -1449,4 +1643,5 @@ make_sandhi_dict()
 make_golden_dict()
 unzip_and_copy()
 value_counts()
+word_counts()
 sanity_test()
