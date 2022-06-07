@@ -282,11 +282,11 @@ def two_word_sandhi():
 
 			# blah blah
 
-			if wordA in all_inflections_set:
-				if wordB in all_inflections_set:
-					f1.write(f"\t{wordA}\t{wordB}\t-\t-\tmatch\n")
-					f2.write(f"{word}\t{wordA}-{wordB}\ttwo-word\t0\n")
-					matches2.append(word)
+			if wordA in all_inflections_set and \
+			wordB in all_inflections_set:
+				f1.write(f"\t{wordA}\t{wordB}\t-\t-\tmatch\n")
+				f2.write(f"{word}\t{wordA}-{wordB}\ttwo-word\t0\n")
+				matches2.append(word)
 			
 			# bla* *lah
 			
@@ -296,16 +296,16 @@ def two_word_sandhi():
 				ch1 = rules[rule].get("ch1")
 				ch2 = rules[rule].get("ch2")
 				
-				if wordA_lastletter == chA:
-					if wordB_firstletter == chB:
-						word1 = wordA[:-1] + ch1
-						word2 = ch2 + wordB[1:]
+				if wordA_lastletter == chA and \
+				wordB_firstletter == chB:
+					word1 = wordA[:-1] + ch1
+					word2 = ch2 + wordB[1:]
 
-						if word1 in all_inflections_set:
-							if word2 in all_inflections_set:
-								matches2.append(word)
-								f1.write(f"\t{word1}\t{word2}\t{rule+2}\t-\tmatch\n")
-								f2.write(f"{word}\t{word1}-{word2}\ttwo-word\t{rule+2}\n")
+					if word1 in all_inflections_set and \
+					word2 in all_inflections_set:
+						matches2.append(word)
+						f1.write(f"\t{word1}\t{word2}\t{rule+2}\t-\tmatch\n")
+						f2.write(f"{word}\t{word1}-{word2}\ttwo-word\t{rule+2}\n")
 						
 		counter += 1
 
@@ -382,17 +382,17 @@ def three_word_sandhi():
 						ch1 = rules[rule].get("ch1")
 						ch2 = rules[rule].get("ch2")
 
-						if wordB_lastletter == chA:
-							if wordC_firstletter == chB:
-								word2 = wordB[:-1] + ch1
-								word3 = ch2 + wordC[1:]
+						if wordB_lastletter == chA and \
+						wordC_firstletter == chB:
+							word2 = wordB[:-1] + ch1
+							word3 = ch2 + wordC[1:]
 
-								if wordA in all_inflections_set:
-									if word2 in all_inflections_set:
-										if word3 in all_inflections_set:
-											matches3.append(word)
-											f1.write(f"\t{wordA}\t{word2}\t{word3}\t-\t{rule+2}\tmatch\n")
-											f2.write(f"{word}\t{wordA}-{word2}-{word3}\tthree-word\t0,{rule+2}\n")
+							if wordA in all_inflections_set and \
+							word2 in all_inflections_seta and \
+							word3 in all_inflections_set:
+								matches3.append(word)
+								f1.write(f"\t{wordA}\t{word2}\t{word3}\t-\t{rule+2}\tmatch\n")
+								f2.write(f"{word}\t{wordA}-{word2}-{word3}\tthree-word\t0,{rule+2}\n")
 				
 				# bla* *lah blah
 
@@ -404,17 +404,17 @@ def three_word_sandhi():
 						ch1 = rules[rule].get("ch1")
 						ch2 = rules[rule].get("ch2")
 
-						if wordA_lastletter == chA:
-							if wordB_firstletter == chB:
-								word1 = wordA[:-1] + ch1
-								word2 = ch2 + wordB[1:]
+						if wordA_lastletter == chA and \
+						wordB_firstletter == chB:
+							word1 = wordA[:-1] + ch1
+							word2 = ch2 + wordB[1:]
 
-								if word1 in all_inflections_set:
-									if word2 in all_inflections_set:
-										if wordC in all_inflections_set:
-											matches3.append(word)
-											f1.write(f"\t{word1}\t{word2}\t{wordC}\t{rule+2}\t-\tmatch\n")
-											f2.write(f"{word}\t{word1}-{word2}-{wordC}\tthree-word\t{rule+2},0\n")
+							if word1 in all_inflections_set and \
+							word2 in all_inflections_set and \
+							wordC in all_inflections_set:
+								matches3.append(word)
+								f1.write(f"\t{word1}\t{word2}\t{wordC}\t{rule+2}\t-\tmatch\n")
+								f2.write(f"{word}\t{word1}-{word2}-{wordC}\tthree-word\t{rule+2},0\n")
 
 				# bla* *la* *lah
 				
@@ -424,28 +424,28 @@ def three_word_sandhi():
 					ch1x = rules[rulex].get("ch1")
 					ch2x = rules[rulex].get("ch2")
 
-					if wordA_lastletter == chAx:
-						if wordB_firstletter == chBx:
-							word1 = wordA[:-1] + ch1x
-							word2 = ch2x + wordB[1:]
-						
-							for ruley in rules:
-								chAy = rules[ruley].get("chA")
-								chBy = rules[ruley].get("chB")
-								ch1y = rules[ruley].get("ch1")
-								ch2y = rules[ruley].get("ch2")
+					if wordA_lastletter == chAx and \
+					wordB_firstletter == chBx:
+						word1 = wordA[:-1] + ch1x
+						word2 = ch2x + wordB[1:]
+					
+						for ruley in rules:
+							chAy = rules[ruley].get("chA")
+							chBy = rules[ruley].get("chB")
+							ch1y = rules[ruley].get("ch1")
+							ch2y = rules[ruley].get("ch2")
 
-								if wordB_lastletter == chAy:
-									if wordC_firstletter == chBy:
-										word2 = (ch2x + wordB[1:])[:-1] + ch1y
-										word3 = ch2y + wordC[1:]
+							if wordB_lastletter == chAy and \
+							wordC_firstletter == chBy:
+								word2 = (ch2x + wordB[1:])[:-1] + ch1y
+								word3 = ch2y + wordC[1:]
 
-										if word1 in all_inflections_set:
-											if word2 in all_inflections_set:
-												if word3 in all_inflections_set:
-													matches3.append(word)
-													f1.write(f"\t{word1}\t{word2}\t{word3}\t{rulex+2}\t{ruley+2}\tmatch\n")
-													f2.write(f"{word}\t{word1}-{word2}-{word3}\tthree-word\t{rulex+2},{ruley+2}\n")
+								if word1 in all_inflections_seta and \
+								word2 in all_inflections_set and \
+								word3 in all_inflections_set:
+									matches3.append(word)
+									f1.write(f"\t{word1}\t{word2}\t{word3}\t{rulex+2}\t{ruley+2}\tmatch\n")
+									f2.write(f"{word}\t{word1}-{word2}-{word3}\tthree-word\t{rulex+2},{ruley+2}\n")
 												
 		counter += 1
 
@@ -509,80 +509,80 @@ def four_word_sandhi():
 
 					# blah blah blah blah
 
-					if wordA in all_inflections_set:
-						if wordB in all_inflections_set:
-							if wordC in all_inflections_set:
-								if wordD in all_inflections_set:
-									matches4.append(word)
-									f1.write(f"\t{wordA}\t{wordB}\t{wordC}\t{wordD}\t-\t-\t-\tmatch\n")
-									f2.write(f"{word}\t{wordA}-{wordB}-{wordC}-{wordD}\tfour-word\t0,0,0\n")
+					if wordA in all_inflections_set and \
+					wordB in all_inflections_set and \
+					wordC in all_inflections_set and \
+					wordD in all_inflections_set:
+						matches4.append(word)
+						f1.write(f"\t{wordA}\t{wordB}\t{wordC}\t{wordD}\t-\t-\t-\tmatch\n")
+						f2.write(f"{word}\t{wordA}-{wordB}-{wordC}-{wordD}\tfour-word\t0,0,0\n")
 
 					# blah blah bla* *lah
 
-					if wordA in all_inflections_set:
-						if wordB in all_inflections_set:
+					if wordA in all_inflections_set and \
+					wordB in all_inflections_set:
 							
-							for rule in rules:
-								chA = rules[rule].get("chA")
-								chB = rules[rule].get("chB")
-								ch1 = rules[rule].get("ch1")
-								ch2 = rules[rule].get("ch2")
+						for rule in rules:
+							chA = rules[rule].get("chA")
+							chB = rules[rule].get("chB")
+							ch1 = rules[rule].get("ch1")
+							ch2 = rules[rule].get("ch2")
 
-								if wordC_lastletter == chA:
-									if wordD_firstletter == chB:
-										word3 = wordC[:-1] + ch1
-										word4 = ch2 + wordD[1:]
+							if wordC_lastletter == chA and \
+							wordD_firstletter == chB:
+								word3 = wordC[:-1] + ch1
+								word4 = ch2 + wordD[1:]
 
-										if word3 in all_inflections_set:
-											if word4 in all_inflections_set:
-												matches4.append(word)
-												f1.write(f"\t{wordA}\t{wordB}\t{word3}\t{word4}\t-\t-\t{rule+2}\tmatch\n")
-												f2.write(f"{word}\t{wordA}-{wordB}-{word3}-{word4}\tfour-word\t0,0,{rule+2}\n")
+								if word3 in all_inflections_set and \
+								word4 in all_inflections_set:
+									matches4.append(word)
+									f1.write(f"\t{wordA}\t{wordB}\t{word3}\t{word4}\t-\t-\t{rule+2}\tmatch\n")
+									f2.write(f"{word}\t{wordA}-{wordB}-{word3}-{word4}\tfour-word\t0,0,{rule+2}\n")
 
 					# bla* *lah blah blah
 
-					if wordC in all_inflections_set:
-						if wordD in all_inflections_set:
+					if wordC in all_inflections_set and \
+					wordD in all_inflections_set:
 
-							for rule in rules:
-								chA = rules[rule].get("chA")
-								chB = rules[rule].get("chB")
-								ch1 = rules[rule].get("ch1")
-								ch2 = rules[rule].get("ch2")
+						for rule in rules:
+							chA = rules[rule].get("chA")
+							chB = rules[rule].get("chB")
+							ch1 = rules[rule].get("ch1")
+							ch2 = rules[rule].get("ch2")
 
-								if wordA_lastletter == chA:
-									if wordB_firstletter == chB:
-										word1 = wordA[:-1] + ch1
-										word2 = ch2 + wordB[1:]
+							if wordA_lastletter == chA and \
+							wordB_firstletter == chB:
+								word1 = wordA[:-1] + ch1
+								word2 = ch2 + wordB[1:]
 
-										if word1 in all_inflections_set:
-											if word2 in all_inflections_set:
-												matches4.append(word)
-												f1.write(f"\t{word1}\t{word2}\t{wordC}\t{wordD}\t{rule+2}-\t-\t\tmatch\n")
-												f2.write(f"{word}\t{word1}-{word2}-{wordC}-{wordD}\tfour-word\t{rule+2},0,0\n")
+								if word1 in all_inflections_set and \
+								word2 in all_inflections_set:
+									matches4.append(word)
+									f1.write(f"\t{word1}\t{word2}\t{wordC}\t{wordD}\t{rule+2}-\t-\t\tmatch\n")
+									f2.write(f"{word}\t{word1}-{word2}-{wordC}-{wordD}\tfour-word\t{rule+2},0,0\n")
 
 					# blah bla* *lah blah
 
-					if wordA in all_inflections_set:
-						if wordD in all_inflections_set:
+					if wordA in all_inflections_set and \
+					wordD in all_inflections_set:
 
-							for rule in rules:
-								chA = rules[rule].get("chA")
-								chB = rules[rule].get("chB")
-								ch1 = rules[rule].get("ch1")
-								ch2 = rules[rule].get("ch2")
+						for rule in rules:
+							chA = rules[rule].get("chA")
+							chB = rules[rule].get("chB")
+							ch1 = rules[rule].get("ch1")
+							ch2 = rules[rule].get("ch2")
 
-								if wordB_lastletter == chA:
-									if wordC_firstletter == chB:
-										word2 = wordB[:-1] + ch1
-										word3 = ch2 + wordC[1:]
+							if wordB_lastletter == chA and \
+							wordC_firstletter == chB:
+								word2 = wordB[:-1] + ch1
+								word3 = ch2 + wordC[1:]
 
-										if word2 in all_inflections_set:
-											if word3 in all_inflections_set:
-												matches4.append(word)
-												f1.write(f"\t{wordA}\t{word2}\t{word3}\t{wordD}\t-\t{rule+2}\t-\tmatch\n")
-												f2.write(f"{word}\t{wordA}-{word2}-{word3}-{wordD}\tfour-word\t0,{rule+2},0\n")
-								
+								if word2 in all_inflections_set and \
+								word3 in all_inflections_set:
+									matches4.append(word)
+									f1.write(f"\t{wordA}\t{word2}\t{word3}\t{wordD}\t-\t{rule+2}\t-\tmatch\n")
+									f2.write(f"{word}\t{wordA}-{word2}-{word3}-{wordD}\tfour-word\t0,{rule+2},0\n")
+					
 					# blah bla* *la* *lah
 
 					if wordA in all_inflections_set:
@@ -593,28 +593,28 @@ def four_word_sandhi():
 							ch1x = rules[rulex].get("ch1")
 							ch2x = rules[rulex].get("ch2")
 
-							if wordB_lastletter == chAx:
-								if wordC_firstletter == chBx:
-									word2 = wordB[:-1] + ch1x
-									word3 = ch2x + wordC[1:]
+							if wordB_lastletter == chAx and \
+							wordC_firstletter == chBx:
+								word2 = wordB[:-1] + ch1x
+								word3 = ch2x + wordC[1:]
 
-									for ruley in rules:
-										chAy = rules[ruley].get("chA")
-										chBy = rules[ruley].get("chB")
-										ch1y = rules[ruley].get("ch1")
-										ch2y = rules[ruley].get("ch2")
+								for ruley in rules:
+									chAy = rules[ruley].get("chA")
+									chBy = rules[ruley].get("chB")
+									ch1y = rules[ruley].get("ch1")
+									ch2y = rules[ruley].get("ch2")
 
-										if wordC_lastletter == chAy:
-											if wordD_firstletter == chBy:
-												word3 = (ch2x + wordC[1:])[:-1] + ch1y
-												word4 = ch2y + wordD[1:]
+									if wordC_lastletter == chAy and \
+									wordD_firstletter == chBy:
+										word3 = (ch2x + wordC[1:])[:-1] + ch1y
+										word4 = ch2y + wordD[1:]
 
-												if word2 in all_inflections_set:
-													if word3 in all_inflections_set:
-														if word4 in all_inflections_set:
-															matches4.append(word)
-															f1.write(f"\t{wordA}\t{word2}\t{word3}\t{word4}\t-\t{rulex+2}\t{ruley+2}\tmatch\n")
-															f2.write(f"{word}\t{wordA}-{word2}-{word3}-{word4}\tfour-word\t0,{rulex+2},{ruley+2}\n")
+										if word2 in all_inflections_set and \
+										word3 in all_inflections_set and \
+										word4 in all_inflections_set:
+											matches4.append(word)
+											f1.write(f"\t{wordA}\t{word2}\t{word3}\t{word4}\t-\t{rulex+2}\t{ruley+2}\tmatch\n")
+											f2.write(f"{word}\t{wordA}-{word2}-{word3}-{word4}\tfour-word\t0,{rulex+2},{ruley+2}\n")
 
 					# bla* *la* *lah blah
 
@@ -626,28 +626,28 @@ def four_word_sandhi():
 							ch1x = rules[rulex].get("ch1")
 							ch2x = rules[rulex].get("ch2")
 
-							if wordA_lastletter == chAx:
-								if wordB_firstletter == chBx:
-									word1 = wordA[:-1] + ch1x
-									word2 = ch2x + wordB[1:]
+							if wordA_lastletter == chAx and \
+							wordB_firstletter == chBx:
+								word1 = wordA[:-1] + ch1x
+								word2 = ch2x + wordB[1:]
 
-									for ruley in rules:
-										chAy = rules[ruley].get("chA")
-										chBy = rules[ruley].get("chB")
-										ch1y = rules[ruley].get("ch1")
-										ch2y = rules[ruley].get("ch2")
+								for ruley in rules:
+									chAy = rules[ruley].get("chA")
+									chBy = rules[ruley].get("chB")
+									ch1y = rules[ruley].get("ch1")
+									ch2y = rules[ruley].get("ch2")
 
-										if wordB_lastletter == chAy:
-											if wordC_firstletter == chBy:
-												word2 = (ch2x + wordB[1:])[:-1] + ch1y
-												word3 = ch2y + wordC[1:]
+									if wordB_lastletter == chAy and \
+									wordC_firstletter == chBy:
+										word2 = (ch2x + wordB[1:])[:-1] + ch1y
+										word3 = ch2y + wordC[1:]
 
-												if word1 in all_inflections_set:
-													if word2 in all_inflections_set:
-														if word3 in all_inflections_set:
-															matches4.append(word)
-															f1.write(f"\t{word1}\t{word2}\t{word3}\t{wordD}\t{rulex+2}\t{ruley+2}\t-\tmatch\n")
-															f2.write(f"{word}\t{word1}-{word2}-{word3}-{wordD}\tfour-word\t{rulex+2},{ruley+2},0\n")
+										if word1 in all_inflections_set and \
+										word2 in all_inflections_set and \
+										word3 in all_inflections_set:
+											matches4.append(word)
+											f1.write(f"\t{word1}\t{word2}\t{word3}\t{wordD}\t{rulex+2}\t{ruley+2}\t-\tmatch\n")
+											f2.write(f"{word}\t{word1}-{word2}-{word3}-{wordD}\tfour-word\t{rulex+2},{ruley+2},0\n")
 
 					# bla* *lah bla* *lah
 
@@ -657,29 +657,29 @@ def four_word_sandhi():
 						ch1x = rules[rulex].get("ch1")
 						ch2x = rules[rulex].get("ch2")
 
-						if wordA_lastletter == chAx:
-							if wordB_firstletter == chBx:
-								word1 = wordA[:-1] + ch1x
-								word2 = ch2x + wordB[1:]
+						if wordA_lastletter == chAx and \
+						wordB_firstletter == chBx:
+							word1 = wordA[:-1] + ch1x
+							word2 = ch2x + wordB[1:]
 
-								for ruley in rules:
-									chAy = rules[ruley].get("chA")
-									chBy = rules[ruley].get("chB")
-									ch1y = rules[ruley].get("ch1")
-									ch2y = rules[ruley].get("ch2")
+							for ruley in rules:
+								chAy = rules[ruley].get("chA")
+								chBy = rules[ruley].get("chB")
+								ch1y = rules[ruley].get("ch1")
+								ch2y = rules[ruley].get("ch2")
 
-									if wordC_lastletter == chAy:
-										if wordD_firstletter == chBy:
-											word3 = wordC[:-1] + ch1y
-											word4 = ch2y + wordD[1:]
+								if wordC_lastletter == chAy and \
+								wordD_firstletter == chBy:
+									word3 = wordC[:-1] + ch1y
+									word4 = ch2y + wordD[1:]
 
-											if word1 in all_inflections_set:
-												if word2 in all_inflections_set:
-													if word3 in all_inflections_set:
-														if word4 in all_inflections_set:
-															matches4.append(word)
-															f1.write(f"\t{word1}\t{word2}\t{word3}\t{word4}\t{rulex+2}\t-\t{ruley+2}\tmatch\n")
-															f2.write(f"{word}\t{word1}-{word2}-{word3}-{word4}\tfour-word\t{rulex+2},0,{ruley+2}\n")
+									if word1 in all_inflections_set and \
+									word2 in all_inflections_set and \
+									word3 in all_inflections_set and \
+									word4 in all_inflections_set:
+										matches4.append(word)
+										f1.write(f"\t{word1}\t{word2}\t{word3}\t{word4}\t{rulex+2}\t-\t{ruley+2}\tmatch\n")
+										f2.write(f"{word}\t{word1}-{word2}-{word3}-{word4}\tfour-word\t{rulex+2},0,{ruley+2}\n")
 
 					# bla* *la* *la* *lah
 
@@ -689,40 +689,40 @@ def four_word_sandhi():
 						ch1x = rules[rulex].get("ch1")
 						ch2x = rules[rulex].get("ch2")
 
-						if wordA_lastletter == chAx:
-							if wordB_firstletter == chBx:
-								word1 = wordA[:-1] + ch1x
-								word2 = ch2x + wordB[1:]
+						if wordA_lastletter == chAx and \
+						wordB_firstletter == chBx:
+							word1 = wordA[:-1] + ch1x
+							word2 = ch2x + wordB[1:]
 
-								for ruley in rules:
-									chAy = rules[ruley].get("chA")
-									chBy = rules[ruley].get("chB")
-									ch1y = rules[ruley].get("ch1")
-									ch2y = rules[ruley].get("ch2")
+							for ruley in rules:
+								chAy = rules[ruley].get("chA")
+								chBy = rules[ruley].get("chB")
+								ch1y = rules[ruley].get("ch1")
+								ch2y = rules[ruley].get("ch2")
 
-									if wordB_lastletter == chAy:
-										if wordC_firstletter == chBy:
-											word2 = (ch2x + wordB[1:])[:-1] + ch1y
-											word3 = ch2y + wordC[1:]
+								if wordB_lastletter == chAy and \
+								wordC_firstletter == chBy:
+									word2 = (ch2x + wordB[1:])[:-1] + ch1y
+									word3 = ch2y + wordC[1:]
 
-											for rulez in rules:
-												chAz = rules[rulez].get("chA")
-												chBz = rules[rulez].get("chB")
-												ch1z = rules[rulez].get("ch1")
-												ch2z = rules[rulez].get("ch2")
+									for rulez in rules:
+										chAz = rules[rulez].get("chA")
+										chBz = rules[rulez].get("chB")
+										ch1z = rules[rulez].get("ch1")
+										ch2z = rules[rulez].get("ch2")
 
-												if wordC_lastletter == chAz:
-													if wordD_firstletter == chBz:
-														word3 =(ch2y + wordC[1:])[:-1] + ch1z
-														word4 = ch2z + wordD[1:]
+										if wordC_lastletter == chAz and \
+										wordD_firstletter == chBz:
+												word3 =(ch2y + wordC[1:])[:-1] + ch1z
+												word4 = ch2z + wordD[1:]
 
-														if word1 in all_inflections_set:
-															if word2 in all_inflections_set:
-																if word3 in all_inflections_set:
-																	if word4 in all_inflections_set:
-																		matches4.append(word)
-																		f1.write(f"\t{word1}\t{word2}\t{word3}\t{word4}\t{rulex+2}\t{ruley+2}\t{rulez+2}\tmatch\n")
-																		f2.write(f"{word}\t{word1}-{word2}-{word3}-{word4}\tfour-word\t{rulex+2},{ruley+2},{rulez+2}\n")
+												if word1 in all_inflections_set and \
+												word2 in all_inflections_set and \
+												word3 in all_inflections_set and \
+												word4 in all_inflections_set:
+													matches4.append(word)
+													f1.write(f"\t{word1}\t{word2}\t{word3}\t{word4}\t{rulex+2}\t{ruley+2}\t{rulez+2}\tmatch\n")
+													f2.write(f"{word}\t{word1}-{word2}-{word3}-{word4}\tfour-word\t{rulex+2},{ruley+2},{rulez+2}\n")
 
 		counter += 1
 
@@ -827,24 +827,24 @@ def split_from_front_and_back(word_initial, word_front, word, word_back, comment
 						wordA_lastletter = wordA
 					wordB_firstletter = wordB[0]
 
-					if wordA_lastletter == chA:
-						if wordB_firstletter == chB:
-							word1 = wordA[:-1] + ch1
-							word2 = ch2 + wordB[1:]
-							f1.write(f"\tapicaeveiti\t{word1}\t{word2}\n")
+					if wordA_lastletter == chA and \
+					wordB_firstletter == chB:
+						word1 = wordA[:-1] + ch1
+						word2 = ch2 + wordB[1:]
+						f1.write(f"\tapicaeveiti\t{word1}\t{word2}\n")
 
-							if \
-							word2 == "api" or \
-							word2 == "eva" or \
-							word2 == "iti":
-								word_to_recurse = word1
-								word_back_to_recurse = f"-{word2}{word_back_original}"
-								f1.write(f"\tapicaeveiti fin:\t{word_front}\t{word_to_recurse}\t{word_back}\n")
-								if printme:
-									print(f"{timeis()} apieveiti fin: {green}{word_front}{blue}{word_to_recurse}{yellow}{word_back_to_recurse}\n")
-								comment = "api ca eva iti"
-								rules_back_to_recurse = [rule+2] + rules_back
-								split_from_front_and_back(word_initial, word_front, word_to_recurse, word_back_to_recurse, comment, rules_front, rules_back_to_recurse)
+						if \
+						word2 == "api" or \
+						word2 == "eva" or \
+						word2 == "iti":
+							word_to_recurse = word1
+							word_back_to_recurse = f"-{word2}{word_back_original}"
+							f1.write(f"\tapicaeveiti fin:\t{word_front}\t{word_to_recurse}\t{word_back}\n")
+							if printme:
+								print(f"{timeis()} apieveiti fin: {green}{word_front}{blue}{word_to_recurse}{yellow}{word_back_to_recurse}\n")
+							comment = "api ca eva iti"
+							rules_back_to_recurse = [rule+2] + rules_back
+							split_from_front_and_back(word_initial, word_front, word_to_recurse, word_back_to_recurse, comment, rules_front, rules_back_to_recurse)
 
 			else:
 
@@ -865,23 +865,24 @@ def split_from_front_and_back(word_initial, word_front, word, word_back, comment
 						if printme:
 							print(f"{timeis()} fuzzysearchA\t{fuzzy_searchA}")
 
-						if fuzzy_searchA != []:
-							if len(wordA) > 0:
-								if lwff_fuzzy_list == []:
-									lwff_fuzzy_list = [wordA]
-								else:
-									lwff_fuzzy_list = [wordA] + lwff_fuzzy_list
+						if fuzzy_searchA != [] and \
+						len(wordA) > 0 and \
+						lwff_fuzzy_list == []:
+							lwff_fuzzy_list = [wordA]
+						else:
+							lwff_fuzzy_list = [wordA] + lwff_fuzzy_list
 
 						fuzzy_searchB = re.findall(f",.{wordB[1:]},", all_inflections_string)
 						if printme:
 							print(f"{timeis()} fuzzysearchB\t{fuzzy_searchB}")
 
-						if fuzzy_searchB != []:
-							if len(wordB) > 0:
-								if lwfb_fuzzy_list  == []:
-									lwfb_fuzzy_list = [wordB]
-								else:
-									lwfb_fuzzy_list = [wordB] + lwfb_fuzzy_list
+						if \
+						fuzzy_searchB != [] and \
+						len(wordB) > 0 and \
+						lwfb_fuzzy_list  == []:
+							lwfb_fuzzy_list = [wordB]
+						else:
+							lwfb_fuzzy_list = [wordB] + lwfb_fuzzy_list
 
 
 					lwff_fuzzy_list = sorted(set(lwff_fuzzy_list), key=len, reverse=True)
@@ -904,8 +905,9 @@ def split_from_front_and_back(word_initial, word_front, word, word_back, comment
 
 				for lwff_fuzzy in lwff_fuzzy_list:
 
-					if (len(lwff_fuzzy) > 2 and \
-                    lwff_fuzzy == lwff_fuzzy_list[0]) or \
+					if \
+					(len(lwff_fuzzy) > 2 and \
+					lwff_fuzzy == lwff_fuzzy_list[0]) or \
 					lwff_fuzzy in shortlist_set:
 					
 						f1.write(f"\n\tlwff_fuzzy\t{lwff_fuzzy}\n")
@@ -939,31 +941,32 @@ def split_from_front_and_back(word_initial, word_front, word, word_back, comment
 							ch1 = rules[rule].get("ch1")
 							ch2 = rules[rule].get("ch2")
 							
-							if wordA_lastletter == chA:
-								if wordB_firstletter == chB:
-									word1 = wordA_fuzzy[:-1] + ch1
-									word2 = ch2 + wordB_fuzzy[1:]
+							if \
+							wordA_lastletter == chA and \
+							wordB_firstletter == chB:
+								word1 = wordA_fuzzy[:-1] + ch1
+								word2 = ch2 + wordB_fuzzy[1:]
 
-									f1.write(f"\tfuzzy words front:\t{word1}-{word2}\n")
+								f1.write(f"\tfuzzy words front:\t{word1}-{word2}\n")
+								if printme:  
+									print(f"{timeis()} fuzzy words front: {green}{word1}-{blue}{word2}")
+
+								if word1 in all_inflections_set:
+									test = re.findall(f",{word2[:3]}", all_inflections_string)
+									f1.write(f"\ttestword2\t{test[:5]}\n")
 									if printme:  
-										print(f"{timeis()} fuzzy words front: {green}{word1}-{blue}{word2}")
+										print(f"{timeis()} testword2\t{test[:5]}")
 
-									if word1 in all_inflections_set:
-										test = re.findall(f",{word2[:3]}", all_inflections_string)
-										f1.write(f"\ttestword2\t{test[:5]}\n")
-										if printme:  
-											print(f"{timeis()} testword2\t{test[:5]}")
-
-										if test != []:
-											word_to_recurse = word2
-											word_front_to_recurse = f"{word_front_original}{word1}-"
-											f1.write(f"\tfuzzy fin:\t{word_front}\t{word_to_recurse}\t{word_back}\n")
-											if printme:
-												print(f"{timeis()} fuzzy: {green}{word_front}{blue}{word_to_recurse}\t{word_back}\n")
-											comment = "front fuzzy"
-											rules_front_to_recurse = rules_front + [rule+2]
-											split_from_front_and_back(word_initial, word_front_to_recurse, word_to_recurse, word_back, comment, rules_front_to_recurse, rules_back)
-				
+									if test != []:
+										word_to_recurse = word2
+										word_front_to_recurse = f"{word_front_original}{word1}-"
+										f1.write(f"\tfuzzy fin:\t{word_front}\t{word_to_recurse}\t{word_back}\n")
+										if printme:
+											print(f"{timeis()} fuzzy: {green}{word_front}{blue}{word_to_recurse}\t{word_back}\n")
+										comment = "front fuzzy"
+										rules_front_to_recurse = rules_front + [rule+2]
+										split_from_front_and_back(word_initial, word_front_to_recurse, word_to_recurse, word_back, comment, rules_front_to_recurse, rules_back)
+			
 				# split fuzzy back, run rules and recurse
 
 				for lwfb_fuzzy in lwfb_fuzzy_list:
@@ -996,32 +999,32 @@ def split_from_front_and_back(word_initial, word_front, word, word_back, comment
 							ch1 = rules[rule].get("ch1")
 							ch2 = rules[rule].get("ch2")
 
-							if wordA_lastletter == chA:
-								if wordB_firstletter == chB:
-									word1 = wordA_fuzzy[:-1] + ch1
-									word2 = ch2 + wordB_fuzzy[1:]
+							if wordA_lastletter == chA and \
+							wordB_firstletter == chB:
+								word1 = wordA_fuzzy[:-1] + ch1
+								word2 = ch2 + wordB_fuzzy[1:]
 
-									f1.write(f"\tfuzzy words back:\t{word1}-{word2}\n")
+								f1.write(f"\tfuzzy words back:\t{word1}-{word2}\n")
+								if printme:
+									print(f"{timeis()} fuzzy words back: {green}{word1}-{blue}{word2}")
+
+								if word2 in all_inflections_set:
+									test = re.findall(f"{word1[-3:]}.,", all_inflections_string)
+									f1.write(f"\ttestword1\t{test[:5]}\n")
 									if printme:
-										print(f"{timeis()} fuzzy words back: {green}{word1}-{blue}{word2}")
+										print(f"{timeis()} testword1\t{test[:5]}")
 
-									if word2 in all_inflections_set:
-										test = re.findall(f"{word1[-3:]}.,", all_inflections_string)
-										f1.write(f"\ttestword1\t{test[:5]}\n")
+									if test != []:
+										word_to_recurse = word1
+										word_back_to_recurse = f"-{word2}{word_back_original}"
+										f1.write(
+											f"\tfuzzy back fin:\t{word_front_original}\t{word_to_recurse}\t{word_back_to_recurse}\n")
 										if printme:
-											print(f"{timeis()} testword1\t{test[:5]}")
-
-										if test != []:
-											word_to_recurse = word1
-											word_back_to_recurse = f"-{word2}{word_back_original}"
-											f1.write(
-												f"\tfuzzy back fin:\t{word_front_original}\t{word_to_recurse}\t{word_back_to_recurse}\n")
-											if printme:
-												print(
-													f"{timeis()} fuzzy back: {green}{word_front_original}{blue}{word_to_recurse}\t{word_back_to_recurse}\n")
-											comment = "back fuzzy"
-											rules_back_to_recurse =  [rule+2] + rules_back
-											split_from_front_and_back(word_initial, word_front_original, word_to_recurse, word_back_to_recurse, comment, rules_front, rules_back_to_recurse)
+											print(
+												f"{timeis()} fuzzy back: {green}{word_front_original}{blue}{word_to_recurse}\t{word_back_to_recurse}\n")
+										comment = "back fuzzy"
+										rules_back_to_recurse =  [rule+2] + rules_back
+										split_from_front_and_back(word_initial, word_front_original, word_to_recurse, word_back_to_recurse, comment, rules_front, rules_back_to_recurse)
 
 				# find longest clean word from the front
 
@@ -1036,21 +1039,21 @@ def split_from_front_and_back(word_initial, word_front, word, word_back, comment
 
 						clean_searchA = wordA in all_inflections_set
 
-						if clean_searchA != False:
-							if len(wordA) > 0:
-								if lwff_clean_list == []:
-									lwff_clean_list = [wordA]
-								else:
-									lwff_clean_list = [wordA] + lwff_clean_list
+						if clean_searchA != False and \
+						len(wordA) > 0 and \
+						lwff_clean_list == []:
+							lwff_clean_list = [wordA]
+						else:
+							lwff_clean_list = [wordA] + lwff_clean_list
 						
 						clean_searchB = wordB in all_inflections_set
 
-						if clean_searchB != False:
-							if len(wordB) > 0:
-								if lwfb_clean_list == []:
-									lwfb_clean_list = [wordB]
-								else:
-									lwfb_clean_list = [wordB] + lwfb_clean_list
+						if clean_searchB != False and \
+						len(wordB) > 0 and \
+						lwfb_clean_list == []:
+							lwfb_clean_list = [wordB]
+						else:
+							lwfb_clean_list = [wordB] + lwfb_clean_list
 
 					lwff_clean_list = sorted(set(lwff_clean_list), key=len, reverse=True)
 					lwfb_clean_list = sorted(set(lwfb_clean_list), key=len, reverse=True)
