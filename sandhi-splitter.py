@@ -10,16 +10,14 @@ import json
 import pickle
 import re
 
-from modules import *
+from modules import clean_machine
 from timeis import timeis, blue, green, yellow, line, white, red
-from typing import List
 from pathlib import Path
 from difflib import SequenceMatcher
 from simsapa.app.stardict import export_words_as_stardict_zip, ifo_from_opts, DictEntry
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 
-print(f"{timeis()} {line}")
 print(f"{timeis()} {yellow}sandhi splitter")
 print(f"{timeis()} {line}")
 
@@ -28,7 +26,7 @@ vowels = ["a", "ā", "i", "ī", "u", "ū", "o", "e"]
 
 def make_text_set():
 
-	print(f"{timeis()} {green}making text set")
+	print(f"{timeis()} {green}making text set", end = " ")
 	
 	text_list = ["s0202m.mul.xml.txt", "s0202a.att.xml.txt"]
 	# !!! change zip_path !!!
@@ -47,6 +45,8 @@ def make_text_set():
 
 	with open(f"output/set text", "wb") as p:
 		pickle.dump(text_set, p)
+	
+	print(f"{white} {len(text_set)}")
 
 
 def make_spelling_mistakes_set():
@@ -60,14 +60,18 @@ def make_spelling_mistakes_set():
 	print(f"{white}{len(spelling_mistakes_set)}")
 
 
-def make_abbreviations_set():
+def make_abbreviations_and_neg_set():
 	
 	print(f"{timeis()} {green}making abbreviations set", end=" ")
 		
 	global dpd_df
 	global dpd_df_length
+
 	global abbreviations_set
 	abbreviations_set = []
+	
+	global neg_headwords_set
+	neg_headwords_set = []
 
 	dpd_df = pd.read_csv("../csvs/dpd-full.csv", sep="\t", dtype=str)
 	dpd_df.fillna("", inplace=True)
@@ -77,13 +81,19 @@ def make_abbreviations_set():
 		headword = dpd_df.loc[row, "Pāli1"]
 		headword_clean = re.sub(r" \d*$", "", headword)
 		pos = dpd_df.loc[row, "POS"]
+		neg = dpd_df.loc[row, "Neg"]
 
 		if pos == "abbrev":
 			abbreviations_set.append(headword_clean)
 
+		if neg == "neg":
+			neg_headwords_set.append(headword)
+
 	abbreviations_set = set(abbreviations_set)
 	
 	print(f"{white}{len(abbreviations_set)}")
+	print(f"{timeis()} {green}making neg headwords set", end=" ")
+	print(f"{white}{len(neg_headwords_set)}")
 
 
 def make_manual_corrections_set():
@@ -135,97 +145,42 @@ def import_text_set():
 	print(f"{white}{len(text_set)}")
 	
 
-def generate_inflected_forms_for_sandhi():
+def make_all_inflections_set():
 
+	print(f"{timeis()} {green}making all inflections set", end=" ")
+
+	global all_inflections_dict
 	global all_inflections_set
+	all_inflections_set = set()
 	
-	all_inflections_set = []
+	global neg_inflections_set
+	neg_inflections_set = set()
+	
 	exceptions_list = ["abbrev", "cs", "idiom", "letter", "prefix", "root", "sandhi", "suffix", "ve"]
 
+	with open("output/all inflections dict", "rb") as f:
+		all_inflections_dict = pickle.load(f)
+
+	for headword in all_inflections_dict:
+		if all_inflections_dict[headword]["pos"] not in exceptions_list:
+			inflections_set = all_inflections_dict[headword]["inflections"]
+			for inflection in inflections_set:
+				all_inflections_set.add(inflection)
+				if headword in neg_headwords_set:
+					neg_inflections_set.add(inflection)
 	
-	yn = input(f"{timeis()} {green}generate all inflected forms? (y/n){white} ")
-
-	if yn == "y":
-
-		inflections_string = ""
-
-		for row in range(dpd_df_length):  # dpd_df_length
-			headword = dpd_df.loc[row, "Pāli1"]
-			headword_clean = re.sub(r" \d*$", "", headword)
-			pos = dpd_df.loc[row, "POS"]
-			stem = dpd_df.loc[row, "Stem"]
-			if re.match("!.+", stem) != None:
-				stem = "!"
-			if stem == "*":
-				stem = ""
-			pattern = dpd_df.loc[row, "Pattern"]
-			pos = dpd_df.loc[row, "POS"]
-
-			if row % 5000 == 0:
-				print(f"{timeis()} {row}/{len(dpd_df)}\t{headword}")
-
-			if pos not in exceptions_list:
-
-				if stem == "-":
-					inflections_string += headword_clean + " "
-				
-				elif stem == "!":
-					inflections_string += headword_clean + " "
-
-				else:
-					
-					try:
-						df = pd.read_csv(f"output/patterns/{pattern}.csv", sep="\t", header=None)
-						df.fillna("", inplace=True)
-						df_rows = df.shape[0]
-						df_columns = df.shape[1]
-
-						for rows in range(1, df_rows):
-							for columns in range(1, df_columns, 2):
-								line = df.iloc[rows, columns]
-								line = re.sub(r"(.+)", f"{stem}\\1", line)
-								search_string = re.compile("\n", re.M)
-								matches = re.sub(search_string, " ", line)
-								inflections_string += matches + " "
-
-					except:
-						print(f"{timeis()} {red}error on: {headword}")
+	print(f"{white} {len(all_inflections_set)}")
+	print(f"{timeis()} {green}making neg inflections set {white} {len(neg_inflections_set)}")
 			
-		all_inflections_set = sorted(set(inflections_string.split()))
 
-		with open("output/set all inflections.csv", "w") as f:
-			for item in all_inflections_set:
-				f.write(f"{item}\n")
-		
-		with open("output/set all inflections", "wb") as p:
-			pickle.dump(all_inflections_set, p)
+def make_all_inflections_string():
 
-	else:
-		pass
+		print(f"{timeis()} {green}generating all inflections string", end=" ")
 
-
-def import_all_inflections_set():
-	
-	print(f"{timeis()} {green}importing all inflections set", end = " ")
-	
-	global all_inflections_set
-	with open(f"output/set all inflections", "rb") as p:
-		all_inflections_set = sorted(pickle.load(p))
-	
-
-	
-	print(f"{white}{len(all_inflections_set)}")
-
-
-def generate_all_inflections_string():
-
-	print(f"{timeis()} {green}generating all inflections string", end=" ")
-
-	global all_inflections_string
-	all_inflections_string = ""
-	all_inflections_string = ",".join(all_inflections_set) + ","
-	print(f"{white}ok")
-	# print(all_inflections_string[:500])
+		global all_inflections_string
+		all_inflections_string = ""
+		all_inflections_string = ",".join(all_inflections_set) + ","
+		print(f"{white}ok")
 
 
 def make_unmatched_set():
@@ -893,40 +848,6 @@ def split_from_front_and_back(word_initial, word_front, word, word_back, comment
 
 			else:
 
-				# # find negatives
-
-				# if len(tried) == 1:
-
-				# 	neg_list = ["a", "an", "na"]
-
-				# 	for neg in neg_list:
-					
-				# 		if re.findall(f"^{neg}", word):
-				# 			f1.write(f"\n\tneg in front:\t{neg}\n")
-				# 			if printme:
-				# 				print(f"{timeis()} neg in front: {neg}")
-
-				# 			word1 = neg
-				# 			word2 = word[len(neg):]
-				# 			f1.write(f"\tneg wordAB:\t{word1}\t{word2}\n")
-				# 			if printme:
-				# 				print(f"{timeis()} neg wordAB:\t{word1}-{word2}")
-							
-				# 			test = re.findall(f",{word2[:3]}", all_inflections_string)
-				# 			f1.write(f"\ttest word2: \t{test[:5]}\n")
-				# 			if printme:
-				# 				print(f"{timeis()} test word2: \t{test[:5]}")
-
-				# 			if test != []:
-				# 				word_front_to_recurse = f"{word1}-"
-				# 				word_to_recurse = word2
-				# 				f1.write(f"\tneg fin:\t{word_front_to_recurse}\t{word_to_recurse}\t{word_back}\n")
-				# 				if printme:
-				# 					print(f"{timeis()} neg fin: {green}{word_front_to_recurse}{blue}{word_to_recurse}{yellow}{word_back}\n")
-				# 				comment = f"neg {neg}"
-				# 				rules_front_to_recruse = rules_front + [-1]
-				# 				split_from_front_and_back(word_initial, word_front_to_recurse, word_to_recurse, word_back, comment, rules_front_to_recruse, rules_back)
-
 				# find longest fuzzy words from the front
 				
 				def find_longest_word_fuzzy(word):
@@ -978,15 +899,6 @@ def split_from_front_and_back(word_initial, word_front, word, word_back, comment
 
 				lwff_fuzzy_list = fuzzy_list[0]
 				lwfb_fuzzy_list = fuzzy_list[1]
-
-				# prune the lists - use first 2
-				
-				# if len(lwff_fuzzy_list) > 1:
-				# 	lwff_fuzzy_list = lwff_fuzzy_list[0:2]
-
-				# if len(lwfb_fuzzy_list) > 1:
-				# 	lwfb_fuzzy_list = lwfb_fuzzy_list[0:2]
-
 
 				# split fuzzy front, run rules and recurse
 
@@ -1155,14 +1067,6 @@ def split_from_front_and_back(word_initial, word_front, word, word_back, comment
 				lwff_clean_list = clean_list[0]
 				lwfb_clean_list = clean_list[1]
 
-				# prune lists - use first 3
-
-				# if len(lwff_clean_list) > 1:
-				# 	lwff_clean_list = lwff_clean_list[0:2]
-
-				# if len(lwfb_clean_list) > 1:
-				# 	lwfb_clean_list = lwfb_clean_list[0:2]
-
 				# split clean front, run rules and recurse
 
 				for lwff_clean in lwff_clean_list:
@@ -1276,7 +1180,7 @@ def x_word_sandhi_from_front_and_back():
 		rules_front = []
 		rules_back = []
 		
-		if counter % 100 == 0:
+		if counter % 10 == 0:
 			print(f"{timeis()} {counter}/{length} {word}")
 		
 		split_from_front_and_back(word_initial, word_front, word, word_back, comment, rules_front, rules_back)
@@ -1331,9 +1235,11 @@ def summary():
 		f.write(f"{len(text_set)}\t{len(unmatched_set)}\t{len(matches2)}\t{len(unmatched2)}\t{len(matches3)}\t{len(unmatched3)}\t{len(matches4)}\t{len(unmatched4)}\t{len(matchesx)}\t{len(unmatchedxfront)}\t{perc_sandhi}\t{perc_all}\n")
 
 
-def make_sandhi_dict():
+def make_matches_df():
 
-	print(f"{timeis()} {green}saving matches_df", end=" ")
+	global matches_df
+
+	print(f"{timeis()} {green}saving matches_df", end = " ")
 
 	matches_df = pd.read_csv("output/sandhi/matches.csv", dtype=str, sep="\t")
 	matches_df = matches_df.fillna("")
@@ -1356,43 +1262,90 @@ def make_sandhi_dict():
 	matches_df.sort_values(by=["splitcount", "ratio", "lettercount"], axis=0, ascending=[True, False, True], inplace=True, ignore_index=True)
 	matches_df.drop_duplicates(subset=['word', 'split'], keep='first', inplace=True, ignore_index=True)
 	matches_df.to_csv("output/sandhi/matches sorted.csv", sep="\t", index=None)
-	
-	sandhi_dict = {}
 
-	for row in range(len(matches_df)):
+	print(f"{white}ok")
+	
+def make_sandhi_dict():
+
+	print(f"{timeis()} {green}making sandhi dict")
+	sandhi_dict = {}
+	sandhi_dict_clean = {}
+
+	with open("sandhi/sandhi.css", "r") as f:
+		sandhi_css = f.read()
+
+	matches_df_length = len(matches_df)
+
+	for row in range(matches_df_length):  # matches_df_length
 		word = matches_df.loc[row, 'word']
-		split = matches_df.loc[row, 'split']
-		ratio = matches_df.loc[row, 'ratio']
-		rulez = matches_df.loc[row, 'rules']
+
+		if row % 1000 == 0:
+			print(f"{timeis()} {white}{row}/{matches_df_length} {word}")
 
 		if word not in sandhi_dict.keys():
-			sandhi_dict.update({word: [f"{split} ({rulez}) ({ratio:.4f})"]})
 
-		if word in sandhi_dict.keys() and \
-			len(sandhi_dict[word]) < 5 and \
-				f"{split} ({rulez}) ({ratio:.4f})" not in sandhi_dict[word]:
-			sandhi_dict[word].append(f"{split} ({rulez}) ({ratio:.4f})")
+			filter = matches_df['word'] == word
+			word_df = matches_df[filter]
+			word_df.reset_index(drop=True, inplace=True)
 
-	matches_df = pd.DataFrame(sandhi_dict.items())
-	matches_df.rename({0: "word", 1: "split"}, axis='columns', inplace=True)
-	matches_df.to_csv("output/sandhi/matches_df.csv", index=None, sep="\t")
+			length = len(word_df)
+			if len(word_df) > 5:
+				length = 5
+			
+			html_string = ""
+			html_string_clean = ""
+			html_string += sandhi_css
+			html_string += f"<body><div class='sandhi'><p class='sandhi'>"
+
+			for rowx in range(length):
+				word = word_df.loc[rowx, 'word']
+				split = word_df.loc[rowx, 'split']
+				split = re.sub("-", " + ", split)
+				split_words = split.split(" + ")
+				rulez = str(word_df.loc[rowx, 'rules'])
+				rulez = re.sub(" ", "", rulez)
+				ratio = word_df.loc[rowx, 'ratio']
+
+				# exclude negatives prefixed with a-
+				# include double negatives
+				
+				neg_count = 0
+				add = True
+
+				for split_word in split_words:
+					if split_word in neg_inflections_set:
+						neg_count +=1
+						if re.findall(f"(>| ){split_word[1:]}(<| )", html_string):
+							add = False
+						
+				if add == True or \
+				neg_count > 1:
+					html_string += f"{split} <span class='sandhi'> ({rulez}) ({ratio: .4f})</span>"
+					html_string_clean += split
+
+					if rowx != length-1:
+						html_string += f"<br>"
+						html_string_clean += f"<br>"
+					else:
+						html_string += f"</p></div></body>"
+
+			sandhi_dict.update({word: html_string})
+			sandhi_dict_clean.update({word: html_string_clean})
+
+	with open("output/sandhi dict", "wb") as pf:
+		pickle.dump(sandhi_dict_clean, pf)
+
+	sandhi_dict_df = pd.DataFrame(sandhi_dict.items())
+	sandhi_dict_df.rename({0: "word", 1: "split"}, axis='columns', inplace=True)
+	sandhi_dict_df.to_csv("output/sandhi/sandhi_dict_df.csv", index=None, sep="\t")
 	
-	print(f"{white}ok")
-
 
 def make_golden_dict():
 
 	print(f"{timeis()} {green}generating goldendict", end=" ")
 	
-	df = pd.read_csv("output/sandhi/matches_df.csv", sep="\t", dtype=str)
+	df = pd.read_csv("output/sandhi/sandhi_dict_df.csv", sep="\t", dtype=str)
 	df = df.fillna("")
-
-	df["split"] = df["split"].str.replace(r"\[|\]", "")
-	df["split"] = df["split"].str.replace("'", "")
-	df["split"] = df["split"].str.replace('"', "")
-	df["split"] = df["split"].str.replace(r"\), ", ")<br>")
-	df["split"] = df["split"].str.replace(", ", ",")
-
 	df.insert(2, "definition_plain", "")
 	df.insert(3, "synonyms", "")
 	df.rename({"word": "word", "split": "definition_html"}, axis='columns', inplace=True)
@@ -1447,7 +1400,7 @@ def value_counts():
 	for row in range(len(matches_df)):
 		rulez = matches_df.loc[row, 'rules']
 		rulez = re.sub("'", "", rulez)
-		rulez = re.sub("\[|\]", "", rulez)
+		rulez = re.sub(r"\[|\]", "", rulez)
 		rules_string = rules_string + rulez + ","
 
 	rules_df = pd.DataFrame(rules_string.split(","))
@@ -1506,131 +1459,94 @@ def word_counts():
 		if len(word) >= 10:
 			letters10plus.append(word)
 
+	masterlist = sorted(masterlist)
+
 	letters_df = pd.DataFrame(masterlist)
-	letters_counts = letters_df.value_counts()
+	letters_counts = letters_df.value_counts(sort=False)
 	letters_counts.to_csv(f"output/sandhi/letters", sep="\t", header=None)
+	letters_counts_sorted = letters_df.value_counts()
+	letters_counts_sorted.to_csv(f"output/sandhi/letters sorted", sep="\t", header=None)
 	
 	letters1_df = pd.DataFrame(letters1)
-	letters1_counts = letters1_df.value_counts()
+	letters1_counts = letters1_df.value_counts(sort=False)
 	letters1_counts.to_csv(f"output/sandhi/letters1", sep="\t", header=None)
+	letters1_counts_sorted = letters1_df.value_counts()
+	letters1_counts_sorted.to_csv(f"output/sandhi/letters1sorted", sep="\t", header=None)
 	
 	letters2_df = pd.DataFrame(letters2)
-	letters2_counts = letters2_df.value_counts()
+	letters2_counts = letters2_df.value_counts(sort=False)
 	letters2_counts.to_csv(f"output/sandhi/letters2", sep="\t", header = None)
+	letters2_counts_sorted = letters2_df.value_counts()
+	letters2_counts_sorted.to_csv(f"output/sandhi/letters2sorted", sep="\t", header = None)
 
 	letters3_df = pd.DataFrame(letters3)
-	letters3_counts = letters3_df.value_counts()
+	letters3_counts = letters3_df.value_counts(sort=False)
 	letters3_counts.to_csv(f"output/sandhi/letters3", sep="\t", header=None)
+	letters3_counts_sorted = letters3_df.value_counts()
+	letters3_counts_sorted.to_csv(f"output/sandhi/letters3sorted", sep="\t", header=None)
 
 	letters4_df = pd.DataFrame(letters4)
-	letters4_counts = letters4_df.value_counts()
+	letters4_counts = letters4_df.value_counts(sort=False)
 	letters4_counts.to_csv(f"output/sandhi/letters4", sep="\t", header=None)
+	letters4_counts_sorted = letters4_df.value_counts()
+	letters4_counts_sorted.to_csv(f"output/sandhi/letters4sorted", sep="\t", header=None)
 
 	letters5_df = pd.DataFrame(letters5)
-	letters5_counts = letters5_df.value_counts()
+	letters5_counts = letters5_df.value_counts(sort=False)
 	letters5_counts.to_csv(f"output/sandhi/letters5", sep="\t", header=None)
+	letters5_counts_sorted = letters5_df.value_counts()
+	letters5_counts_sorted.to_csv(f"output/sandhi/letters5sorted", sep="\t", header=None)
 
 	letters6_df = pd.DataFrame(letters6)
-	letters6_counts = letters6_df.value_counts()
+	letters6_counts = letters6_df.value_counts(sort=False)
 	letters6_counts.to_csv(f"output/sandhi/letters6", sep="\t", header=None)
+	letters6_counts_sorted = letters6_df.value_counts()
+	letters6_counts_sorted.to_csv(f"output/sandhi/letters6sorted", sep="\t", header=None)
 
 	letters7_df = pd.DataFrame(letters7)
-	letters7_counts = letters7_df.value_counts()
+	letters7_counts = letters7_df.value_counts(sort=False)
 	letters7_counts.to_csv(f"output/sandhi/letters7", sep="\t", header=None)
+	letters7_counts_sorted = letters7_df.value_counts()
+	letters7_counts_sorted.to_csv(f"output/sandhi/letters7sorted", sep="\t", header=None)
 
 	letters8_df = pd.DataFrame(letters8)
-	letters8_counts = letters8_df.value_counts()
+	letters8_counts = letters8_df.value_counts(sort=False)
 	letters8_counts.to_csv(f"output/sandhi/letters8", sep="\t", header=None)
+	letters8_counts_sorted = letters8_df.value_counts()
+	letters8_counts_sorted.to_csv(f"output/sandhi/letters8sorted", sep="\t", header=None)
 
 	letters9_df = pd.DataFrame(letters9)
-	letters9_counts = letters9_df.value_counts()
+	letters9_counts = letters9_df.value_counts(sort=False)
 	letters9_counts.to_csv(f"output/sandhi/letters9", sep="\t", header=None)
+	letters9_counts_sorted = letters9_df.value_counts()
+	letters9_counts_sorted.to_csv(f"output/sandhi/letters9sorted", sep="\t", header=None)
 
 	letters10plus_df = pd.DataFrame(letters10plus)
-	letters10plus_counts = letters10plus_df.value_counts()
+	letters10plus_counts = letters10plus_df.value_counts(sort=False)
 	letters10plus_counts.to_csv(f"output/sandhi/letters10+", sep="\t", header=None)
+	letters10plus_counts_sorted = letters10plus_df.value_counts()
+	letters10plus_counts_sorted.to_csv(f"output/sandhi/letters10+sorted", sep="\t", header=None)
 
 	print(f"{white}ok")
 
-def sanity_test():
 
-	print(f"{timeis()} {green}sanity test")
+def test_me():
+
+	print(f"{timeis()} {green}random test {white}10")
 	print(f"{timeis()} {green}{green}{line}")
-
-	word = random.choice(list(unmatched_set))
-
-	if word in unmatched_set:
-		print(f"{timeis()} {word} {green}in unmatched_set")
-	else:
-		print(f"{timeis()} {word} {green}not in unmatched_set")
-
-	print(f"{timeis()} ")
-
-	if word in matches2:
-		print(f"{timeis()} {word} {green}in matches2")
-	else:
-		print(f"{timeis()} {word} {green}not in matches2")
-
-	if word in unmatched2:
-		print(f"{timeis()} {word} {green}in unmatched2")
-	else:
-		print(f"{timeis()} {word} {green}not in unmatched2")
-
-	print(f"{timeis()} ")
-
-	if word in matches3:
-		print(f"{timeis()} {word} {green}in matches3")
-	else:
-		print(f"{timeis()} {word} {green}not in matches3")
-
-	if word in unmatched3:
-		print(f"{timeis()} {word} {green}in unmatched3")
-	else:
-		print(f"{timeis()} {word} {green}not in unmatched3")
-
-	print(f"{timeis()} ")
-
-	if word in matches4:
-		print(f"{timeis()} {word} {green}in matches4")
-	else:
-		print(f"{timeis()} {word} {green}not in matches4")
-
-	if word in unmatched4:
-		print(f"{timeis()} {word} {green}in unmatched4")
-	else:
-		print(f"{timeis()} {word} {green}not in unmatched4")
-
-	print(f"{timeis()} ")
-
-	if word in matchesx:
-		print(f"{timeis()} {word} {green}in matchesx")
-	else:
-		print(f"{timeis()} {word} {green}not in matchesx")
-	
-	if word in unmatchedxfront:
-		print(f"{timeis()} {word} {green}in unmatchedx")
-	else:
-		print(f"{timeis()} {word} {green}not in unmatchedx")
-
-	print(f"{timeis()} ")
-	
-	if word in unmatched_final:
-		print(f"{timeis()} {word} {green}in unmatched")
-	else:
-		print(f"{timeis()} {word} {green}not in unmatched")
-
+	for x in range(10):
+		print(f"{timeis()} {white}{random.choice(list(unmatched_set))}")
 	print(f"{timeis()} {line}")
 
 
 make_text_set()
 make_spelling_mistakes_set()
-make_abbreviations_set()
+make_abbreviations_and_neg_set()
 make_manual_corrections_set()
 make_shortlist_set()
 import_text_set()
-generate_inflected_forms_for_sandhi()
-import_all_inflections_set()
-generate_all_inflections_string()
+make_all_inflections_set()
+make_all_inflections_string()
 make_unmatched_set()
 import_sandhi_rules()
 remove_exceptions()
@@ -1639,9 +1555,10 @@ three_word_sandhi()
 four_word_sandhi()
 x_word_sandhi_from_front_and_back()
 summary()
+make_matches_df()
 make_sandhi_dict()
 make_golden_dict()
 unzip_and_copy()
 value_counts()
 word_counts()
-sanity_test()
+test_me()

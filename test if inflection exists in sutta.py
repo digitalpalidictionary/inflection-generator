@@ -1,10 +1,9 @@
 #!/usr/bin/env python3.10
 #coding: utf-8
 
-import warnings
 from modules import *
 import os
-
+import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 def inflection_exists_in_sutta():
