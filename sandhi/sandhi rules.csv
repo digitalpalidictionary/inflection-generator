@@ -62,6 +62,7 @@ g	o	go	i	paribhogoti	iti
 g	u	ga	u	aggupaṭṭhāyikā	general
 g	ū	ga	u	saggūpagena	general
 h	a	ha	a	passathayye	general
+h	a	ha	i	itihame	general
 h	a	hi	a	sattahaṅgehi	general
 h	ā	ha	a	idhāhaṃ	general
 h	ā	ha	ā	maññathāvuso	general
@@ -145,6 +146,7 @@ m	ā	mā	e	metaṃ	general
 m	ā	me	a	māyaṃ	general
 m	b	ṃ	b	garumbhāraṃ	general
 m	e	ṃ	e	viññāṇakasiṇameko	general
+m	e	ma	e	nāmesa	general
 m	e	ma	i	mamedaṃ	general
 m	e	mā	e	metamāsado	general
 m	e	me	a	me'si	general
@@ -258,6 +260,8 @@ s	ā	sa	ā	vītamohassāvuso	general
 s	ā	sa	i	assā'ti	iti
 s	ā	sā	a	sāssa	general
 s	ā	saṃ	a	tesāhaṃ	general
+s	ā	si	a	ahosāhaṃ	general
+s	ā	su	a	yesāhaṃ	general
 s	e	sa	e	ariyassetaṃ	general
 s	e	so	e	eseva	eva
 s	i	sa	i	tassimaṃ	general
@@ -267,6 +271,7 @@ s	o	sa	o	sīsokkamanaṃ	general
 s	o	so	a	somhi	general
 s	o	so	e	dosova	eva
 s	o	so	i	sadisoti	iti
+s	s		s	chinnassarāpi	general
 s	u	sa	u	imassuppādā	general
 s	u	su	a	indriyesumha	general
 s	u	su	i	apissumaṃ	general
@@ -299,6 +304,7 @@ t	u	to	u	tatuttariṃ	general
 t	ū	ta	u	cittūpahāraṃ	general
 ṭ	ā	ṭa	ā	makkaṭādi	general
 ṭ	o	ṭo	a	āvaṭṭosi	general
+ṭ	o	ṭo	i	paṭṭoti	iti
 ṭ	ṭ	ṭ		āsavaṭṭhānīyā	general
 ṭ	ṭ		ṭ	majjhaṭṭhāne	general
 u	k	uṃ	k	patiṭṭhapetukāmo	general
@@ -351,6 +357,3 @@ y	o	ya	o	mahāmāluky'ovāde	general
 y	o	yo	a	yo'yaṃ	general
 y	u	ya	u	ācariy'upajjhāyānaṃ	general
 y	ū	yā	u	chāy'ūdaka	general
-s	s		s	chinnassarāpi	general
-ṭ	o	ṭo	i	paṭṭoti	iti
-
