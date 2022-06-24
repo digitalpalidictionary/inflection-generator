@@ -2,9 +2,12 @@
 # coding: utf-8 
 
 from modules import *
+from timeis import tic, toc
 
 def inflection_generator_for_dpd():
+	tic()
 	create_inflection_table_index()
+	# generate_inflection_tables_dict()
 	create_inflection_table_df()
 	test_inflection_pattern_changed()
 	create_dpd_df()
@@ -17,6 +20,6 @@ def inflection_generator_for_dpd():
 	generate_html_inflection_table()
 	transliterate_inflections()
 	delete_unused_html_tables()
-
+	toc()
 
 inflection_generator_for_dpd()

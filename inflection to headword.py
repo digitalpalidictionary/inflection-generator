@@ -4,7 +4,9 @@
 import pickle
 import json
 import pandas as pd
-from timeis import timeis, green, white, yellow, line
+from timeis import timeis, green, white, yellow, line, tic, toc
+
+tic()
 
 with open("output/all inflections dict", "rb") as f:
 	all_inflections_dict = pickle.load(f)
@@ -43,4 +45,4 @@ df.rename_axis("inflection", inplace=True)
 df.to_csv("output/inflection to headwords dict.csv", sep="\t")
 df.to_json("output/inflection to headwords dict.json", force_ascii=False, orient="index", indent=6)
 
-print(f"{timeis()} {line}")
+toc()

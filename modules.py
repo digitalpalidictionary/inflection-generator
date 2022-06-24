@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# coding: utf-8
+
 import pandas as pd
 import re
 import pickle
@@ -9,8 +12,9 @@ from timeis import timeis, blue, yellow, green, red, white, line
 
 
 def create_inflection_table_index():
+
 	print(f"{timeis()} {yellow}inflection generator")
-	print(f"{timeis()} {line}") 
+	print(f"{timeis()} {line}")
 	print(f"{timeis()} {green}creating inflection table index")
 
 	global inflection_table_index_df
@@ -25,6 +29,62 @@ def create_inflection_table_index():
 	inflection_table_index_dict = dict(zip(inflection_table_index_df.iloc[:, 0], inflection_table_index_df.iloc[:, 2]))
 
 
+def generate_inflection_tables_dict():
+	print(f"{timeis()} {green}creating dict of inflection table dataframes")
+
+	inflection_tables_dict = {}
+
+	inflection_table_df = pd.read_excel(
+		"declensions & conjugations.xlsx", sheet_name="declensions", dtype=str)
+
+	inflection_table_df = inflection_table_df.shift(periods=2)
+
+	inflection_table_df.columns = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", 
+	"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", 
+	"AA", "AB", "AC", "AD", "AE", "AF", "AG", "AH", "AI", "AJ", "AK", "AL", "AM", 
+	"AN", "AO", "AP", "AQ", "AR", "AS", "AT", "AU", "AV", "AW", "AX", "AY", "AZ", 
+	"BA", "BB", "BC", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BK", "BL", "BM", 
+	"BN", "BO", "BP", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BX", "BY", "BZ", 
+	"CA", "CB", "CC", "CD", "CE", "CF", "CG", "CH", "CI", "CJ", "CK", "CL", "CM", 
+	"CN", "CO", "CP", "CQ", "CR", "CS", "CT", "CU", "CV", "CW", "CX", "CY", "CZ", 
+	"DA", "DB", "DC", "DD", "DE", "DF", "DG", "DH", "DI", "DJ", "DK"]
+
+	inflection_table_df.fillna("", inplace=True)
+
+	for row in range(inflection_table_index_length):
+		inflection_name = inflection_table_index_df.iloc[row, 0]
+		cell_range = inflection_table_index_df.iloc[row, 1]
+		like = inflection_table_index_df.iloc[row, 2]
+
+		col_range_1 = re.sub("(.+?)\d*\:.+", "\\1", cell_range)
+		col_range_2 = re.sub(".+\:(.[A-Z]*)\d*", "\\1", cell_range)
+		row_range_1 = int(re.sub(".+?(\d{1,3}):.+", "\\1", cell_range))
+		row_range_2 = int(re.sub(".+:.+?(\d{1,3})", "\\1", cell_range))
+
+		inflection_table_df_filtered = inflection_table_df.loc[row_range_1:row_range_2, col_range_1:col_range_2]
+		inflection_table_df_filtered.name = f"{inflection_name}"
+		inflection_table_df_filtered.reset_index(drop=True, inplace=True)
+		inflection_table_df_filtered.iloc[0, 0] = "" # remove inflection name
+		
+		# replace header
+		new_header = inflection_table_df_filtered.iloc[0] #grab the first row for the header
+		inflection_table_df_filtered = inflection_table_df_filtered[1:] #take the data less the header row
+		inflection_table_df_filtered.columns = new_header #set the header row as the df header
+
+		# replace index
+		inflection_table_df_filtered.index = inflection_table_df_filtered.iloc[0:, 0]
+		inflection_table_df_filtered = inflection_table_df_filtered.iloc[:, 1:]
+		inflection_table_df_filtered.rename_axis(None, axis=1, inplace=True)  # delete pattern name
+
+		inflection_tables_dict[inflection_name] = {}
+		inflection_tables_dict[inflection_name]["df"] = inflection_table_df_filtered
+		inflection_tables_dict[inflection_name]["range"] = cell_range
+		inflection_tables_dict[inflection_name]["like"] = like
+	
+	with open("output/inflection tables dict", "wb") as f:
+		pickle.dump(inflection_tables_dict, f)
+
+
 def create_inflection_table_df():
 	print(f"{timeis()} {green}creating inflection table dataframe")
 
@@ -36,10 +96,15 @@ def create_inflection_table_df():
 	inflection_table_df.columns = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "AB", "AC", "AD", "AE", "AF", "AG", "AH", "AI", "AJ", "AK", "AL", "AM", "AN", "AO", "AP", "AQ", "AR", "AS", "AT", "AU", "AV", "AW", "AX", "AY", "AZ", "BA", "BB", "BC", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BK", "BL", "BM", "BN", "BO", "BP", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BX", "BY", "BZ", "CA", "CB", "CC", "CD", "CE", "CF", "CG", "CH", "CI", "CJ", "CK", "CL", "CM", "CN", "CO", "CP", "CQ", "CR", "CS", "CT", "CU", "CV", "CW", "CX", "CY", "CZ", "DA", "DB", "DC", "DD", "DE", "DF", "DG", "DH", "DI", "DJ", "DK"]
 
 	inflection_table_df.fillna("", inplace=True)
+	# print(inflection_table_df[:20])
 
 
 def test_inflection_pattern_changed():
-	print(f"{timeis()} {green}test if inflection patterns have changed")
+	print(f"{timeis()} {green}test if inflection table has changed")
+	
+	global inflection_tables_dict
+	with open("output/inflection tables dict", "rb") as f:
+		inflection_tables_dict = pickle.load(f)
 
 	global pattern_changed
 	pattern_changed = []
@@ -48,7 +113,6 @@ def test_inflection_pattern_changed():
 		inflection_name = inflection_table_index_df.iloc[row,0]
 		cell_range = inflection_table_index_df.iloc[row,1]
 		like = inflection_table_index_df.iloc[row,2]
-		irreg = inflection_table_index_df.iloc[row,3]
 
 		col_range_1 = re.sub("(.+?)\d*\:.+", "\\1", cell_range)
 		col_range_2 = re.sub(".+\:(.[A-Z]*)\d*", "\\1", cell_range)
@@ -56,51 +120,60 @@ def test_inflection_pattern_changed():
 		row_range_2 = int(re.sub(".+:.+?(\d{1,3})", "\\1", cell_range))
 
 		inflection_table_df_filtered = inflection_table_df.loc[row_range_1:row_range_2, col_range_1:col_range_2]
-		inflection_table_df_filtered.Name =  f"{inflection_name}"
-
+		inflection_table_df_filtered.name =  f"{inflection_name}"
 		inflection_table_df_filtered.reset_index(drop=True, inplace=True)
-
 		inflection_table_df_filtered.iloc[0,0] = ""
 
 		# replace header
-
 		new_header = inflection_table_df_filtered.iloc[0] #grab the first row for the header
 		inflection_table_df_filtered = inflection_table_df_filtered[1:] #take the data less the header row
 		inflection_table_df_filtered.columns = new_header #set the header row as the df header
 
 		# replace index
-
 		inflection_table_df_filtered.index = inflection_table_df_filtered.iloc[0:,0]
 		inflection_table_df_filtered = inflection_table_df_filtered.iloc[:, 1:]
-
-		# remove unnamed column headers
-
-		inflection_table_df_filtered = inflection_table_df_filtered.rename(columns=lambda x: re.sub('Unnamed.*','',x))
+		inflection_table_df_filtered.rename_axis(None, axis=1, inplace=True)  # delete pattern name
 
 		# test
-
 		try:
-			old = pd.read_csv(f"output/patterns/{inflection_name}.csv", sep="\t", index_col=0, na_filter=False) #, header=0
-			old.fillna("", inplace=True)
-			old = old.rename(columns=lambda x: re.sub('Unnamed.*','',x))
+			old_table = inflection_tables_dict[inflection_name]["df"]
+			new_table = inflection_table_df_filtered
+			old_range = inflection_tables_dict[inflection_name]["range"]
+			new_range = cell_range
+			old_like = inflection_tables_dict[inflection_name]["like"]
+			new_like = like
+			
+			if (not old_table.equals(new_table)
+			or old_range != new_range
+			or old_like != new_like):
+				print(f"{timeis()} {red}{inflection_name} changed {white}updated")
+				inflection_tables_dict[inflection_name]["df"] = inflection_table_df_filtered
+				inflection_tables_dict[inflection_name]["range"] = cell_range
+				inflection_tables_dict[inflection_name]["like"] = like
+				pattern_changed.append(inflection_name)
+
 		except:
-			print(f"{timeis()} {red}{inflection_name} - doesn't exist - added")
-			pattern_changed.append(inflection_name)
-			inflection_table_df_filtered.to_csv(f"output/patterns/{inflection_name}.csv", sep="\t")
-
-		if inflection_table_df_filtered.equals(old):
-			continue
-		elif inflection_name in pattern_changed:
-			continue
-		elif not inflection_table_df_filtered.equals(old):
-			print(f"{timeis()} {red}{inflection_name} - different - updated")
-			inflection_table_df_filtered.to_csv(f"output/patterns/{inflection_name}.csv", sep="\t")
+			print(f"{timeis()} {red}{inflection_name} doesn't exist {white}added")
+			inflection_tables_dict[inflection_name] = {}
+			inflection_tables_dict[inflection_name]["df"] = inflection_table_df_filtered
+			inflection_tables_dict[inflection_name]["range"] = cell_range
+			inflection_tables_dict[inflection_name]["like"] = like
 			pattern_changed.append(inflection_name)
 
-	if pattern_changed != []:
-		print(f"{timeis()} {red}the following patterns have changes and will be generated")
-		print(f"{timeis()} {red}{pattern_changed}")
+	print(f"{timeis()} {green}test if inflection table exists")
 	
+	pattern_deleted = []
+	for inflection in inflection_tables_dict:
+		if inflection not in inflection_table_index_dict:
+			print(f"{timeis()} {red}{inflection} no longer exists {white}deleted")
+			pattern_deleted.append(inflection)
+
+	for deleted in pattern_deleted:
+		inflection_tables_dict.pop(deleted)
+		
+	with open("output/inflection tables dict", "wb") as f:
+		pickle.dump(inflection_tables_dict, f)
+
 	with open (f"../frequency maps/output/pickle tests/pattern_changed", "wb") as pattern_changed_pickle:
 			pickle.dump(pattern_changed, pattern_changed_pickle)
 
@@ -185,7 +258,7 @@ def test_for_wrong_patterns():
 	if wrong_patten_string != "":
 		print(f"{timeis()} {red}wrong patterns: {wrong_patten_string}")
 	if error == True:
-		input(f"{timeis()} {red}wrong patterns - fix 'em!")
+		print(f"{timeis()} {red}wrong patterns - fix 'em!")
 
 
 def test_for_differences_in_stem_and_pattern():
@@ -243,9 +316,13 @@ def generate_all_inflections_dict():
 		meaning = dpd_df.loc[row, "Meaning IN CONTEXT"]
 		buddhadatta = dpd_df.loc[row, "Buddhadatta"]
 		literal = dpd_df.loc[row, "Literal Meaning"]
+		source1 = dpd_df.loc[row, "Source1"]
+		sutta1 = dpd_df.loc[row, "Sutta1"]
+		example1 = dpd_df.loc[row, "Example1"]
+		source2 = dpd_df.loc[row, "Source 2"]
+		sutta2 = dpd_df.loc[row, "Sutta2"]
+		example2 = dpd_df.loc[row, "Example 2"]
 
-		if meaning == "":
-			meaning = buddhadatta
 		if literal != "":
 			meaning += "; lit. " + literal
 	
@@ -254,18 +331,19 @@ def generate_all_inflections_dict():
 		
 		if stem == "-":
 			all_inflections_dict.update(
-				{headword: {"pos": pos, "meaning": meaning, "stem": stem_clean, "pattern": pattern, "inflections": {headword_clean}, "sinhala": "", "devanagari": "", "thai": ""}})
+				{headword: {"pos": pos, "meaning": meaning, "meaning2": buddhadatta, "stem": stem_clean, "pattern": pattern, "inflections": {headword_clean}, "sinhala": "", "devanagari": "", "thai": ""}})
 
 		elif stem == "!":
 			all_inflections_dict.update(
-				{headword: {"pos": pos, "meaning": meaning, "stem": stem_clean, "pattern": pattern, "inflections": {headword_clean}, "sinhala": "", "devanagari": "", "thai": ""}})
+				{headword: {"pos": pos, "meaning": meaning, "meaning2": buddhadatta, "stem": stem_clean, "pattern": pattern, "inflections": {headword_clean}, "sinhala": "", "devanagari": "", "thai": ""}})
 
 		else:
 			all_inflections_dict.update(
-				{headword: {"pos": pos, "meaning": meaning, "stem": stem_clean, "pattern": pattern, "inflections": {headword_clean}, "sinhala": "", "devanagari": "", "thai": ""}})
+				{headword: {"pos": pos, "meaning": meaning, "meaning2": buddhadatta, "stem": stem_clean, "pattern": pattern, "inflections": {headword_clean}, "sinhala": "", "devanagari": "", "thai": ""}})
 
 			try:
-				df = pd.read_csv(f"output/patterns/{pattern}.csv", sep="\t", header=None)
+				df = inflection_tables_dict[pattern]["df"]
+				# df = pd.read_csv(f"output/patterns/{pattern}.csv", sep="\t", header=None)
 				df.fillna("", inplace=True)
 				df_rows = df.shape[0]
 				df_columns = df.shape[1]
@@ -284,6 +362,23 @@ def generate_all_inflections_dict():
 			except:
 				with open("inflection generator errorlog.txt", "a") as error_log:
 					print(f"{timeis()} {red}error on: {headword}")
+			
+			if (
+			source1 != "" and
+			sutta1 != "" and
+			example1 != ""):
+				all_inflections_dict[headword]["sutta1"] = True
+			else:
+				all_inflections_dict[headword]["sutta1"] = False
+
+			if (
+			source2 != "" and
+			sutta2 != "" and
+			example2 != ""):
+				all_inflections_dict[headword]["sutta2"] = True
+			else:
+				all_inflections_dict[headword]["sutta2"] = False
+
 
 	df = pd.DataFrame.from_dict(all_inflections_dict, orient='index')
 	df.to_csv("output/all inflections dict.csv", sep="\t")
@@ -320,43 +415,72 @@ def update_all_inflections_dict():
 		meaning = dpd_df.loc[row, "Meaning IN CONTEXT"]
 		buddhadatta = dpd_df.loc[row, "Buddhadatta"]
 		literal = dpd_df.loc[row, "Literal Meaning"]
+		source1 = dpd_df.loc[row, "Source1"]
+		sutta1 = dpd_df.loc[row, "Sutta1"]
+		example1 = dpd_df.loc[row, "Example1"]
+		source2 = dpd_df.loc[row, "Source 2"]
+		sutta2 = dpd_df.loc[row, "Sutta2"]
+		example2 = dpd_df.loc[row, "Example 2"]
 
-		if meaning == "":
-			meaning = buddhadatta
 		if literal != "":
 			meaning += "; lit. " + literal
 
 		if headword not in changed_headwords:
+			
 			try:
 				all_inflections_dict[headword]["meaning"] = meaning
 			except:
 				print(f"{timeis()} {red}{headword} - error adding meaning")
+
+			try:
+				all_inflections_dict[headword]["meaning2"] = buddhadatta
+			except:
+				print(f"{timeis()} {red}{headword} - error adding meaning2")
+
 			try:
 				all_inflections_dict[headword]["pos"] = pos
 			except:
 				print(f"{timeis()} {red}{headword} - error adding pos")
 
+			if (
+			source1 != "" and
+			sutta1 != "" and
+			example1 != ""):
+				all_inflections_dict[headword]["sutta1"] = True
+			else:
+				all_inflections_dict[headword]["sutta1"] = False
+
+			if (
+			source2 != "" and
+			sutta2 != "" and
+			example2 != ""):
+				all_inflections_dict[headword]["sutta2"] = True
+			else:
+				all_inflections_dict[headword]["sutta2"] = False		
+
+
 		if headword in changed_headwords:
 			print(f"{timeis()} {row}/{len(dpd_df)}\t{headword}")
 			
 			if stem == "-":
-				all_inflections_dict.update({headword: {"pos": pos, "meaning": meaning, "stem": stem_clean, "pattern": pattern, "inflections": {headword_clean}, "sinhala":"", "devanagari":"", "thai":""}})
+				all_inflections_dict.update({headword: {"pos": pos, "meaning": meaning, "meaning2": buddhadatta, "stem": stem_clean, "pattern": pattern, "inflections": {headword_clean}, "sinhala":"", "devanagari":"", "thai":""}})
 			
 			elif stem == "!":
-				all_inflections_dict.update({headword: {"pos": pos, "meaning": meaning, "stem": stem_clean, "pattern": pattern, "inflections": {headword_clean}, "sinhala":"", "devanagari":"", "thai":""}})
+				all_inflections_dict.update({headword: {"pos": pos, "meaning": meaning, "meaning2": buddhadatta, "stem": stem_clean, "pattern": pattern, "inflections": {headword_clean}, "sinhala":"", "devanagari":"", "thai":""}})
 			
 			else:
-				all_inflections_dict.update({headword: {"pos": pos, "meaning": meaning, "stem": stem_clean, "pattern": pattern, "inflections": {headword_clean}, "sinhala": "", "devanagari": "", "thai": ""}})
+				all_inflections_dict.update({headword: {"pos": pos, "meaning": meaning, "meaning2": buddhadatta, "stem": stem_clean, "pattern": pattern, "inflections": {headword_clean}, "sinhala": "", "devanagari": "", "thai": ""}})
 				
 				try:
-					df = pd.read_csv(f"output/patterns/{pattern}.csv", sep="\t", header=None)
-					df.fillna("", inplace=True)
-					df_rows = df.shape[0]
-					df_columns = df.shape[1]
+					df_table = inflection_tables_dict[pattern]["df"].copy()
+					# df = pd.read_csv(f"output/patterns/{pattern}.csv", sep="\t", header=None)
+					df_table.fillna("", inplace=True)
+					df_rows = df_table.shape[0]
+					df_columns = df_table.shape[1]
 
-					for rows in range(1, df_rows):
-						for columns in range(1, df_columns, 2):
-							line = df.iloc[rows, columns]
+					for rows in range(0, df_rows):
+						for columns in range(0, df_columns, 2):
+							line = df_table.iloc[rows, columns]
 							line = re.sub(r"(.+)", f"{stem}\\1", line)
 							search_string = re.compile("\n", re.M)
 							replace_string = " "
@@ -368,6 +492,22 @@ def update_all_inflections_dict():
 				except:
 					with open("inflection generator errorlog.txt", "a") as error_log:
 						print(f"{timeis()} {red}error on: {headword}")
+
+			if (
+			source1 != "" and
+			sutta1 != "" and
+			example1 != ""):
+				all_inflections_dict[headword]["sutta1"] = True
+			else:
+				all_inflections_dict[headword]["sutta1"] = False
+
+			if (
+			source2 != "" and
+			sutta2 != "" and
+			example2 != ""):
+				all_inflections_dict[headword]["sutta2"] = True
+			else:
+				all_inflections_dict[headword]["sutta2"] = False
 
 	df = pd.DataFrame.from_dict(all_inflections_dict, orient='index')
 	df.to_csv("output/all inflections dict.csv", sep="\t")
@@ -397,70 +537,54 @@ def generate_html_inflection_table():
 		if headword in changed_headwords:
 			print(f"{timeis()} {row}/{dpd_df_length}\t{headword}")
 
-			try:
-				with open(f"output/html tables/{headword}.html", "w") as html_table:
-					
-					if stem == "-":
-						html_table.write(f"<p><b>{headword_clean}</b> is indeclinable")
-
-					elif stem == "!":
-						html_table.write(f"<p>click on <b>{pattern}</b> for inflection table")
-
-					else:
-						df = pd.read_csv(f"output/patterns/{pattern}.csv", sep="\t", index_col=0)
-						df.fillna("", inplace=True, axis=0)
-						df.rename_axis(None, inplace=True) #delete pattern name
-
-						df_rows = df.shape[0]
-						df_columns = df.shape[1]
-
-						for rows in range(0, df_rows): 
-							for columns in range(0, df_columns, 2): #1 to 0
-							
-								html_cell = df.iloc[rows, columns]
-								syn_cell = df.iloc[rows, columns]
-
-								html_cell = re.sub(r"(.+)", f"<b>\\1</b>", html_cell) # add bold
-								html_cell = re.sub(r"(.+)", f"{stem}\\1", html_cell) # add stem
-								html_cell = re.sub(r"\n", "<br>", html_cell) # add line breaks
-								df.iloc[rows, columns] = html_cell
-							
-								syn_cell = re.sub(r"(.+)", f"{stem}\\1", syn_cell)
-								# search_string = re.compile("\n", re.M)
-								# replace_string = " "
-								# matches = re.sub(search_string, replace_string, syn_cell)
-					
-						column_list = []
-						for i in range(1, df_columns, 2):
-							column_list.append(i)
-
-						df.drop(df.columns[column_list], axis=1, inplace=True)
-						table = df.to_html(escape=False)
-						table = re.sub("Unnamed.+", "", table)
-						table = re.sub("NaN", "", table)
-
-						# write header info
-
-						if inflection_table_index_dict[pattern] != "":
-							if pos in declensions:
-								heading = (f"""<p class ="heading"><b>{headword_clean}</b> is <b>{pattern}</b> declension like <b>{inflection_table_index_dict[pattern]}</b></p>""")
-							if pos in conjugations:
-								heading = (f"""<p class ="heading"><b>{headword_clean}</b> is <b>{pattern}</b> conjugation like <b>{inflection_table_index_dict[pattern]}</b></p>""")
-
-						if inflection_table_index_dict[pattern] == "":
-							if pos in declensions:
-								heading = (f"""<p class ="heading"><b>{headword_clean}</b> is <b>{pattern}</b> irregular declension</p>""")
-							if pos in conjugations:
-								heading = (f"""<p class ="heading"><b>{headword_clean}</b> is <b>{pattern}</b> irregular conjugation</p>""")
-					
-						html = heading + table 
-						html_table.write(html)
-			
-			except:
+			html_file = open(f"output/html tables/{headword}.html", "w")
 				
-				print(f"{timeis()} {red}error! pattern {pattern} does not exist - fix it!")
-				continue
+			if stem == "-":
+				html_file.write(f"<p><b>{headword_clean}</b> is indeclinable")
 
+			elif stem == "!":
+				html_file.write(f"<p>click on <b>{pattern}</b> for inflection table")
+
+			else:
+				df_table = inflection_tables_dict[pattern]["df"].copy()
+				# df = pd.read_csv(f"output/patterns/{pattern}.csv", sep="\t", index_col=0)
+				df_table.fillna("", inplace=True)
+				df_rows = df_table.shape[0]
+				df_columns = df_table.shape[1]
+
+				for rows in range(0, df_rows): 
+					for columns in range(0, df_columns, 2): #1 to 0
+						html_cell = df_table.iloc[rows, columns]
+						html_cell = re.sub(r"(.+)", f"<b>\\1</b>", html_cell) # add bold
+						html_cell = re.sub(r"(.+)", f"{stem}\\1", html_cell) # add stem
+						html_cell = re.sub(r"\n", "<br>", html_cell) # add line breaks
+						df_table.iloc[rows, columns] = html_cell
+
+				column_list = []
+				for i in range(1, df_columns, 2):
+					column_list.append(i)
+
+				df_table.drop(df_table.columns[column_list], axis=1, inplace=True)
+				html_table = df_table.to_html(escape=False)
+				html_table = re.sub("Unnamed.+", "", html_table)
+				html_table = re.sub("NaN", "", html_table)
+
+				# write header info
+
+				if inflection_table_index_dict[pattern] != "":
+					if pos in declensions:
+						heading = (f"""<p class ="heading"><b>{headword_clean}</b> is <b>{pattern}</b> declension like <b>{inflection_table_index_dict[pattern]}</b></p>""")
+					if pos in conjugations:
+						heading = (f"""<p class ="heading"><b>{headword_clean}</b> is <b>{pattern}</b> conjugation like <b>{inflection_table_index_dict[pattern]}</b></p>""")
+
+				if inflection_table_index_dict[pattern] == "":
+					if pos in declensions:
+						heading = (f"""<p class ="heading"><b>{headword_clean}</b> is <b>{pattern}</b> irregular declension</p>""")
+					if pos in conjugations:
+						heading = (f"""<p class ="heading"><b>{headword_clean}</b> is <b>{pattern}</b> irregular conjugation</p>""")
+			
+				html = heading + html_table 
+				html_file.write(html)
 
 def transliterate_inflections():
 
@@ -493,7 +617,7 @@ def transliterate_inflections():
 			thai = transliterate.process("IASTPali", "Thai", inflections_string)
 			all_inflections_dict[headword]["thai"] = set(thai.split(" "))
 
-			counter +=1
+		counter +=1
 
 	df = pd.DataFrame.from_dict(all_inflections_dict, orient='index')
 	df.to_csv("output/all inflections dict.csv", sep="\t")
@@ -513,8 +637,6 @@ def delete_unused_html_tables():
 					print(f"{timeis()} {file}")
 			except:
 				print(f"{timeis()} {red}{file} not found")
-	
-	print(f"{timeis()} {line}")
 
 
 # from here on its for sutta colouring
@@ -992,5 +1114,3 @@ body {
 		html_file.write(html3)
 		html_file.close
 
-
-# print(f"{timeis()} ----------------------------------------")

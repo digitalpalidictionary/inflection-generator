@@ -11,12 +11,13 @@ import pickle
 import re
 
 from modules import clean_machine
-from timeis import timeis, blue, green, yellow, line, white, red
+from timeis import timeis, blue, green, yellow, line, white, red, tic, toc
 from pathlib import Path
 from difflib import SequenceMatcher
 from simsapa.app.stardict import export_words_as_stardict_zip, ifo_from_opts, DictEntry
 
 warnings.filterwarnings("ignore", category=FutureWarning)
+
 
 print(f"{timeis()} {yellow}sandhi splitter")
 print(f"{timeis()} {line}")
@@ -28,6 +29,7 @@ def make_text_set():
 
 	print(f"{timeis()} {green}making text set", end = " ")
 	
+	# text_list = ["s0101m.mul.xml.txt"]
 	text_list = ["s0202m.mul.xml.txt", "s0202a.att.xml.txt"]
 	# !!! change zip_path !!!
 
@@ -137,7 +139,7 @@ def import_text_set():
 	with open(f"output/set text", "rb") as p:
 		text_set = pickle.load(p)
 
-	text_set.add("chedanaviniyogavinayakiriyālesantarakappataṇhādiṭṭhiasaṅkhyeyyakappamahākappādīsu")
+	# text_set.add("chedanaviniyogavinayakiriyālesantarakappataṇhādiṭṭhiasaṅkhyeyyakappamahākappādīsu")
 	text_set = text_set - spelling_mistakes_set
 	text_set = text_set - abbreviations_set
 	text_set = text_set - manual_corrections_set
@@ -388,7 +390,7 @@ def three_word_sandhi():
 							word3 = ch2 + wordC[1:]
 
 							if wordA in all_inflections_set and \
-							word2 in all_inflections_seta and \
+							word2 in all_inflections_set and \
 							word3 in all_inflections_set:
 								matches3.append(word)
 								f1.write(f"\t{wordA}\t{word2}\t{word3}\t-\t{rule+2}\tmatch\n")
@@ -440,7 +442,7 @@ def three_word_sandhi():
 								word2 = (ch2x + wordB[1:])[:-1] + ch1y
 								word3 = ch2y + wordC[1:]
 
-								if word1 in all_inflections_seta and \
+								if word1 in all_inflections_set and \
 								word2 in all_inflections_set and \
 								word3 in all_inflections_set:
 									matches3.append(word)
@@ -869,7 +871,11 @@ def split_from_front_and_back(word_initial, word_front, word, word_back, comment
 						len(wordA) > 0 and \
 						lwff_fuzzy_list == []:
 							lwff_fuzzy_list = [wordA]
-						else:
+						
+						elif \
+						fuzzy_searchA != [] and \
+						len(wordA) > 0 and \
+						lwff_fuzzy_list != []:
 							lwff_fuzzy_list = [wordA] + lwff_fuzzy_list
 
 						fuzzy_searchB = re.findall(f",.{wordB[1:]},", all_inflections_string)
@@ -881,7 +887,11 @@ def split_from_front_and_back(word_initial, word_front, word, word_back, comment
 						len(wordB) > 0 and \
 						lwfb_fuzzy_list  == []:
 							lwfb_fuzzy_list = [wordB]
-						else:
+						
+						elif \
+						fuzzy_searchB != [] and \
+						len(wordB) > 0 and \
+						lwfb_fuzzy_list  != []:
 							lwfb_fuzzy_list = [wordB] + lwfb_fuzzy_list
 
 
@@ -1043,7 +1053,11 @@ def split_from_front_and_back(word_initial, word_front, word, word_back, comment
 						len(wordA) > 0 and \
 						lwff_clean_list == []:
 							lwff_clean_list = [wordA]
-						else:
+
+						elif \
+						clean_searchA != False and \
+						len(wordA) > 0 and \
+						lwff_clean_list != []:
 							lwff_clean_list = [wordA] + lwff_clean_list
 						
 						clean_searchB = wordB in all_inflections_set
@@ -1052,7 +1066,11 @@ def split_from_front_and_back(word_initial, word_front, word, word_back, comment
 						len(wordB) > 0 and \
 						lwfb_clean_list == []:
 							lwfb_clean_list = [wordB]
-						else:
+						
+						elif \
+						clean_searchB != False and \
+						len(wordB) > 0 and \
+						lwfb_clean_list != []:
 							lwfb_clean_list = [wordB] + lwfb_clean_list
 
 					lwff_clean_list = sorted(set(lwff_clean_list), key=len, reverse=True)
@@ -1238,15 +1256,22 @@ def summary():
 		f.write(f"{len(text_set)}\t{len(unmatched_set)}\t{len(matches2)}\t{len(unmatched2)}\t{len(matches3)}\t{len(unmatched3)}\t{len(matches4)}\t{len(unmatched4)}\t{len(matchesx)}\t{len(unmatchedxfront)}\t{perc_sandhi}\t{perc_all}\n")
 
 
-def make_matches_df():
+def combine_matches_df():
 
 	global matches_df
 
-	print(f"{timeis()} {green}saving matches_df", end = " ")
+	print(f"{timeis()} {green}combining matches df's", end = " ")
 
 	matches_df = pd.read_csv("output/sandhi/matches.csv", dtype=str, sep="\t")
 	matches_df = matches_df.fillna("")
-	# matches_df.drop(['process', 'rules'], inplace=True, axis=1)
+
+	# walk through matches dir
+
+	# for root, dirs, files in os.walk("output/sandhi/matches"):
+	# 	for file in files:
+	# 		more_matches_df = pd.read_csv(f"output/sandhi/matches/{file}", dtype=str, sep="\t")
+	# 		more_matches_df = more_matches_df.fillna("")
+	# 		matches_df = pd.concat([matches_df, more_matches_df], ignore_index=True)
 	
 	# add splitcount and lettercount and count
 
@@ -1355,7 +1380,7 @@ def make_golden_dict():
 	
 	df.to_json("output/sandhi/matches.json", force_ascii=False, orient="records", indent=5)
 
-	zip_path = Path("./output/sandhi/padavibhāga MN2.zip")
+	zip_path = Path("./output/sandhi/padavibhāga.zip")
 	# change bookname
 	# change unzip
 
@@ -1372,7 +1397,7 @@ def make_golden_dict():
 	words = list(map(item_to_word, data_read))
 
 	ifo = ifo_from_opts(
-		{"bookname": "padavibhāga MN2",
+		{"bookname": "padavibhāga",
 			"author": "Bodhirasa",
 			"description": "",
 			"website": "",}
@@ -1387,7 +1412,7 @@ def unzip_and_copy():
 
 	print(f"{timeis()} {green}unipping and copying goldendict", end = " ")
 
-	os.popen('unzip -o "output/sandhi/padavibhāga MN2" -d "/home/bhikkhu/Documents/Golden Dict"')
+	os.popen('unzip -o "output/sandhi/padavibhāga" -d "/home/bhikkhu/Documents/Golden Dict"')
 	
 	print(f"{white}ok")
 	print(f"{timeis()} {green}{line}")
@@ -1539,9 +1564,9 @@ def test_me():
 	print(f"{timeis()} {green}{green}{line}")
 	for x in range(10):
 		print(f"{timeis()} {white}{random.choice(list(unmatched_set))}")
-	print(f"{timeis()} {line}")
 
 
+tic()
 make_text_set()
 make_spelling_mistakes_set()
 make_abbreviations_and_neg_set()
@@ -1558,10 +1583,11 @@ three_word_sandhi()
 four_word_sandhi()
 x_word_sandhi_from_front_and_back()
 summary()
-make_matches_df()
+combine_matches_df()
 make_sandhi_dict()
 make_golden_dict()
 unzip_and_copy()
 value_counts()
 word_counts()
 test_me()
+toc()
