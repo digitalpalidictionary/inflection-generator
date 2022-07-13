@@ -15,6 +15,7 @@ def inflection_generator_for_dpd():
 	test_for_missing_stem_and_pattern()
 	test_for_wrong_patterns()
 	test_for_differences_in_stem_and_pattern()
+	test_for_missing_html()
 	# generate_all_inflections_dict()
 	update_all_inflections_dict()
 	generate_html_inflection_table()
@@ -23,3 +24,4 @@ def inflection_generator_for_dpd():
 	toc()
 
 inflection_generator_for_dpd()
+

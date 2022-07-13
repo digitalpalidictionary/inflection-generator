@@ -8,7 +8,10 @@ import os
 from aksharamukha import transliterate
 from datetime import datetime
 import json
-from timeis import timeis, blue, yellow, green, red, white, line
+from timeis import timeis, blue, yellow, green, red, white, line, tic, toc
+from io import StringIO
+from csv import writer
+from sorter import sort_key
 
 
 def create_inflection_table_index():
@@ -292,6 +295,16 @@ def test_for_differences_in_stem_and_pattern():
 
 	with open("../frequency maps/output/pickle tests/stem_pattern_differences", "wb") as f:
 		pickle.dump(changed_headwords, f)
+
+def test_for_missing_html():
+	print(f"{timeis()} {green}testing for missing html files")
+
+	for headword in headwords_list:
+		try:
+			open(f'output/html tables/{headword}.html')
+		except:
+			print(f"{timeis()} {red}{headword} missing html file")
+			changed_headwords.add(headword)
 
 
 def generate_all_inflections_dict():
@@ -639,6 +652,207 @@ def delete_unused_html_tables():
 				print(f"{timeis()} {red}{file} not found")
 
 
+def generate_grammar_dict():
+
+	print(f"{timeis()} {green}generating grammar df from scratch")
+
+
+	grammar_dict = {}
+
+	for row in range(dpd_df_length):  # dpd_df_length
+		headword = dpd_df.loc[row, "Pāli1"]
+		headword_clean = re.sub(" \d*$", "", headword)
+		stem = dpd_df.loc[row, "Stem"]
+		if re.match("!.+", stem) != None:
+			stem = re.sub("!.+", "!", stem)
+		if stem == "*":
+			stem = ""
+		pattern = dpd_df.loc[row, "Pattern"]
+		pos = dpd_df.loc[row, "POS"]
+
+		if row % 5000 == 0:
+			print(f"{timeis()} {row}/{dpd_df_length}\t{headword}")
+
+		if stem == "-":
+			grammar_dict[headword] = {'inflection':{headword_clean: f'<b>{headword_clean}</b> is <b>indeclineable</b> ({pos})'}}
+
+		elif stem == "!":
+			pass
+
+		else:
+			df_table = inflection_tables_dict[pattern]["df"].copy()
+			df_table.fillna("", inplace=True)
+			df_rows = df_table.shape[0]
+			df_columns = df_table.shape[1]
+
+			for rows in range(0, df_rows):
+				for columns in range(0, df_columns, 2):  # 1 to 0
+					html_cell = df_table.iloc[rows, columns]
+					html_cell = re.sub(r"(.+)", f"{stem}\\1", html_cell)  # add stem
+					df_table.iloc[rows, columns] = html_cell
+
+			column_list = []
+			for i in range(0, df_columns, 2):
+				column_list.append(i)
+
+			try:
+				df_table.drop(index="in comps", inplace=True)
+			except:
+				pass
+
+			for column in column_list:
+				for row in range(len(df_table)):
+					inflections = df_table.iloc[row, column].split("\n")
+					grammar = df_table.iloc[row, column+1]
+
+					for inflection in inflections:
+						if inflection != "":
+							data_row = f"<b>{inflection}</b> is <b>{grammar}</b> of {headword_clean} ({pos})"
+
+							try:
+								if inflection in grammar_dict[headword][inflection]:
+									grammar_dict[headword] = {'inflection':{inflection:data_row}}
+									data_row_escaped = re.escape(data_row)
+									if not re.findall(data_row_escaped, grammar_dict[headword][inflection]):
+										grammar_dict[headword][inflection] += f"<br>{data_row}"
+							
+							except:
+								grammar_dict[headword] = {'inflection': {inflection: data_row}}
+
+
+	grammar_df = pd.DataFrame.from_dict(grammar_dict, orient='index')
+	grammar_df.to_csv("output/grammar df.csv", sep="\t", index=None)
+	with open('output/grammardict', 'wb') as p:
+		pickle.dump(grammar_dict, p)
+
+
+
+def update_grammar_dict():
+	print(f"{timeis()} {green}updating grammar dict")
+
+	with open('output/grammardict', 'rb') as p:
+		grammar_dict = pickle.load(p) 
+
+	for headword in changed_headwords:
+		grammar_dict.pop(headword)
+	
+	for row in range(dpd_df_length):  # dpd_df_length
+		headword = dpd_df.loc[row, "Pāli1"]
+
+		if headword in changed_headwords:
+			headword_clean = re.sub(" \d*$", "", headword)
+			stem = dpd_df.loc[row, "Stem"]
+			if re.match("!.+", stem) != None:
+				stem = re.sub("!.+", "!", stem)
+			if stem == "*":
+				stem = ""
+			pattern = dpd_df.loc[row, "Pattern"]
+			pos = dpd_df.loc[row, "POS"]
+
+			if row % 5000 == 0:
+				print(f"{timeis()} {row}/{dpd_df_length}\t{headword}")
+
+			if stem == "-":
+				grammar_dict[headword] = {'inflection': {
+					headword_clean: f'<b>{headword_clean}</b> is <b>indeclineable</b> ({pos})'}}
+
+			elif stem == "!":
+				pass
+
+			else:
+				df_table = inflection_tables_dict[pattern]["df"].copy()
+				df_table.fillna("", inplace=True)
+				df_rows = df_table.shape[0]
+				df_columns = df_table.shape[1]
+
+				for rows in range(0, df_rows):
+					for columns in range(0, df_columns, 2):  # 1 to 0
+						html_cell = df_table.iloc[rows, columns]
+						html_cell = re.sub(r"(.+)", f"{stem}\\1", html_cell)  # add stem
+						df_table.iloc[rows, columns] = html_cell
+
+				column_list = []
+				for i in range(0, df_columns, 2):
+					column_list.append(i)
+
+				try:
+					df_table.drop(index="in comps", inplace=True)
+				except:
+					pass
+
+				for column in column_list:
+					for row in range(len(df_table)):
+						inflections = df_table.iloc[row, column].split("\n")
+						grammar = df_table.iloc[row, column+1]
+
+						for inflection in inflections:
+							if inflection != "":
+								data_row = f"<b>{inflection}</b> is <b>{grammar}</b> of {headword_clean} ({pos})"
+
+								try:
+									if inflection in grammar_dict[headword][inflection]:
+										grammar_dict[headword] = {'inflection': {inflection: data_row}}
+										data_row_escaped = re.escape(data_row)
+										if not re.findall(data_row_escaped, grammar_dict[headword][inflection]):
+											grammar_dict[headword][inflection] += f"<br>{data_row}"
+
+								except:
+									grammar_dict[headword] = {'inflection': {inflection: data_row}}
+
+	grammar_df = pd.DataFrame.from_dict(grammar_dict, orient='index')
+	grammar_df.to_csv("output/grammar df.csv", sep="\t", index=None)
+	with open('output/grammardict', 'wb') as p:
+		pickle.dump(grammar_dict, p)
+
+def reformat_gramma_dict():
+	print(f"{timeis()} {green}reformatting grammar dict")
+	
+
+
+def make_grammar_dict():
+	print(f"{timeis()} {green}making grammar dict")
+	grammar_df_len = len(grammar_df)
+	grammar_dict = {}
+
+	for row in range(grammar_df_len):
+		inflection = grammar_df.iloc[row, 0]
+		grammar = grammar_df.iloc[row, 1]
+		headword = grammar_df.iloc[row, 2]
+		headword_clean = re.sub(" \d*$", "", headword)
+		pos = grammar_df.iloc[row, 3]
+
+		if row % 5000 == 0:
+			print(f"{timeis()} {row}/{grammar_df_len}\t{inflection}")
+
+		if grammar == "indeclineable":
+			data_row = f"<b>{inflection}</b> is <b>indecliable</b> ({pos})" 
+		
+		else:
+			data_row = f"<b>{inflection}</b> is <b>{grammar}</b> of {headword_clean} ({pos})"
+		
+		if inflection not in grammar_dict.keys():
+			grammar_dict[inflection] = data_row
+		
+		elif inflection in grammar_dict.keys():
+			if not re.findall(data_row, grammar_dict[inflection]):
+				grammar_dict[inflection] += f"<br>{data_row}"
+
+	grammar_data_list = []
+	for key, value in grammar_dict.items():
+		grammar_data_list += [[f"{key}", f"""{value}""", "", ""]]
+
+	grammar_data_df = pd.DataFrame(grammar_data_list)
+	grammar_data_df.columns = ["word", "definition_html", "definition_plain", "synonyms"]
+	grammar_data_df.to_csv('output/grammar for dict.csv', sep='\t', index=None)
+	return grammar_data_df
+
+
+
+
+# make some compact data
+# make gd
+# made mdict
+
 # from here on its for sutta colouring
 # fixme split into another module?
 
@@ -773,14 +987,15 @@ def clean_machine(text):
 	text = re.sub("‘", "", text)
 	text = re.sub(";", "", text)
 	text = re.sub("’", "", text)
-	text = re.sub("!", "", text)
+	text = re.sub("`", "", text)
+	text = re.sub("!", "", text)	
 	text = re.sub("\?", "", text)
 	text = re.sub("\+", "", text)
 	text = re.sub("=", "", text)	
 	text = re.sub("﻿", "", text)
 	text = re.sub("§", " ", text)
-	text = re.sub("\(", "", text)
-	text = re.sub("\)", "", text)
+	text = re.sub("\(", " ", text)
+	text = re.sub("\)", " ", text)
 	text = re.sub("-", " ", text)
 	text = re.sub("–", "", text)	
 	text = re.sub("\t", " ", text)
