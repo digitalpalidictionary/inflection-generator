@@ -14,7 +14,7 @@ print(f"{timeis()} {line}")
 def make_text_list():
 	print(f"{timeis()} {green}making text list", end=" ")
 	text_path = "../Cst4/txt/"
-	text = "s0102m.mul.xml.txt"
+	text = "s0103m.mul.xml.txt"
 
 	with open (f"{text_path}{text}", "r") as f:
 		text_read = f.read()
