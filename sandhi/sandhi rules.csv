@@ -30,6 +30,7 @@ c	e	ce	e	sacetaṃ	general
 c	i	ca	i	cime	general
 c	i	ci	a	kaccisi	general
 c	i	ci	i	kecime	general
+c	o	ca	u	c'oggate	general
 c	o	co	a	niccomhi	general
 c	o	co	i	ādiccova	general
 c	u	ca	u	papañcuppatti	general
@@ -39,6 +40,7 @@ d	ā	da	a	idāhaṃ	general
 d	ā	da	ā	vādādayo	general
 d	ā	dā	a	yadāhaṃ	general
 d	ā	daṃ	a	ekamid'āhaṃ	general
+d	e	da	e	sadd'ettha	general
 d	e		e	bahudeva	eva
 d	ī	dī	a	saccavādīmhi	general
 d	o	da	u	candopama	general
@@ -58,6 +60,8 @@ g	ā	ga	a	kāliṅgāraññaṃ	general
 g	ā	ga	ā	vigatarāgādi	general
 g	e	go	e	pagevetaṃ	general
 g	g		g	vighātaggahaṇena	general
+g	ī	gi	i	aggī'va	general
+g	o	go	a	aggo'hamasmi	general
 g	o	go	i	paribhogoti	iti
 g	u	ga	u	aggupaṭṭhāyikā	general
 g	ū	ga	u	saggūpagena	general
@@ -71,8 +75,10 @@ h	ā	hā	a	santosakathāvasāne	general
 h	ā	hā	ā	addhāyasmantehi	general
 h	ā	hi	ā	hāyasmanto	general
 h	ā	hī	ā	hatthārūḷhaṃ	general
+h	ā	hu	a	sādh'āhaṃ	general
 h	ā	hu	ā	sādhāvuso	general
 h	e	ha	e	etthevassa	general
+h	e	hā	e	tatheva	eva
 h	e	haṃ	e	mayhevete	general
 h	e	he	a	yaggheyye	general
 h	e	hi	e	hete	general
@@ -115,6 +121,7 @@ k	ī	kī	i	kikīva	general
 k	k		k	cittakkhaṇiko	general
 k	o	ka	o	ek'obhāsajāto	general
 k	o	ko	a	ekomhi	general
+k	o	ko	u	pāṭik'odumbarīceva	general
 k	u	ka	u	ekucchaṅgena	general
 k	ū	ka	u	khajjopanakūpamā	general
 l	a	la	a	celaṇḍakena	general
@@ -162,6 +169,7 @@ m	ī	mi	i	asmīti	general
 m	o	ma	u	sadhammokkaṃsanā	general
 m	o	mo	a	saccanāmomhi	general
 m	o	mo	e	abhikkamosānaṃ	general
+m	o	mo	i	appaṭimo'dha 	general
 m	p	ṃ	ap	kusacīrampi	api
 m	p	ṃ	api	yampicchaṃ	general
 m	u	ṃ	u	ahamupaka	general
@@ -186,6 +194,7 @@ n	e	na	e	neso	general
 n	e	naṃ	e	pañcannetaṃ	general
 n	i	na	i	panidaṃ	general
 n	i	ni	a	ādīnipi	api
+n	i	ni	i	idān'ime	general
 n	ī	ni	i	sāmīcikammānīti	iti
 n	ī	nī	i	añjanīva	general
 n	n	ṃ	n	kinnu	general
@@ -200,6 +209,7 @@ n	u	nu	a	nujja	general
 n	u	nu	e	nuttha	general
 n	u	nu	i	nanume	general
 n	ū	na	u	udakādhān'ūpamāyo	general
+n	ū	nā	u	vedanūpāyaṃ	general
 ñ	a	ña	a	araññajjhāsayā	general
 ñ	ā	ñā	a	aññāssa	general
 ñ	ā	ñā	ā	saññādīsu	general
@@ -208,11 +218,14 @@ n	ū	na	u	udakādhān'ūpamāyo	general
 ñ	j	ṃ	j	dhanañjānī	general
 ñ	ñ	ṃ	y	yaññadeva	general
 ñ	ñ	ṃ		taññeva	general
+ñ	o	ño	a	katapuñño'si	general
+ñ	ū	ñā	u	saññ'ūpāyaṃ	general
 ṅ	k	ṃ	k	khemaṅkarassa	general
 ṇ	a	ṇa	a	gahaṇaṭṭhena	general
 ṇ	ā	ṇa	ā	khīṇāsavo	general
 ṇ	ā	ṇā	a	samaṇāmhā	general
 ṇ	i	ṇa	i	pīṇindriye	general
+ṇ	i	ṇi	i	tīṇindriyāni	general
 ṇ	o	ṇa	u	dakkhiṇodakaṃ	general
 ṇ	o	ṇo	a	otiṇṇomhi	general
 ṇ	u	ṇa	u	gaṇaṅgaṇupāhanā	general
@@ -229,6 +242,7 @@ p	ā	api	ā	yampāvuso	general
 p	ā	pa	a	appādhikaraṇaṃ	general
 p	ā	pa	ā	kassapādi	general
 p	ā	pi	a	apāhaṃ	general
+p	ā	pi	ā	apāvuso	api
 p	ā	po	ā	āp'ādīsupi	general
 p	e	api	e	brahmunāpesā	general
 p	i	ap	i	pidhekacce	general
@@ -244,6 +258,7 @@ r	a	ra	a	saṅkāraggi	general
 r	ā	ra	a	tatrāssudaṃ	general
 r	ā	ra	ā	saṃvarāpajjanā	general
 r	ā	rā	ā	accasarāvuso	general
+r	ā	ri	a	cattār'āhaṃ	general
 r	e	ra	e	tatrekassa	general
 r	i	ra	i	tatrime	general
 r	i	ri	i	cattārimāni	general
@@ -279,7 +294,9 @@ s	u	su	u	pañcasupādāna	general
 s	ū	sa	u	maṃsūpasecano	general
 s	ū	su	i	kathaṃsūti	iti
 s	ū	su	u	ājānīyasus'ūpamaṃ	general
+s	v	so	a	svajja	general
 t	a	ta	a	paṇītaṭṭhena	general
+t	a	ti	a	jhāyatassu	general
 t	ā	ta	a	nissutāssa	general
 t	ā	ta	ā	navanītādīni	general
 t	ā	ta	i	pattāti	general
@@ -288,8 +305,10 @@ t	ā	tā	ā	rājamahāmattādayo	general
 t	ā	tā	i	amantāti	iti
 t	ā	taṃ	a	dīgharattāhaṃ	general
 t	ā	ti	a	sammāpaṭipattādhikaraṇahetu	general
+t	ā	ti	ā	ijjhat'āvuso	general
 t	ā	tu	ā	yāpetāyasmā	general
 t	e	ti	e	santettha	general
+t	e	to	e	kutettha	general
 t	e	tu	e	tiṭṭhatetaṃ	general
 t	i	ta	i	vatidaṃ	general
 t	i	ti	a	satihaṃ	general
@@ -302,6 +321,7 @@ t	t		t	maṅgalatthambhaṃ	general
 t	u	ta	u	satubbedhaṃ	general
 t	u	to	u	tatuttariṃ	general
 t	ū	ta	u	cittūpahāraṃ	general
+t	ū	ti	u	bhavat'ūpapatti	general
 ṭ	ā	ṭa	ā	makkaṭādi	general
 ṭ	o	ṭo	a	āvaṭṭosi	general
 ṭ	o	ṭo	i	paṭṭoti	iti
@@ -327,6 +347,7 @@ v	ā	va	a	evāhaṃ	general
 v	ā	va	ā	mamevārabbha	general
 v	ā	va	i	yevāti	iti
 v	ā	vā	a	vāssa	general
+v	ā	vi	a	dv'āhaṃ	general
 v	e	o	e	khvettha	general
 v	e	u	e	tveva	general
 v	e	va	e	evettha	general
@@ -355,5 +376,6 @@ y	i	ya	i	kāy'indriyo	general
 y	i		i	y'ito	general
 y	o	ya	o	mahāmāluky'ovāde	general
 y	o	yo	a	yo'yaṃ	general
+y	o	yo	i	tayome	general
 y	u	ya	u	ācariy'upajjhāyānaṃ	general
 y	ū	yā	u	chāy'ūdaka	general

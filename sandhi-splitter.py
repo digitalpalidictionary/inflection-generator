@@ -29,8 +29,11 @@ def make_text_set():
 
 	print(f"{timeis()} {green}making text set", end = " ")
 	
-	# text_list = ["s0101m.mul.xml.txt"]
-	text_list = ["s0202m.mul.xml.txt", "s0202a.att.xml.txt"]
+	text_list = ["s0101m.mul.xml.txt"] # DN1 mūla
+	text_list += ["s0102m.mul.xml.txt"] # DN2 mūla
+	text_list += ["s0103m.mul.xml.txt"]  # DN3 mūla
+	text_list += ["s0202m.mul.xml.txt"]  # MN2 mūla
+	text_list += ["s0202a.att.xml.txt"]  # MN2 aṭṭhakathā
 	# !!! change zip_path !!!
 
 	# text_list = ["s0201m.mul.xml.txt", "s0201a.att.xml.txt", "s0202m.mul.xml.txt", "s0202a.att.xml.txt"]
@@ -53,6 +56,7 @@ def make_text_set():
 
 def make_spelling_mistakes_set():
 	global spelling_mistakes_set
+	global spelling_corrections_set
 	print(f"{timeis()} {green}making spelling mistakes set", end=" ")
 	sp_mistakes_df = pd.read_csv(
 		"sandhi/spelling mistakes.csv", dtype=str, header=None, sep="\t")
@@ -60,6 +64,20 @@ def make_spelling_mistakes_set():
 
 	spelling_mistakes_set = set(sp_mistakes_df[0].tolist())
 	print(f"{white}{len(spelling_mistakes_set)}")
+
+	print(f"{timeis()} {green}making spelling corrections set", end=" ")
+	spelling_corrections_set = set(sp_mistakes_df[1].tolist())
+	print(f"{white}{len(spelling_corrections_set)}")
+
+	f2 = open("output/sandhi/matches.csv", "w")
+	f2.write(f"word\tsplit\tprocess\trules\n")
+
+	for row in range(len(sp_mistakes_df)):
+		mistake = sp_mistakes_df.loc[row, 0]
+		correction = sp_mistakes_df.loc[row, 1]
+		f2.write(f"{mistake}\tincorrect spelling of <i>{correction}</i>\tspelling\tsp\n")
+	f2.close()
+
 
 
 def make_abbreviations_and_neg_set():
@@ -109,8 +127,8 @@ def make_manual_corrections_set():
 	manual_corrections_set = set(manual_corrections_df[0].tolist())
 	print(f"{white}{len(manual_corrections_set)}")
 
-	f2 = open("output/sandhi/matches.csv", "w")
-	f2.write(f"word\tsplit\tprocess\trules\n")
+	f2 = open("output/sandhi/matches.csv", "a")
+	# f2.write(f"word\tsplit\tprocess\trules\n")
 
 	for row in range(len(manual_corrections_df)):
 		sandhi = manual_corrections_df.loc[row, 0]
@@ -139,8 +157,8 @@ def import_text_set():
 	with open(f"output/set text", "rb") as p:
 		text_set = pickle.load(p)
 
-	# text_set.add("chedanaviniyogavinayakiriyālesantarakappataṇhādiṭṭhiasaṅkhyeyyakappamahākappādīsu")
 	text_set = text_set - spelling_mistakes_set
+	text_set = text_set | spelling_corrections_set
 	text_set = text_set - abbreviations_set
 	text_set = text_set - manual_corrections_set
 
