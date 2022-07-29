@@ -176,7 +176,8 @@ def generate_grammar_dict():
 
 	for item in grammar_dict:
 		grammar_dict[item] += f"</table></div></body>"
-
+	print(f"{timeis()} {green}grammar dict size", end= " ")
+	print(f"{white}{len(grammar_dict)}")
 	return grammar_dict
 
 
@@ -224,7 +225,7 @@ def make_goldendict():
     )
 
 	print(f"{timeis()} {green}writing goldendict")
-	zip_path = Path("../exporter/share/dpd grammar.zip")
+	zip_path = Path("../exporter/share/dpd-grammar.zip")
 	export_words_as_stardict_zip(words, ifo, zip_path)
 	
 
@@ -244,7 +245,7 @@ def convert_to_mdict(dpd_data_dict):
 	}
 	dpd_data = reduce(synonyms, dpd_data_dict, [])
 	writer = MDictWriter(dpd_data, title=ifo['bookname'], description = f"<p>by {ifo['author']} </p> <p>For more infortmation, please visit <a href=\"{ifo['website']}\">{ifo['description']}</a></p>")
-	outfile = open('../exporter/share/dpd grammar.mdx', 'wb')
+	outfile = open('../exporter/share/dpd-grammar.mdx', 'wb')
 	writer.write(outfile)
 	outfile.close()
 

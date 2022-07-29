@@ -32,8 +32,11 @@ def make_text_set():
 	text_list = ["s0101m.mul.xml.txt"] # DN1 mūla
 	text_list += ["s0102m.mul.xml.txt"] # DN2 mūla
 	text_list += ["s0103m.mul.xml.txt"]  # DN3 mūla
+	text_list += ["s0201m.mul.xml.txt"]  # MN1 mūla
 	text_list += ["s0202m.mul.xml.txt"]  # MN2 mūla
-	text_list += ["s0202a.att.xml.txt"]  # MN2 aṭṭhakathā
+	# text_list += ["s0202a.att.xml.txt"]  # MN2 aṭṭhakathā
+	text_list += ["s0203m.mul.xml.txt"]  # MN3 mūla
+	
 	# !!! change zip_path !!!
 
 	# text_list = ["s0201m.mul.xml.txt", "s0201a.att.xml.txt", "s0202m.mul.xml.txt", "s0202a.att.xml.txt"]
@@ -78,6 +81,30 @@ def make_spelling_mistakes_set():
 		f2.write(f"{mistake}\tincorrect spelling of <i>{correction}</i>\tspelling\tsp\n")
 	f2.close()
 
+
+def make_variant_readings_set():
+	global variant_readings_set
+	global variant_corrections_set
+
+	print(f"{timeis()} {green}making variant readings set", end=" ")
+	variant_reading_df = pd.read_csv(
+		"sandhi/variant readings.csv", dtype=str, header=None, sep="\t")
+	variant_reading_df.fillna("", inplace=True)
+
+	variant_readings_set = set(variant_reading_df[0].tolist())
+	print(f"{white}{len(variant_readings_set)}")
+
+	print(f"{timeis()} {green}making variant corrections set", end=" ")
+	variant_corrections_set = set(variant_reading_df[1].tolist())
+	print(f"{white}{len(variant_corrections_set)}")
+
+	f2 = open("output/sandhi/matches.csv", "a")
+
+	for row in range(len(variant_reading_df)):
+		variant = variant_reading_df.loc[row, 0]
+		correction = variant_reading_df.loc[row, 1]
+		f2.write(f"{variant}\tvariant reading of <i>{correction}</i>\tvariant\tv\n")
+	f2.close()
 
 
 def make_abbreviations_and_neg_set():
@@ -158,7 +185,9 @@ def import_text_set():
 		text_set = pickle.load(p)
 
 	text_set = text_set - spelling_mistakes_set
+	text_set = text_set - variant_readings_set
 	text_set = text_set | spelling_corrections_set
+	text_set = text_set | variant_corrections_set
 	text_set = text_set - abbreviations_set
 	text_set = text_set - manual_corrections_set
 
@@ -503,7 +532,7 @@ def four_word_sandhi():
 
 	for word in unmatched3:
 
-		if counter % 50 == 0:
+		if counter % 10 == 0:
 			print(f"{timeis()} {counter}/{length}\t{word}")
 
 		f1.write(f"{counter}\t{word}\n")
@@ -1219,7 +1248,7 @@ def x_word_sandhi_from_front_and_back():
 		rules_front = []
 		rules_back = []
 		
-		if counter % 10 == 0:
+		if counter % 1 == 0:
 			print(f"{timeis()} {counter}/{length} {word}")
 		
 		split_from_front_and_back(word_initial, word_front, word, word_back, comment, rules_front, rules_back)
@@ -1587,6 +1616,7 @@ def test_me():
 tic()
 make_text_set()
 make_spelling_mistakes_set()
+make_variant_readings_set()
 make_abbreviations_and_neg_set()
 make_manual_corrections_set()
 make_shortlist_set()

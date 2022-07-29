@@ -13,13 +13,21 @@ print(f"{timeis()} {line}")
 
 def make_text_list():
 	print(f"{timeis()} {green}making text list", end=" ")
+	text_list = []
 	text_path = "../Cst4/txt/"
-	text = "s0103m.mul.xml.txt"
-
-	with open (f"{text_path}{text}", "r") as f:
-		text_read = f.read()
-	clean_text = clean_machine(text_read)
-	text_list = clean_text.split()
+	# texts = ["s0101m.mul.xml.txt"]
+	# texts += ["s0102m.mul.xml.txt"]
+	# texts += ["s0103m.mul.xml.txt"]
+	# texts += ["s0201m.mul.xml.txt"]
+	# texts = ["s0202m.mul.xml.txt"]
+	texts = ["s0203m.mul.xml.txt"]
+	# texts = ["s0502a.att.xml.txt"]
+	for text in texts:
+		with open (f"{text_path}{text}", "r") as f:
+			text_read = f.read()
+		clean_text = clean_machine(text_read)
+		text_list += clean_text.split()
+	
 	print(f"{white}{len(text_list)}")
 	return text_list
 
@@ -34,6 +42,14 @@ def make_sp_mistakes_list():
 
 sp_mistakes_list = make_sp_mistakes_list()
 
+def make_variant_reading_list():
+	print(f"{timeis()} {green}making variant reading list", end=" ")
+	var_df = pd.read_csv("../inflection generator/sandhi/variant readings.csv", sep="\t", dtype=str, header=None)
+	var_list = var_df[0].to_list()
+	print(f"{white}{len(var_list)}")
+	return var_list
+
+var_list = make_variant_reading_list()
 
 def make_sandhi_list():
 	print(f"{timeis()} {green}making sandhi list", end=" ")
@@ -49,6 +65,7 @@ sandhi_list = make_sandhi_list()
 
 text_set = set(text_list) - set(sandhi_list)
 text_set = text_set - set(sp_mistakes_list)
+text_set = text_set - set(var_list)
 text_list = sorted(text_set, key=text_list.index)
 
 def make_all_inflections_set():

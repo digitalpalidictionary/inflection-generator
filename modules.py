@@ -300,11 +300,12 @@ def test_for_missing_html():
 	print(f"{timeis()} {green}testing for missing html files")
 
 	for headword in headwords_list:
-		try:
-			open(f'output/html tables/{headword}.html')
-		except:
-			print(f"{timeis()} {red}{headword} missing html file")
-			changed_headwords.add(headword)
+		if headword not in changed_headwords:
+			try:
+				open(f'output/html tables/{headword}.html')
+			except:
+				print(f"{timeis()} {red}{headword} missing html file")
+				changed_headwords.add(headword)
 
 
 def generate_all_inflections_dict():
@@ -984,8 +985,8 @@ def clean_machine(text):
 	text = re.sub("\d", "", text)
 	text = re.sub("\.", " ", text) #sometmes no space afterwards, so needs space
 	text = re.sub(",", " ", text)
+	text = re.sub(";", " ", text)
 	text = re.sub("‘", "", text)
-	text = re.sub(";", "", text)
 	text = re.sub("’", "", text)
 	text = re.sub("`", "", text)
 	text = re.sub("!", "", text)	
