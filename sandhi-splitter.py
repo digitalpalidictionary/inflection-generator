@@ -28,19 +28,17 @@ vowels = ["a", "ā", "i", "ī", "u", "ū", "o", "e"]
 def make_text_set():
 
 	print(f"{timeis()} {green}making text set", end = " ")
-	
+
 	text_list = ["s0101m.mul.xml.txt"] # DN1 mūla
 	text_list += ["s0102m.mul.xml.txt"] # DN2 mūla
 	text_list += ["s0103m.mul.xml.txt"]  # DN3 mūla
 	text_list += ["s0201m.mul.xml.txt"]  # MN1 mūla
 	text_list += ["s0202m.mul.xml.txt"]  # MN2 mūla
-	# text_list += ["s0202a.att.xml.txt"]  # MN2 aṭṭhakathā
+	text_list += ["s0202a.att.xml.txt"]  # MN2 aṭṭhakathā
 	text_list += ["s0203m.mul.xml.txt"]  # MN3 mūla
-	
-	# !!! change zip_path !!!
+	text_list += ["dd.txt"]
+	# !!! change zip_path if you change this !!!
 
-	# text_list = ["s0201m.mul.xml.txt", "s0201a.att.xml.txt", "s0202m.mul.xml.txt", "s0202a.att.xml.txt"]
-	# text_list = ["s0512m.mul.xml.txt", "s0512a.att.xml.txt"]
 	text_path = "../Cst4/txt/"
 	text_string = ""
 	
@@ -68,8 +66,26 @@ def make_spelling_mistakes_set():
 	spelling_mistakes_set = set(sp_mistakes_df[0].tolist())
 	print(f"{white}{len(spelling_mistakes_set)}")
 
+	filter = sp_mistakes_df[0] == sp_mistakes_df[1]
+	duplicates_df = sp_mistakes_df[filter]
+	duplicates_list = duplicates_df[0].to_list()
+	if duplicates_list != []:
+		print(f"{timeis()} {red}! dupes found {duplicates_list}")
+
 	print(f"{timeis()} {green}making spelling corrections set", end=" ")
 	spelling_corrections_set = set(sp_mistakes_df[1].tolist())
+	remove_me = set()
+	add_me = set()
+
+	for word in spelling_corrections_set:
+		if re.findall(".+ .+", word):
+			remove_me.add(word)
+			single_words = word.split(" ")
+			for single_word in single_words:
+				add_me.add(single_word)
+
+	spelling_corrections_set = spelling_corrections_set - remove_me
+	spelling_corrections_set = spelling_corrections_set | add_me
 	print(f"{white}{len(spelling_corrections_set)}")
 
 	f2 = open("output/sandhi/matches.csv", "w")
@@ -94,8 +110,26 @@ def make_variant_readings_set():
 	variant_readings_set = set(variant_reading_df[0].tolist())
 	print(f"{white}{len(variant_readings_set)}")
 
+	filter = variant_reading_df[0] == variant_reading_df[1]
+	duplicates_df = variant_reading_df[filter]
+	duplicates_list = duplicates_df[0].to_list()
+	if duplicates_list != []:
+		print(f"{timeis()} {red}! dupes found {duplicates_list}")
+
 	print(f"{timeis()} {green}making variant corrections set", end=" ")
 	variant_corrections_set = set(variant_reading_df[1].tolist())
+	remove_me = set()
+	add_me = set()
+
+	for word in variant_corrections_set:
+		if re.findall(".+ .+", word):
+			remove_me.add(word)
+			single_words = word.split(" ")
+			for single_word in single_words:
+				add_me.add(single_word)
+
+	variant_corrections_set = variant_corrections_set - remove_me
+	variant_corrections_set = variant_corrections_set | add_me
 	print(f"{white}{len(variant_corrections_set)}")
 
 	f2 = open("output/sandhi/matches.csv", "a")
@@ -154,8 +188,17 @@ def make_manual_corrections_set():
 	manual_corrections_set = set(manual_corrections_df[0].tolist())
 	print(f"{white}{len(manual_corrections_set)}")
 
+	manual_corrections_list = manual_corrections_df[1].tolist()
+
+	for word in manual_corrections_list:
+		if not re.findall ("\\+", word):
+			print(f"{timeis()} {red}! no plus sign {word}")
+		if re.findall ("(\\S\\+|\\+\\S)", word):
+			print(f"{timeis()} {red}! needs space {word}")		
+		# if re.findall ("\\+\\S", word):
+		# 	print(f"{timeis()} {red}! needs space {word}")				
+	
 	f2 = open("output/sandhi/matches.csv", "a")
-	# f2.write(f"word\tsplit\tprocess\trules\n")
 
 	for row in range(len(manual_corrections_df)):
 		sandhi = manual_corrections_df.loc[row, 0]
@@ -260,7 +303,7 @@ def import_sandhi_rules():
 		["chA", "chB", "ch1", "ch2"], keep=False)]
 
 	if len(dupes) != 0:
-		print(f"\n{timeis()} {red}duplicates found! please remove them and try again")
+		print(f"\n{timeis()} {red}! duplicates found! please remove them and try again")
 		print(f"{timeis()} {red}{line}")
 		print(f"\n{red}{dupes}")
 		sys.exit()
@@ -275,7 +318,7 @@ def import_sandhi_rules():
     rules_df["chB"].str.contains(" ").any() or \
     rules_df["ch1"].str.contains(" ").any() or \
     rules_df["ch2"].str.contains(" ").any():
-		print(f"\n{timeis()} {red}spaces found! please remove them and try again")
+		print(f"\n{timeis()} {red}! spaces found! please remove them and try again")
 		print(f"{timeis()} {red}{line}")
 		sys.exit()
 

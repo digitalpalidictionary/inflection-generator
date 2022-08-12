@@ -89,6 +89,8 @@ def combine_word_sets():
 	print(f"{timeis()} {green}making all words set", end=" ")
 	all_words = all_tipitaka_words | all_sandhi_words
 	print(f"{white}{len(all_words)}")
+	with open("output/allwords set", "wb") as p:
+		pickle.dump(all_words, p)
 	return all_words
 
 
@@ -186,8 +188,16 @@ def make_grammar_data_df():
 	grammar_data_list = []
 	grammar_data_list_mdict = []
 	for key, value in grammar_dict.items():
-		grammar_data_list += [[f"{key}", f"""{value}""", "", ""]]
-		grammar_data_list_mdict += [[f"{key}", f"""<h3>{key}</h3>{value}""", "", ""]]
+		synonyms = [key]
+		for synoym in synonyms:
+			if re.findall("ṃ", synoym):
+				synoym1 = re.sub("ṃ", "ṁ", synoym)
+				synonyms += [synoym1]
+				synoym2 = re.sub("ṃ", "ŋ", synoym)
+				synonyms += [synoym2]
+
+		grammar_data_list += [[f"{key}", f"""{value}""", "", synonyms]]
+		grammar_data_list_mdict += [[f"{key}", f"""<h3>{key}</h3>{value}""", "", synonyms]]
 	
 	grammar_data_df = pd.DataFrame(grammar_data_list)
 	grammar_data_df.columns = [
@@ -225,7 +235,7 @@ def make_goldendict():
     )
 
 	print(f"{timeis()} {green}writing goldendict")
-	zip_path = Path("../exporter/share/dpd-grammar.zip")
+	zip_path = Path("../exporter/share/dpd-grammar-goldendict.zip")
 	export_words_as_stardict_zip(words, ifo, zip_path)
 	
 
@@ -245,7 +255,7 @@ def convert_to_mdict(dpd_data_dict):
 	}
 	dpd_data = reduce(synonyms, dpd_data_dict, [])
 	writer = MDictWriter(dpd_data, title=ifo['bookname'], description = f"<p>by {ifo['author']} </p> <p>For more infortmation, please visit <a href=\"{ifo['website']}\">{ifo['description']}</a></p>")
-	outfile = open('../exporter/share/dpd-grammar.mdx', 'wb')
+	outfile = open('../exporter/share/dpd-grammar-mdict.mdx', 'wb')
 	writer.write(outfile)
 	outfile.close()
 
@@ -255,6 +265,38 @@ def make_mdict():
 	dict_data = grammar_data_df_mdict.to_dict(orient="records")
 	convert_to_mdict(dict_data)
 
+
+def make_raw_inflections_table():
+	print(f"{timeis()} {green}generting list of raw inflections")
+
+	output_csv = open ("output/raw inflections.csv", "w")
+	output_csv.write(f"pattern\tdescription\tpattern name\n")
+
+	for pattern_name,table in inflection_tables_dict.items():
+
+		df_table = inflection_tables_dict[pattern_name]["df"]
+		df_table.fillna("", inplace=True)
+		df_rows = df_table.shape[0]
+		df_columns = df_table.shape[1]
+
+		for rows in range(0, df_rows):
+			for columns in range(0, df_columns, 2):  # 1 to 0
+				patterns = df_table.iloc[rows, columns]
+				patterns = patterns.split("\n")
+				description = df_table.iloc[rows, columns+1]
+				if description == "":
+					description = "in comps"
+				for pattern in patterns:
+					if pattern != "":
+						output_csv.write(f"{pattern}\t{description}\t{pattern_name}\n")
+	
+	output_csv.close()
+	pattern_df = pd.read_csv("output/raw inflections.csv", sep="\t", dtype = str)
+	pattern_df.sort_values(["pattern", "description", "pattern name"], inplace=True)
+	pattern_df.to_csv("output/raw inflections.csv", sep="\t", index=None)
+
+
+
 tic()
 dpd_df, dpd_df_length, headwords_list, inflection_tables_dict = setup()
 all_words_set = combine_word_sets()
@@ -262,4 +304,5 @@ grammar_dict = generate_grammar_dict()
 grammar_data_df, grammar_data_df_mdict = make_grammar_data_df()
 make_goldendict()
 make_mdict()
+make_raw_inflections_table()
 toc()

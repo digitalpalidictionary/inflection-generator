@@ -99,7 +99,6 @@ def create_inflection_table_df():
 	inflection_table_df.columns = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "AB", "AC", "AD", "AE", "AF", "AG", "AH", "AI", "AJ", "AK", "AL", "AM", "AN", "AO", "AP", "AQ", "AR", "AS", "AT", "AU", "AV", "AW", "AX", "AY", "AZ", "BA", "BB", "BC", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BK", "BL", "BM", "BN", "BO", "BP", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BX", "BY", "BZ", "CA", "CB", "CC", "CD", "CE", "CF", "CG", "CH", "CI", "CJ", "CK", "CL", "CM", "CN", "CO", "CP", "CQ", "CR", "CS", "CT", "CU", "CV", "CW", "CX", "CY", "CZ", "DA", "DB", "DC", "DD", "DE", "DF", "DG", "DH", "DI", "DJ", "DK"]
 
 	inflection_table_df.fillna("", inplace=True)
-	# print(inflection_table_df[:20])
 
 
 def test_inflection_pattern_changed():
@@ -203,7 +202,13 @@ def import_old_inflections_dict():
 
 	with open("output/all inflections dict", "rb") as f:
 		old_inflections_dict = pickle.load(f)
-	
+
+def import_allwords_set():
+	with open ("output/allwords set", "rb") as p:
+		allwords_set = pickle.load(p)
+	return allwords_set
+
+allwords_set = import_allwords_set()
 
 def test_for_missing_stem_and_pattern():
 	print(f"{timeis()} {green}test for missing stems and patterns")
@@ -536,7 +541,7 @@ def generate_html_inflection_table():
 	conjugations = ["aor", "cond", "fut", "imp", "imperf", "opt", "perf", "pr"]
 	declensions = ["adj", "card", "cs", "fem", "letter", "masc", "nt", "ordin", "pp", "pron", "prp", "ptp", "root", "suffix", "ve"]
 
-	for row in range(dpd_df_length): #dpd_df_length
+	for row in range(dpd_df_length):  # dpd_df_length
 		headword = dpd_df.loc[row, "Pāli1"]
 		headword_clean = re.sub(" \d*$", "", headword)
 		stem = dpd_df.loc[row, "Stem"]
@@ -544,12 +549,15 @@ def generate_html_inflection_table():
 			stem = re.sub("!", "", stem)
 		if stem == "*":
 			stem = ""
+			stem_star = True
 		pattern = dpd_df.loc[row, "Pattern"]
 		pos = dpd_df.loc[row, "POS"]
 		meaning = dpd_df.loc[row, "Meaning IN CONTEXT"]
 
+		# if 1==1:
 		if headword in changed_headwords:
-			print(f"{timeis()} {row}/{dpd_df_length}\t{headword}")
+			if row % 5000 ==0 :
+				print(f"{timeis()} {row}/{dpd_df_length}\t{headword}")
 
 			html_file = open(f"output/html tables/{headword}.html", "w")
 				
@@ -561,7 +569,6 @@ def generate_html_inflection_table():
 
 			else:
 				df_table = inflection_tables_dict[pattern]["df"].copy()
-				# df = pd.read_csv(f"output/patterns/{pattern}.csv", sep="\t", index_col=0)
 				df_table.fillna("", inplace=True)
 				df_rows = df_table.shape[0]
 				df_columns = df_table.shape[1]
@@ -569,8 +576,13 @@ def generate_html_inflection_table():
 				for rows in range(0, df_rows): 
 					for columns in range(0, df_columns, 2): #1 to 0
 						html_cell = df_table.iloc[rows, columns]
-						html_cell = re.sub(r"(.+)", f"<b>\\1</b>", html_cell) # add bold
+						# html_cell = re.sub(r"(.+)", f"<b>\\1</b>", html_cell) # add bold
 						html_cell = re.sub(r"(.+)", f"{stem}\\1", html_cell) # add stem
+						inflected_words = html_cell.split("\n")
+						for inflected_word in inflected_words:
+							if inflected_word not in allwords_set:
+								html_cell = re.sub(f"\\b{inflected_word}\\b", f"<span class='gray'>{inflected_word}</span>", html_cell)
+						html_cell = re.sub(f"(^|\n|>){stem}(.+)", f"\\1{stem}<b>\\2</b>", html_cell) # add bold
 						html_cell = re.sub(r"\n", "<br>", html_cell) # add line breaks
 						df_table.iloc[rows, columns] = html_cell
 
@@ -582,21 +594,23 @@ def generate_html_inflection_table():
 				html_table = df_table.to_html(escape=False)
 				html_table = re.sub("Unnamed.+", "", html_table)
 				html_table = re.sub("NaN", "", html_table)
+				html_table = re.sub(' style="text-align: right;"', "", html_table)
+				html_table = re.sub('border="1" ', '', html_table)
 
 				# write header info
 
-				if inflection_table_index_dict[pattern] != "":
+				if inflection_table_index_dict[pattern] != "irreg":
 					if pos in declensions:
-						heading = (f"""<p class ="heading"><b>{headword_clean}</b> is <b>{pattern}</b> declension like <b>{inflection_table_index_dict[pattern]}</b></p>""")
+						heading = (f"""<p class="heading"><b>{headword_clean}</b> is <b>{pattern}</b> declension like <b>{inflection_table_index_dict[pattern]}</b></p>""")
 					if pos in conjugations:
-						heading = (f"""<p class ="heading"><b>{headword_clean}</b> is <b>{pattern}</b> conjugation like <b>{inflection_table_index_dict[pattern]}</b></p>""")
+						heading = (f"""<p class="heading"><b>{headword_clean}</b> is <b>{pattern}</b> conjugation like <b>{inflection_table_index_dict[pattern]}</b></p>""")
 
-				if inflection_table_index_dict[pattern] == "":
+				if inflection_table_index_dict[pattern] == "irreg":
 					if pos in declensions:
-						heading = (f"""<p class ="heading"><b>{headword_clean}</b> is <b>{pattern}</b> irregular declension</p>""")
+						heading = (f"""<p class="heading"><b>{headword_clean}</b> is <b>{pattern}</b> irregular declension</p>""")
 					if pos in conjugations:
-						heading = (f"""<p class ="heading"><b>{headword_clean}</b> is <b>{pattern}</b> irregular conjugation</p>""")
-			
+						heading = (f"""<p class="heading"><b>{headword_clean}</b> is <b>{pattern}</b> irregular conjugation</p>""")
+
 				html = heading + html_table 
 				html_file.write(html)
 
@@ -656,7 +670,6 @@ def delete_unused_html_tables():
 def generate_grammar_dict():
 
 	print(f"{timeis()} {green}generating grammar df from scratch")
-
 
 	grammar_dict = {}
 

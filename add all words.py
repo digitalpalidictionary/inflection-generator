@@ -4,7 +4,7 @@
 import pandas as pd
 from modules import clean_machine
 import pickle
-from timeis import timeis, tic, toc, white, green, yellow, line
+from timeis import timeis, tic, toc, white, green, yellow, line, red
 
 tic()
 print(f"{timeis()} {line}")
@@ -53,11 +53,8 @@ var_list = make_variant_reading_list()
 
 def make_sandhi_list():
 	print(f"{timeis()} {green}making sandhi list", end=" ")
-	try:
-		sandhi_df = pd.read_csv("output/allwords/sandhi.csv", sep="\t", dtype=str, header=None)
-		sandhi_list = sandhi_df[0].to_list()
-	except:
-		sandhi_list = []
+	sandhi_df = pd.read_csv("allwords/sandhi.csv", sep="\t", dtype=str, header=None)
+	sandhi_list = sandhi_df[0].to_list()
 	print(f"{white}{len(sandhi_list)}")
 	return sandhi_list
 

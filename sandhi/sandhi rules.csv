@@ -1,33 +1,33 @@
 chA	chB	ch1	ch2	eg	for
-a	p	a	ap	abhivaggenapi	api
-a	v	a	ev	cūḷava	eva
-a	y	a		tayidaṃ	general
-ā	p	a	ap	ajjāpi	api
-ā	p	ā	ap	samāpattiyāpi	api
-ā	t	a	it	cāti	iti
-ā	t	ā	it	upādāyāti	iti
-ā	t	ā		tasmātiha	general
-ā	v	ā	ev	datvāva	eva
-ā	y	ā		imissāyeva	general
-b	a	ba	a	sabbaṅga	general
-b	ā	bā	ā	sabbākārena	general
-b	ā	baṃ	a	bhūtapubbāhaṃ	general
-b	b	d	v	tabbipaccanīka	general
-b	e	be	e	sabbete	general
-b	o	ba	o	sabbokāsaṃ	general
-c	a	ca	a	caggā	general
-c	a	ce	a	sacassa	general
-c	ā	ca	a	cāhaṃ	general
-c	ā	ca	ā	cānanda	general
-c	ā	ca	i	cāti	iti
-c	ā	cā	i	sammuccāti	iti
-c	ā	ce	a	sacāyaṃ	general
-c	ā	ci	a	kaccāsi	general
-c	c	ti		icceva	general
-c	c		c	sāracchedo	general
-c	e	ca	e	cevimaṃ	general
-c	e	ce	e	sacetaṃ	general
-c	i	ca	i	cime	general
+a	p	a	ap	abhivaggen'api	api
+a	v	a	ev	cūḷa'va	eva
+a	y	a		ta'y'idaṃ	general
+ā	p	a	ap	ajjā'pi	api
+ā	p	ā	ap	samāpattiyā'pi	api
+ā	t	a	it	cā'ti	iti
+ā	t	ā	it	upādāyā'ti	iti
+ā	t	ā		tasmā't'iha	general
+ā	v	ā	ev	datvā'va	eva
+ā	y	ā		imissā'y'eva	general
+b	a	ba	a	sabb'aṅga	general
+b	ā	bā	ā	sabb'ākārena	general
+b	ā	baṃ	a	bhūtapubb'āhaṃ	general
+b	b	d	v	tab'bipaccanīka	general
+b	e	be	e	sabb'ete	general
+b	o	ba	o	sabb'okāsaṃ	general
+c	a	ca	a	c'aggā	general
+c	a	ce	a	sac'assa	general
+c	ā	ca	a	c'āhaṃ	general
+c	ā	ca	ā	c'ānanda	general
+c	ā	ca	i	cā'ti	iti
+c	ā	cā	i	sammuccā'ti	iti
+c	ā	ce	a	sac'āyaṃ	general
+c	ā	ci	a	kacc'āsi	general
+c	c	ti		icc'eva	general
+c	c		c	sāra'c'chedo	general
+c	e	ca	e	c'evimaṃ	general
+c	e	ce	e	sac'etaṃ	general
+c	i	ca	i	c'ime	general
 c	i	ci	a	kaccisi	general
 c	i	ci	i	kecime	general
 c	o	ca	u	c'oggate	general
@@ -294,6 +294,7 @@ s	o	sa	o	sīsokkamanaṃ	general
 s	o	so	a	somhi	general
 s	o	so	e	dosova	eva
 s	o	so	i	sadisoti	iti
+s	s	d	s	tassāruppaṃ	general
 s	s		s	chinnassarāpi	general
 s	u	sa	u	imassuppādā	general
 s	u	su	a	indriyesumha	general
@@ -374,6 +375,8 @@ y	a	ya	a	gomayaggi	general
 y	a	yaṃ	a	āhareyy'assāhaṃ	general
 y	ā	e	a	tyāhaṃ	general
 y	ā	e	ā	tyāvuso	general
+y	ā	iṃ	a	kyāhaṃ	general
+y	ā	iṃ	ā	kyādīsupi	general
 y	ā	ya	a	sudhammāy'ābhito	general
 y	ā	ya	ā	huveyy'āvuso	general
 y	ā	yā	a	yāhaṃ	general
@@ -386,6 +389,6 @@ y	i	ya	i	kāy'indriyo	general
 y	i		i	y'ito	general
 y	o	ya	o	mahāmāluky'ovāde	general
 y	o	yo	a	yo'yaṃ	general
-y	o	yo	i	tayome	general
+y	o	yo	i	tayo'me	general
 y	u	ya	u	ācariy'upajjhāyānaṃ	general
 y	ū	yā	u	chāy'ūdaka	general
