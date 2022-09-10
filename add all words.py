@@ -5,6 +5,7 @@ import pandas as pd
 from modules import clean_machine
 import pickle
 from timeis import timeis, tic, toc, white, green, yellow, line, red
+import re
 
 tic()
 print(f"{timeis()} {line}")
@@ -15,13 +16,23 @@ def make_text_list():
 	print(f"{timeis()} {green}making text list", end=" ")
 	text_list = []
 	text_path = "../Cst4/txt/"
-	# texts = ["s0101m.mul.xml.txt"]
-	# texts += ["s0102m.mul.xml.txt"]
-	# texts += ["s0103m.mul.xml.txt"]
-	# texts += ["s0201m.mul.xml.txt"]
-	# texts = ["s0202m.mul.xml.txt"]
-	texts = ["s0203m.mul.xml.txt"]
-	# texts = ["s0502a.att.xml.txt"]
+	# texts = ["s0101m.mul.xml.txt"]  # DN1
+	# texts += ["s0102m.mul.xml.txt"]  # DN2
+	# texts += ["s0103m.mul.xml.txt"]  # DN3
+	# texts += ["s0201m.mul.xml.txt"]  # MN1
+	# texts = ["s0202m.mul.xml.txt"]  # MN2
+	# texts = ["s0203m.mul.xml.txt"]  # MN3
+	texts = ["s0301m.mul.xml.txt"]  # SN1
+	# texts = ["s0302m.mul.xml.txt"]  # SN2
+	# texts = ["s0303m.mul.xml.txt"]  # SN3
+	# texts = ["s0304m.mul.xml.txt"]  # SN4
+	# texts = ["s0305m.mul.xml.txt"]  # SN5
+	# texts = ["vin01m.mul.xml.txt"]  # VIN1
+	# texts = ["vin02m1.mul.xml.txt"]  # VIN2
+	# texts = ["vin02m2.mul.xml.txt"]  # VIN3
+	# texts = ["vin02m3.mul.xml.txt"] # VIN4
+	# texts = ["vin02m4.mul.xml.txt"]  # VIN5
+
 	for text in texts:
 		with open (f"{text_path}{text}", "r") as f:
 			text_read = f.read()
@@ -31,7 +42,68 @@ def make_text_list():
 	print(f"{white}{len(text_list)}")
 	return text_list
 
+
 text_list = make_text_list()
+
+def make_sc_text_list():
+	print(f"{timeis()} {green}making sutta central text list", end=" ")
+	sc_text_list = []
+	sc_path = "/home/bhikkhu/git/Tipitaka-Pali-Projector/tipitaka_projector_data/pali/"
+	
+	sc_texts = []
+	# sc_texts += ["11010a.js"]  # VIN1
+	# sc_texts += ["11020a.js"]  # VIN2
+	# sc_texts += ["11030a.js"]  # VIN3
+	# sc_texts += ["11040a.js"]  # VIN4
+	# sc_texts += ["11050a.js"]  # VIN5
+
+	sc_texts += ["21010a.js"]  # DN1
+	sc_texts += ["21020a.js"]  # DN2
+	sc_texts += ["21030a.js"]  # DN3
+
+	sc_texts += ["31010a.js"]  # MN1
+	sc_texts += ["31020a.js"]  # MN2
+	sc_texts += ["31030a.js"]  # MN3
+
+	sc_texts += ["41010a.js"]  # SN1
+	# sc_texts += ["41020a.js"]  # SN2
+	# sc_texts += ["41030a.js"]  # SN3
+	# sc_texts += ["41040a.js"]  # SN4
+	# sc_texts += ["41050a.js"]  # SN5
+
+	# sc_texts += ["51010a.js"]  # AN1
+	# sc_texts += ["51020a.js"]  # AN2
+	# sc_texts += ["51030a.js"]  # AN3
+	# sc_texts += ["51040a.js"]  # AN4
+	# sc_texts += ["51050a.js"]  # AN5
+	# sc_texts += ["51060a.js"]  # AN6
+	# sc_texts += ["51070a.js"]  # AN7
+	# sc_texts += ["51080a.js"]  # AN8
+	# sc_texts += ["51090a.js"]  # AN9
+	# sc_texts += ["51100a.js"]  # AN10
+	# sc_texts += ["51110a.js"]  # AN11
+
+	# sc_texts += ["61080a.js"]  # TH
+	# sc_texts += ["61090a.js"]  # THI
+
+	for sc_text in sc_texts:
+		with open(f"{sc_path}{sc_text}", "r") as f:
+			text_read = f.read()
+		text_read = re.sub("var P_HTM.+", "", text_read)
+		text_read = re.sub("""P_HTM\\[\d+\\]="\\*""", "", text_read)
+		text_read = re.sub("""\\*\\*.+;""", "", text_read)
+		text_read = re.sub("\n", " ", text_read)
+		text_read = text_read.lower()
+		clean_text = clean_machine(text_read)
+		sc_text_list += clean_text.split()
+
+	# print(sc_text_list)
+	print(f"{white}{len(sc_text_list)}")
+	return sc_text_list
+
+
+sc_text_list = make_sc_text_list()
+
 
 def make_sp_mistakes_list():
 	print(f"{timeis()} {green}making spelling mistakes list", end=" ")
@@ -60,6 +132,7 @@ def make_sandhi_list():
 
 sandhi_list = make_sandhi_list()
 
+text_list = text_list + sc_text_list
 text_set = set(text_list) - set(sandhi_list)
 text_set = text_set - set(sp_mistakes_list)
 text_set = text_set - set(var_list)
