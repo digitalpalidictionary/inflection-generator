@@ -12,6 +12,7 @@ from timeis import timeis, blue, yellow, green, red, white, line, tic, toc
 from io import StringIO
 from csv import writer
 from sorter import sort_key
+from delete_unused_files import del_unused_files
 
 
 def create_inflection_table_index():
@@ -311,6 +312,7 @@ def test_for_missing_html():
 			except:
 				print(f"{timeis()} {red}{headword} missing html file")
 				changed_headwords.add(headword)
+	return changed_headwords
 
 
 def generate_all_inflections_dict():
@@ -367,8 +369,8 @@ def generate_all_inflections_dict():
 				df_rows = df.shape[0]
 				df_columns = df.shape[1]
 
-				for rows in range(1, df_rows):
-					for columns in range(1, df_columns, 2):
+				for rows in range(0, df_rows):
+					for columns in range(0, df_columns, 2):
 						line = df.iloc[rows, columns]
 						line = re.sub(r"(.+)", f"{stem}\\1", line)
 						search_string = re.compile("\n", re.M)
@@ -533,8 +535,42 @@ def update_all_inflections_dict():
 	with open("output/all inflections dict", "wb") as f:
 		pickle.dump(all_inflections_dict, f)
 
+def unused_patterns():
+	print(f"{timeis()} {green}unused patterns")
 
-def generate_html_inflection_table():
+	# list of all inflection patterns
+	all_inflection_patterns = inflection_table_index_df["inflection name"].to_list()
+	
+	# list of all "aka" patterns
+	aka_patterns = inflection_table_index_df["aka"].to_list()
+	aka_patterns = sorted(set(aka_patterns))
+	aka_patterns.remove("")
+
+	# make a dict of all used patterns
+	used_infl = {}
+	for pattern in all_inflection_patterns:
+		used_infl[pattern] = 0
+	for pattern in aka_patterns:
+		used_infl[pattern] = 0
+	
+	# count patterns used in dpd_df
+	for row in range(len(dpd_df)):
+		pattern = dpd_df.loc[row, "Pattern"]
+		if pattern in used_infl:
+			used_infl[pattern] += 1
+	
+	# print unused patterns
+	for pattern in used_infl:
+		if used_infl[pattern] == 0:
+			print(f"{timeis()} {red}{pattern} ")
+	
+	# save csv of most common patterns
+	most_common_patterns_df = pd.DataFrame.from_dict(used_infl, orient = "index")
+	most_common_patterns_df.sort_values(0, inplace=True, ascending=False)
+	most_common_patterns_df.to_csv("output/most common patterns.csv", sep="\t", header=None) 
+
+
+def generate_html_inflection_table(make_tables, changed_headwords):
 	print(f"{timeis()} {green}generating html inflection tables")
 
 	indeclinables = ["abbrev", "abs", "ger", "ind", "inf", "prefix"]
@@ -549,12 +585,12 @@ def generate_html_inflection_table():
 			stem = re.sub("!", "", stem)
 		if stem == "*":
 			stem = ""
-			stem_star = True
 		pattern = dpd_df.loc[row, "Pattern"]
 		pos = dpd_df.loc[row, "POS"]
-		meaning = dpd_df.loc[row, "Meaning IN CONTEXT"]
+		
+		if make_tables == True:
+			changed_headwords = headwords_list
 
-		# if 1==1:
 		if headword in changed_headwords:
 			if row % 5000 ==0 :
 				print(f"{timeis()} {row}/{dpd_df_length}\t{headword}")
@@ -581,9 +617,21 @@ def generate_html_inflection_table():
 						inflected_words = html_cell.split("\n")
 						for inflected_word in inflected_words:
 							if inflected_word not in allwords_set:
+								# html_cell = re.sub(f"\\b{inflected_word}\\b", f"<span class='gray'>{inflected_word}</span>", html_cell)
 								html_cell = re.sub(f"\\b{inflected_word}\\b", f"<span class='gray'>{inflected_word}</span>", html_cell)
-						html_cell = re.sub(f"(^|\n|>){stem}(.+)", f"\\1{stem}<b>\\2</b>", html_cell) # add bold
-						html_cell = re.sub(r"\n", "<br>", html_cell) # add line breaks
+								
+						html_cell = re.sub(f"(<span class\\='gray'>){stem}(.+?)(<\\/span>)", f"\\1{stem}<b>\\2</b>\\3", html_cell)  # add bold to grayed word
+
+						search = re.compile(
+							f"(^|\\n){stem}(.+?)(\\n|$)", re.M)
+						html_cell = re.sub(
+							search, 
+							f"\\1{stem}<b>\\2</b>\\3", 
+							html_cell) # add bold
+						html_cell = re.sub(
+							"\\n",
+							"<br>",
+							html_cell) # add line breaks
 						df_table.iloc[rows, columns] = html_cell
 
 				column_list = []
@@ -614,7 +662,65 @@ def generate_html_inflection_table():
 				html = heading + html_table 
 				html_file.write(html)
 
+
+
 def transliterate_inflections():
+	print(f"{timeis()} {green}transliterating inflections to sinhala devanagari thai")
+
+	translit_dict = {}
+	for headword in all_inflections_dict:
+		if headword in changed_headwords or \
+			all_inflections_dict[headword]["sinhala"] == "":
+
+			translit_dict[headword] = ""
+			for inflection in all_inflections_dict[headword]["inflections"]:
+				translit_dict[headword] += f"{inflection} "
+	
+	translit_df = pd.DataFrame.from_dict(translit_dict, orient="index")
+	translit_df = translit_df.dropna()
+	translit_df.fillna("", inplace=True)
+	translit_df.reset_index(inplace=True)
+	
+	inflections = translit_df[0].to_csv(index=None, quoting=None, header=None)
+
+	sinhala = transliterate.process(
+		"IASTPali", "Sinhala", inflections, post_options=['SinhalaPali', 'SinhalaConjuncts'])
+
+	devanagari = devanagari = transliterate.process(
+		"IASTPali", "Devanagari", inflections, post_options=['DevanagariAnusvara'])
+
+	thai = transliterate.process(
+		"IASTPali", "Thai", inflections)
+
+	sinhala_df = pd.DataFrame(sinhala.split("\n"))
+	devanagari_df = pd.DataFrame(devanagari.split("\n"))
+	thai_df = pd.DataFrame(thai.split("\n"))
+
+	concat_df = pd.concat([translit_df, sinhala_df, devanagari_df, thai_df], axis=1)
+	concat_df = concat_df.dropna()
+
+	for row in range(len(concat_df)):
+		headword = concat_df.iloc[row, 0]
+		inflections = concat_df.iloc[row, 1]
+		sinhala = concat_df.iloc[row, 2]
+		devanagari = concat_df.iloc[row, 3]
+		thai = concat_df.iloc[row, 4]
+
+		if len(concat_df) >= 1000:
+			if row % 1000 == 0:
+				print(f"{timeis()} {white}{row}\t{headword}")
+
+		all_inflections_dict[headword]["sinhala"] = set(sinhala.split())
+		all_inflections_dict[headword]["devanagari"] = set(devanagari.split())
+		all_inflections_dict[headword]["thai"] = set(thai.split())
+
+	df = pd.DataFrame.from_dict(all_inflections_dict, orient='index')
+	df.to_csv("output/all inflections dict.csv", sep="\t")
+	with open("output/all inflections dict", "wb") as f:
+		pickle.dump(all_inflections_dict, f)
+
+
+def transliterate_inflections_old():
 
 	print(f"{timeis()} {green}transliterating inflections to sinhala devanagari thai")
 
@@ -653,18 +759,12 @@ def transliterate_inflections():
 		pickle.dump(all_inflections_dict, f)
 
 
-def delete_unused_html_tables():
-	print(f"{timeis()} {green}deleting unused html files ")
 
-	for root, dirs, files in os.walk("output/html tables", topdown=True):
-		for file in files:
-			try:
-				file_clean = re.sub(".html", "", file)
-				if file_clean not in headwords_list:
-					os.remove(f"output/html tables/{file}")
-					print(f"{timeis()} {file}")
-			except:
-				print(f"{timeis()} {red}{file} not found")
+def delete_unused_html_tables():
+
+	file_dir = "output/html tables/"
+	file_ext = ".html"
+	del_unused_files(headwords_list, file_dir, file_ext)
 
 
 def generate_grammar_dict():
@@ -818,48 +918,6 @@ def update_grammar_dict():
 	with open('output/grammardict', 'wb') as p:
 		pickle.dump(grammar_dict, p)
 
-def reformat_gramma_dict():
-	print(f"{timeis()} {green}reformatting grammar dict")
-	
-
-
-def make_grammar_dict():
-	print(f"{timeis()} {green}making grammar dict")
-	grammar_df_len = len(grammar_df)
-	grammar_dict = {}
-
-	for row in range(grammar_df_len):
-		inflection = grammar_df.iloc[row, 0]
-		grammar = grammar_df.iloc[row, 1]
-		headword = grammar_df.iloc[row, 2]
-		headword_clean = re.sub(" \d*$", "", headword)
-		pos = grammar_df.iloc[row, 3]
-
-		if row % 5000 == 0:
-			print(f"{timeis()} {row}/{grammar_df_len}\t{inflection}")
-
-		if grammar == "indeclineable":
-			data_row = f"<b>{inflection}</b> is <b>indecliable</b> ({pos})" 
-		
-		else:
-			data_row = f"<b>{inflection}</b> is <b>{grammar}</b> of {headword_clean} ({pos})"
-		
-		if inflection not in grammar_dict.keys():
-			grammar_dict[inflection] = data_row
-		
-		elif inflection in grammar_dict.keys():
-			if not re.findall(data_row, grammar_dict[inflection]):
-				grammar_dict[inflection] += f"<br>{data_row}"
-
-	grammar_data_list = []
-	for key, value in grammar_dict.items():
-		grammar_data_list += [[f"{key}", f"""{value}""", "", ""]]
-
-	grammar_data_df = pd.DataFrame(grammar_data_list)
-	grammar_data_df.columns = ["word", "definition_html", "definition_plain", "synonyms"]
-	grammar_data_df.to_csv('output/grammar for dict.csv', sep='\t', index=None)
-	return grammar_data_df
-
 
 
 
@@ -999,19 +1057,24 @@ def clean_machine(text):
 	text = re.sub("\.", " ", text) #sometmes no space afterwards, so needs space
 	text = re.sub(",", " ", text)
 	text = re.sub(";", " ", text)
+	text = re.sub(":", " ", text)
 	text = re.sub("‘", "", text)
 	text = re.sub("’", "", text)
 	text = re.sub("`", "", text)
+	text = re.sub("“", "", text)
+	text = re.sub("”", "", text)
 	text = re.sub("!", "", text)	
 	text = re.sub("\?", "", text)
 	text = re.sub("\+", "", text)
+	text = re.sub("\*", "", text)
 	text = re.sub("=", "", text)	
 	text = re.sub("﻿", "", text)
 	text = re.sub("§", " ", text)
 	text = re.sub("\(", " ", text)
 	text = re.sub("\)", " ", text)
 	text = re.sub("-", " ", text)
-	text = re.sub("–", "", text)	
+	text = re.sub("–", "", text)
+	text = re.sub("—", " ", text)
 	text = re.sub("\t", " ", text)
 	text = re.sub("…", " ", text)
 	text = re.sub("–", "", text)

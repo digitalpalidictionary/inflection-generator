@@ -3,7 +3,8 @@
 
 import pandas as pd
 import pickle
-from timeis import timeis, yellow, green, white, line, tic, toc
+import subprocess
+from timeis import timeis, yellow, green, white, red, line, tic, toc
 from simsapa.app.stardict import export_words_as_stardict_zip, ifo_from_opts, DictEntry
 from pathlib import Path
 import re
@@ -29,7 +30,6 @@ def setup():
 	dpd_df = pd.read_csv("../csvs/dpd-full.csv", sep="\t", dtype=str)
 	dpd_df.fillna("", inplace=True)
 	
-
 	dpd_df_length = dpd_df.shape[0]
 	headwords_list = dpd_df["Pāli1"].tolist()
 	
@@ -39,7 +39,6 @@ def setup():
 	indeclineables = ['abbrev', 'abs', 'ger', 'ind', 'inf', 'prefix']
 	others = ['cs', 'adj', 'card', 'letter', 'ordin', 'ordinal', 'pp', 'pron', 'prp', 'ptp', 'root', 'sandhi', 'suffix', 'var', 've']
 
-	
 	dpd_df.loc[dpd_df['POS'].isin(nouns), 'POS'] = 'noun'
 	dpd_df.loc[dpd_df['POS'].isin(verbs), 'POS'] = 'verb'
 	dpd_df.loc[dpd_df['Grammar'].str.contains('adv'), 'POS'] = 'adv'
@@ -94,11 +93,10 @@ def combine_word_sets():
 	return all_words
 
 
-def generate_grammar_dict():
+def generate_grammar_dict(dpd_df, dpd_df_length, all_words_set, inflection_tables_dict):
 	print(f"{timeis()} {green}generating inflection tables")
 
 	grammar_dict = {}
-	f = open('output/testytesy.csc', 'w')
 	vowels = ['a', 'e', 'i', 'o', 'u']
 	exclusions = ['var', 'sandhi', 'idiom']
 
@@ -115,8 +113,6 @@ def generate_grammar_dict():
 			stem = ""
 		pattern = dpd_df.loc[row, "Pattern"]
 		pos = dpd_df.loc[row, "POS"]
-
-		f.write(f"{row} - {pos} - {headword}\n")
 
 		if row %5000 == 0:
 			print(f"{timeis()} {row}/{dpd_df_length}\t{headword}")
@@ -180,10 +176,91 @@ def generate_grammar_dict():
 		grammar_dict[item] += f"</table></div></body>"
 	print(f"{timeis()} {green}grammar dict size", end= " ")
 	print(f"{white}{len(grammar_dict)}")
+	with open('output/grammardict', 'wb') as p:
+		pickle.dump(grammar_dict, p)
 	return grammar_dict
 
 
-def make_grammar_data_df():
+def update_grammar_dict(dpd_df, dpd_df_length, all_words_set, inflection_tables_dict, changed_headwords):
+	print(f"{timeis()} {green}updating grammar dict")
+
+	with open('output/grammardict', 'rb') as p:
+		grammar_dict = pickle.load(p)
+
+	for headword in changed_headwords:
+		grammar_dict.pop(headword)
+
+	for row in range(dpd_df_length):  # dpd_df_length
+		headword = dpd_df.loc[row, "Pāli1"]
+
+		if headword in changed_headwords:
+			headword_clean = re.sub(" \d*$", "", headword)
+			stem = dpd_df.loc[row, "Stem"]
+			if re.match("!.+", stem) != None:
+				stem = re.sub("!.+", "!", stem)
+			if stem == "*":
+				stem = ""
+			pattern = dpd_df.loc[row, "Pattern"]
+			pos = dpd_df.loc[row, "POS"]
+
+			if row % 5000 == 0:
+				print(f"{timeis()} {row}/{dpd_df_length}\t{headword}")
+
+			if stem == "-":
+				grammar_dict[headword] = {'inflection': {
+					headword_clean: f'<b>{headword_clean}</b> is <b>indeclineable</b> ({pos})'}}
+
+			elif stem == "!":
+				pass
+
+			else:
+				df_table = inflection_tables_dict[pattern]["df"].copy()
+				df_table.fillna("", inplace=True)
+				df_rows = df_table.shape[0]
+				df_columns = df_table.shape[1]
+
+				for rows in range(0, df_rows):
+					for columns in range(0, df_columns, 2):  # 1 to 0
+						html_cell = df_table.iloc[rows, columns]
+						html_cell = re.sub(r"(.+)", f"{stem}\\1", html_cell)  # add stem
+						df_table.iloc[rows, columns] = html_cell
+
+				column_list = []
+				for i in range(0, df_columns, 2):
+					column_list.append(i)
+
+				try:
+					df_table.drop(index="in comps", inplace=True)
+				except:
+					pass
+
+				for column in column_list:
+					for row in range(len(df_table)):
+						inflections = df_table.iloc[row, column].split("\n")
+						grammar = df_table.iloc[row, column+1]
+
+						for inflection in inflections:
+							if inflection != "":
+								data_row = f"<b>{inflection}</b> is <b>{grammar}</b> of {headword_clean} ({pos})"
+
+								try:
+									if inflection in grammar_dict[headword][inflection]:
+										grammar_dict[headword] = {'inflection': {inflection: data_row}}
+										data_row_escaped = re.escape(data_row)
+										if not re.findall(data_row_escaped, grammar_dict[headword][inflection]):
+											grammar_dict[headword][inflection] += f"<br>{data_row}"
+
+								except:
+									grammar_dict[headword] = {'inflection': {inflection: data_row}}
+
+	grammar_df = pd.DataFrame.from_dict(grammar_dict, orient='index')
+	grammar_df.to_csv("output/grammar df.csv", sep="\t", index=None)
+	with open('output/grammardict', 'wb') as p:
+		pickle.dump(grammar_dict, p)
+	return grammar_dict
+
+
+def make_grammar_data_df(grammar_dict):
 	print(f"{timeis()} {green}generating grammar dict")
 	grammar_data_list = []
 	grammar_data_list_mdict = []
@@ -210,7 +287,7 @@ def make_grammar_data_df():
 	return grammar_data_df, grammar_data_df_mdict
 
 
-def make_goldendict():
+def make_goldendict(grammar_data_df):
 	print(f"{timeis()} {green}parsing grammar data")
 	# global dict_data
 	dict_data = grammar_data_df.to_dict(orient="records")
@@ -235,9 +312,18 @@ def make_goldendict():
     )
 
 	print(f"{timeis()} {green}writing goldendict")
-	zip_path = Path("../exporter/share/dpd-grammar-goldendict.zip")
+	zip_path = Path("dpd-grammar.zip")
 	export_words_as_stardict_zip(words, ifo, zip_path)
-	
+
+	# copy to exporter/share
+	source_dir = "dpd-grammar.zip"
+	dest_dir = "../exporter/share/dpd-grammar-goldendict.zip"
+
+	try:
+		subprocess.run(['mv', '--backup=numbered', source_dir, dest_dir], check=True)
+	except Exception as e:
+		print(f"{timeis()} {red}{e}")
+
 
 def synonyms(all_items, item):
     all_items.append((item['word'], item['definition_html']))
@@ -259,14 +345,15 @@ def convert_to_mdict(dpd_data_dict):
 	writer.write(outfile)
 	outfile.close()
 
-def make_mdict():
+
+def make_mdict(grammar_data_df_mdict):
 	print(f"{timeis()} {green}writing mdict")
 
 	dict_data = grammar_data_df_mdict.to_dict(orient="records")
 	convert_to_mdict(dict_data)
 
 
-def make_raw_inflections_table():
+def make_raw_inflections_table(inflection_tables_dict):
 	print(f"{timeis()} {green}generting list of raw inflections")
 
 	output_csv = open ("output/raw inflections.csv", "w")
@@ -296,13 +383,15 @@ def make_raw_inflections_table():
 	pattern_df.to_csv("output/raw inflections.csv", sep="\t", index=None)
 
 
+if __name__ == "__main__":
 
-tic()
-dpd_df, dpd_df_length, headwords_list, inflection_tables_dict = setup()
-all_words_set = combine_word_sets()
-grammar_dict = generate_grammar_dict()
-grammar_data_df, grammar_data_df_mdict = make_grammar_data_df()
-make_goldendict()
-make_mdict()
-make_raw_inflections_table()
-toc()
+	tic()
+	dpd_df, dpd_df_length, headwords_list, inflection_tables_dict = setup()
+	all_words_set = combine_word_sets()
+	grammar_dict = generate_grammar_dict(
+		dpd_df, dpd_df_length, all_words_set, inflection_tables_dict)
+	grammar_data_df, grammar_data_df_mdict = make_grammar_data_df(grammar_dict)
+	make_goldendict(grammar_data_df)
+	make_mdict(grammar_data_df_mdict)
+	make_raw_inflections_table(inflection_tables_dict)
+	toc()
