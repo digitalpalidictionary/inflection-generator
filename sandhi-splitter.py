@@ -11,7 +11,7 @@ import pickle
 import re
 
 from modules import clean_machine
-from timeis import timeis, blue, green, yellow, line, white, red, tic, toc
+from timeis import timeis, blue, green, yellow, line, white, red, tic, toc, bip, bop
 from pathlib import Path
 from difflib import SequenceMatcher
 from simsapa.app.stardict import export_words_as_stardict_zip, ifo_from_opts, DictEntry
@@ -36,7 +36,7 @@ def make_text_set():
 	text_list += ["s0202m.mul.xml.txt"]  # MN2 mūla
 	text_list += ["s0202a.att.xml.txt"]  # MN2 aṭṭhakathā
 	text_list += ["s0203m.mul.xml.txt"]  # MN3 mūla
-	text_list += ["dd.txt"]
+	text_list += ["s0301m.mul.xml.txt"]  # SN1 mūla
 	# !!! change zip_path if you change this !!!
 
 	text_path = "../Cst4/txt/"
@@ -53,6 +53,70 @@ def make_text_set():
 		pickle.dump(text_set, p)
 	
 	print(f"{white} {len(text_set)}")
+
+
+def make_sc_text_set():
+
+	print(f"{timeis()} {green}making sutta central text set", end=" ")
+
+	sc_text_list = []
+	sc_path = "/home/bhikkhu/git/Tipitaka-Pali-Projector/tipitaka_projector_data/pali/"
+
+	sc_texts = []
+	# sc_texts += ["11010a.js"]  # VIN1
+	# sc_texts += ["11020a.js"]  # VIN2
+	# sc_texts += ["11030a.js"]  # VIN3
+	# sc_texts += ["11040a.js"]  # VIN4
+	# sc_texts += ["11050a.js"]  # VIN5
+
+	sc_texts += ["21010a.js"]  # DN1
+	sc_texts += ["21020a.js"]  # DN2
+	sc_texts += ["21030a.js"]  # DN3
+
+	sc_texts += ["31010a.js"]  # MN1
+	sc_texts += ["31020a.js"]  # MN2
+	sc_texts += ["31030a.js"]  # MN3
+
+	sc_texts += ["41010a.js"]  # SN1
+	# sc_texts += ["41020a.js"]  # SN2
+	# sc_texts += ["41030a.js"]  # SN3
+	# sc_texts += ["41040a.js"]  # SN4
+	# sc_texts += ["41050a.js"]  # SN5
+
+	# sc_texts += ["51010a.js"]  # AN1
+	# sc_texts += ["51020a.js"]  # AN2
+	# sc_texts += ["51030a.js"]  # AN3
+	# sc_texts += ["51040a.js"]  # AN4
+	# sc_texts += ["51050a.js"]  # AN5
+	# sc_texts += ["51060a.js"]  # AN6
+	# sc_texts += ["51070a.js"]  # AN7
+	# sc_texts += ["51080a.js"]  # AN8
+	# sc_texts += ["51090a.js"]  # AN9
+	# sc_texts += ["51100a.js"]  # AN10
+	# sc_texts += ["51110a.js"]  # AN11
+
+	# sc_texts += ["61080a.js"]  # TH
+	# sc_texts += ["61090a.js"]  # THI
+
+	text_string = ""
+
+	for sc_text in sc_texts:
+		with open(f"{sc_path}/{sc_text}", "r") as f:
+			text_string += f.read()
+
+	text_string = re.sub("var P_HTM.+", "", text_string)
+	text_string = re.sub("""P_HTM\\[\\d+\\]="\\*""", "", text_string)
+	text_string = re.sub("""\\*\\*.+;""", "", text_string)
+	text_string = text_string.lower()
+	text_string = clean_machine(text_string)
+	sc_text_set = set(text_string.split())
+
+	with open("output/sc_text_set.csv", "w") as f:
+		for word in sorted(sc_text_set):
+			f.write(f"{word}\n")
+			
+	print(f"{white} {len(sc_text_set)}")
+	return sc_text_set
 
 
 def make_spelling_mistakes_set():
@@ -194,9 +258,7 @@ def make_manual_corrections_set():
 		if not re.findall ("\\+", word):
 			print(f"{timeis()} {red}! no plus sign {word}")
 		if re.findall ("(\\S\\+|\\+\\S)", word):
-			print(f"{timeis()} {red}! needs space {word}")		
-		# if re.findall ("\\+\\S", word):
-		# 	print(f"{timeis()} {red}! needs space {word}")				
+			print(f"{timeis()} {red}! needs space {word}")					
 	
 	f2 = open("output/sandhi/matches.csv", "a")
 
@@ -226,11 +288,12 @@ def import_text_set():
 
 	with open(f"output/set text", "rb") as p:
 		text_set = pickle.load(p)
-
-	text_set = text_set - spelling_mistakes_set
-	text_set = text_set - variant_readings_set
+	
+	text_set = text_set | sc_text_set
 	text_set = text_set | spelling_corrections_set
 	text_set = text_set | variant_corrections_set
+	text_set = text_set - spelling_mistakes_set
+	text_set = text_set - variant_readings_set
 	text_set = text_set - abbreviations_set
 	text_set = text_set - manual_corrections_set
 
@@ -264,16 +327,29 @@ def make_all_inflections_set():
 	print(f"{white} {len(all_inflections_set)}")
 	print(f"{timeis()} {green}making neg inflections set {white} {len(neg_inflections_set)}")
 			
+def make_all_inflections_nfl_nll():
 
-def make_all_inflections_string():
+		print(f"{timeis()} {green}making all inflections nfl & nll", end=" ")
 
-		print(f"{timeis()} {green}generating all inflections string", end=" ")
+		global all_inflections_nofirst
+		global all_inflections_nolast
+		global all_inflections_first3
+		global all_inflections_last3
 
-		global all_inflections_string
-		all_inflections_string = ""
-		all_inflections_string = ",".join(all_inflections_set) + ","
-		print(f"{white}ok")
-
+		all_inflections_nofirst = []
+		all_inflections_nolast = []
+		all_inflections_first3 = []
+		all_inflections_last3 = []
+		
+		sorted_set = sorted(set(all_inflections_set))
+		for inflection in sorted_set:
+			all_inflections_nofirst += [inflection.replace(inflection[0], "")] # no first letter
+			all_inflections_nolast += [inflection.replace(inflection[-1], "")] # no last letter
+			all_inflections_first3 += [inflection.replace(inflection[3:], "")]  # leave first 3 letters
+			all_inflections_last3 += [inflection.replace(inflection[:-3], "")]  # leave last 3 letters
+		
+		print(f"{white}{len(all_inflections_nofirst)}")
+		
 
 def make_unmatched_set():
 
@@ -952,34 +1028,35 @@ def split_from_front_and_back(word_initial, word_front, word, word_back, comment
 						wordA = word[:1+x]
 						wordB = word[1+x:]
 
-						fuzzy_searchA = re.findall(f",{wordA[:-1]}.,", all_inflections_string)
+						fuzzy_searchA = wordA[:-1] in all_inflections_nolast
 						f1.write(f"\tfuzzysearchA\t{fuzzy_searchA}\n")
 						if printme:
 							print(f"{timeis()} fuzzysearchA\t{fuzzy_searchA}")
 
-						if fuzzy_searchA != [] and \
+						if fuzzy_searchA == True and \
 						len(wordA) > 0 and \
 						lwff_fuzzy_list == []:
 							lwff_fuzzy_list = [wordA]
 						
 						elif \
-						fuzzy_searchA != [] and \
+						fuzzy_searchA == True and \
 						len(wordA) > 0 and \
 						lwff_fuzzy_list != []:
 							lwff_fuzzy_list = [wordA] + lwff_fuzzy_list
 
-						fuzzy_searchB = re.findall(f",.{wordB[1:]},", all_inflections_string)
+						fuzzy_searchB = wordB[1:] in all_inflections_nofirst
+						f1.write(f"\tfuzzysearchB\t{fuzzy_searchB}\n")
 						if printme:
 							print(f"{timeis()} fuzzysearchB\t{fuzzy_searchB}")
 
 						if \
-						fuzzy_searchB != [] and \
+						fuzzy_searchB == True and \
 						len(wordB) > 0 and \
 						lwfb_fuzzy_list  == []:
 							lwfb_fuzzy_list = [wordB]
 						
 						elif \
-						fuzzy_searchB != [] and \
+						fuzzy_searchB == True and \
 						len(wordB) > 0 and \
 						lwfb_fuzzy_list  != []:
 							lwfb_fuzzy_list = [wordB] + lwfb_fuzzy_list
@@ -1052,12 +1129,12 @@ def split_from_front_and_back(word_initial, word_front, word, word_back, comment
 									print(f"{timeis()} fuzzy words front: {green}{word1}-{blue}{word2}")
 
 								if word1 in all_inflections_set:
-									test = re.findall(f",{word2[:3]}", all_inflections_string)
-									f1.write(f"\ttestword2\t{test[:5]}\n")
+									test = word2[:3] in all_inflections_first3
+									f1.write(f"\ttestword2\t{test}\n")
 									if printme:  
-										print(f"{timeis()} testword2\t{test[:5]}")
+										print(f"{timeis()} testword2\t{test}")
 
-									if test != []:
+									if test == True:	
 										word_to_recurse = word2
 										word_front_to_recurse = f"{word_front_original}{word1}-"
 										f1.write(f"\tfuzzy fin:\t{word_front}\t{word_to_recurse}\t{word_back}\n")
@@ -1109,12 +1186,12 @@ def split_from_front_and_back(word_initial, word_front, word, word_back, comment
 									print(f"{timeis()} fuzzy words back: {green}{word1}-{blue}{word2}")
 
 								if word2 in all_inflections_set:
-									test = re.findall(f"{word1[-3:]}.,", all_inflections_string)
-									f1.write(f"\ttestword1\t{test[:5]}\n")
+									test = word2[-3:] in all_inflections_last3
+									f1.write(f"\ttestword1\t{test}\n")
 									if printme:
-										print(f"{timeis()} testword1\t{test[:5]}")
+										print(f"{timeis()} testword1\t{test}")
 
-									if test != []:
+									if test == True:
 										word_to_recurse = word1
 										word_back_to_recurse = f"-{word2}{word_back_original}"
 										f1.write(
@@ -1192,13 +1269,12 @@ def split_from_front_and_back(word_initial, word_front, word, word_back, comment
 						if printme:
 							print(f"{timeis()} clean words front: {green}{wordA}-{blue}{wordB}")
 
-						test = re.findall(f",{wordB[:3]}", all_inflections_string)
-						f1.write(f"\ttestB\t{sorted(set(test))}\n")
+						test = wordB[:3] in all_inflections_first3
+						f1.write(f"\ttestB\t{test}\n")
 						if printme:
-							print(f"{timeis()} testB\t{sorted(set(test))}")
+							print(f"{timeis()} testB\t{test}")
 
-						if test != []:
-
+						if test == True:
 							word_to_recurse = re.sub(f"^{wordA}", "", word)
 							word_front_to_recurse = f"{word_front_original}{wordA}-"
 							f1.write(f"\tclean front fin\t{word_front_to_recurse}\t{word_to_recurse}\t{word_back}\n")
@@ -1222,12 +1298,12 @@ def split_from_front_and_back(word_initial, word_front, word, word_back, comment
 						if printme:
 							print(f"{timeis()} clean words back: {green}{wordA}-{blue}{wordB}")
 
-						test = re.findall(f"{wordA[-3:]},", all_inflections_string)
-						f1.write(f"\ttestA\t{sorted(set(test))}\n")
+						test = wordA[-3:] in all_inflections_last3
+						f1.write(f"\ttestA\t{test}\n")
 						if printme:
-							print(f"{timeis()} testA\t{sorted(set(test))}")
+							print(f"{timeis()} testA\t{test}")
 
-						if test != []:
+						if test == True:
 
 							word_front = word_front_original
 							word_to_recurse = wordA
@@ -1291,7 +1367,7 @@ def x_word_sandhi_from_front_and_back():
 		rules_front = []
 		rules_back = []
 		
-		if counter % 1 == 0:
+		if counter % 5 == 0:
 			print(f"{timeis()} {counter}/{length} {word}")
 		
 		split_from_front_and_back(word_initial, word_front, word, word_back, comment, rules_front, rules_back)
@@ -1658,6 +1734,7 @@ def test_me():
 
 tic()
 make_text_set()
+sc_text_set = make_sc_text_set()
 make_spelling_mistakes_set()
 make_variant_readings_set()
 make_abbreviations_and_neg_set()
@@ -1665,7 +1742,7 @@ make_manual_corrections_set()
 make_shortlist_set()
 import_text_set()
 make_all_inflections_set()
-make_all_inflections_string()
+make_all_inflections_nfl_nll()
 make_unmatched_set()
 import_sandhi_rules()
 remove_exceptions()
