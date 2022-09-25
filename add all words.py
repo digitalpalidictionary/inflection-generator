@@ -16,23 +16,27 @@ def make_text_list():
 	print(f"{timeis()} {green}making text list", end=" ")
 	text_list = []
 	text_path = "../Cst4/txt/"
+	texts = []
+	texts += ["vin01m.mul.xml.txt"]  # VIN1
+	# texts += ["vin02m1.mul.xml.txt"]  # VIN2
+	# texts += ["vin02m2.mul.xml.txt"]  # VIN3
+	# texts += ["vin02m3.mul.xml.txt"]  # VIN4
+	# texts += ["vin02m4.mul.xml.txt"]  # VIN5
+
 	# texts = ["s0101m.mul.xml.txt"]  # DN1
 	# texts += ["s0102m.mul.xml.txt"]  # DN2
 	# texts += ["s0103m.mul.xml.txt"]  # DN3
+
 	# texts += ["s0201m.mul.xml.txt"]  # MN1
 	# texts = ["s0202m.mul.xml.txt"]  # MN2
 	# texts = ["s0203m.mul.xml.txt"]  # MN3
-	texts = ["s0301m.mul.xml.txt"]  # SN1
+
+	# texts = ["s0301m.mul.xml.txt"]  # SN1
 	# texts = ["s0302m.mul.xml.txt"]  # SN2
 	# texts = ["s0303m.mul.xml.txt"]  # SN3
 	# texts = ["s0304m.mul.xml.txt"]  # SN4
 	# texts = ["s0305m.mul.xml.txt"]  # SN5
-	# texts = ["vin01m.mul.xml.txt"]  # VIN1
-	# texts = ["vin02m1.mul.xml.txt"]  # VIN2
-	# texts = ["vin02m2.mul.xml.txt"]  # VIN3
-	# texts = ["vin02m3.mul.xml.txt"] # VIN4
-	# texts = ["vin02m4.mul.xml.txt"]  # VIN5
-
+	
 	for text in texts:
 		with open (f"{text_path}{text}", "r") as f:
 			text_read = f.read()
@@ -51,21 +55,21 @@ def make_sc_text_list():
 	sc_path = "/home/bhikkhu/git/Tipitaka-Pali-Projector/tipitaka_projector_data/pali/"
 	
 	sc_texts = []
-	# sc_texts += ["11010a.js"]  # VIN1
+	sc_texts += ["11010a.js"]  # VIN1
 	# sc_texts += ["11020a.js"]  # VIN2
 	# sc_texts += ["11030a.js"]  # VIN3
 	# sc_texts += ["11040a.js"]  # VIN4
 	# sc_texts += ["11050a.js"]  # VIN5
 
-	sc_texts += ["21010a.js"]  # DN1
-	sc_texts += ["21020a.js"]  # DN2
-	sc_texts += ["21030a.js"]  # DN3
+	# sc_texts += ["21010a.js"]  # DN1
+	# sc_texts += ["21020a.js"]  # DN2
+	# sc_texts += ["21030a.js"]  # DN3
 
-	sc_texts += ["31010a.js"]  # MN1
-	sc_texts += ["31020a.js"]  # MN2
-	sc_texts += ["31030a.js"]  # MN3
+	# sc_texts += ["31010a.js"]  # MN1
+	# sc_texts += ["31020a.js"]  # MN2
+	# sc_texts += ["31030a.js"]  # MN3
 
-	sc_texts += ["41010a.js"]  # SN1
+	# sc_texts += ["41010a.js"]  # SN1
 	# sc_texts += ["41020a.js"]  # SN2
 	# sc_texts += ["41030a.js"]  # SN3
 	# sc_texts += ["41040a.js"]  # SN4
@@ -161,7 +165,24 @@ def write_all_missing_words():
 			if word not in all_inflections_set:
 				f.write(f"{word}\n")
 				counter+=1
+		f.write(f"{counter}")
 	print(f"{white}{counter}")
 
 write_all_missing_words()
 toc()
+
+# 2187
+# 2147
+# 2044
+# 1938
+# 1893
+# 1777
+# 1614
+# 1487 > 1350
+# 1202 > 1206
+# 930 > 938
+# 938 > 769
+# 775 > 543
+# 555 > 
+
+
