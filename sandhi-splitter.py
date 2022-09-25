@@ -11,7 +11,7 @@ import pickle
 import re
 
 from modules import clean_machine
-from timeis import timeis, blue, green, yellow, line, white, red, tic, toc, bip, bop
+from timeis import timeis, blue, green, yellow, line, white, red, tic, toc
 from pathlib import Path
 from difflib import SequenceMatcher
 from simsapa.app.stardict import export_words_as_stardict_zip, ifo_from_opts, DictEntry
@@ -28,16 +28,41 @@ vowels = ["a", "ā", "i", "ī", "u", "ū", "o", "e"]
 def make_text_set():
 
 	print(f"{timeis()} {green}making text set", end = " ")
+	text_list = []
 
-	text_list = ["s0101m.mul.xml.txt"] # DN1 mūla
+	text_list += ["vin01m.mul.xml.txt"]  # VIN1 mūla
+	# text_list += ["vin02m1.mul.xml.txt"]  # VIN2 mūla
+	# text_list += ["vin02m2.mul.xml.txt"]  # VIN3 mūla
+	# text_list += ["vin02m3.mul.xml.txt"]  # VIN4 mūla
+	# text_list += ["vin02m4.mul.xml.txt"]  # VIN5 mūla
+
+	text_list += ["s0101m.mul.xml.txt"] # DN1 mūla
 	text_list += ["s0102m.mul.xml.txt"] # DN2 mūla
 	text_list += ["s0103m.mul.xml.txt"]  # DN3 mūla
+
 	text_list += ["s0201m.mul.xml.txt"]  # MN1 mūla
 	text_list += ["s0202m.mul.xml.txt"]  # MN2 mūla
-	text_list += ["s0202a.att.xml.txt"]  # MN2 aṭṭhakathā
 	text_list += ["s0203m.mul.xml.txt"]  # MN3 mūla
+
 	text_list += ["s0301m.mul.xml.txt"]  # SN1 mūla
-	# !!! change zip_path if you change this !!!
+	# text_list += ["s0302m.mul.xml.txt"]  # SN2 mūla
+	# text_list += ["s0303m.mul.xml.txt"]  # SN3 mūla
+	# text_list += ["s0304m.mul.xml.txt"]  # SN4 mūla
+	# text_list += ["s0305m.mul.xml.txt"]  # SN5 mūla
+
+	# text_list += ["s0401m.mul.xml.txt"]  # AN1 mūla
+	# text_list += ["s0402m1.mul.xml.txt"]  # AN2 mūla
+	# text_list += ["s0402m2.mul.xml.txt"]  # AN3 mūla
+	# text_list += ["s0402m3.mul.xml.txt"]  # AN4 mūla
+	# text_list += ["s0403m1.mul.xml.txt"]  # AN5 mūla
+	# text_list += ["s0403m2.mul.xml.txt"]  # AN6 mūla
+	# text_list += ["s0403m3.mul.xml.txt"]  # AN7 mūla
+	# text_list += ["s0404m1.mul.xml.txt"]  # AN8 mūla
+	# text_list += ["s0404m2.mul.xml.txt"]  # AN9 mūla
+	# text_list += ["s0404m3.mul.xml.txt"]  # AN10 mūla
+	# text_list += ["s0404m4.mul.xml.txt"]  # AN11 mūla
+
+	# text_list += ["s0202a.att.xml.txt"]  # MN2 aṭṭhakathā
 
 	text_path = "../Cst4/txt/"
 	text_string = ""
@@ -59,11 +84,10 @@ def make_sc_text_set():
 
 	print(f"{timeis()} {green}making sutta central text set", end=" ")
 
-	sc_text_list = []
 	sc_path = "/home/bhikkhu/git/Tipitaka-Pali-Projector/tipitaka_projector_data/pali/"
 
 	sc_texts = []
-	# sc_texts += ["11010a.js"]  # VIN1
+	sc_texts += ["11010a.js"]  # VIN1
 	# sc_texts += ["11020a.js"]  # VIN2
 	# sc_texts += ["11030a.js"]  # VIN3
 	# sc_texts += ["11040a.js"]  # VIN4
@@ -1547,8 +1571,6 @@ def make_golden_dict():
 	df.to_json("output/sandhi/matches.json", force_ascii=False, orient="records", indent=5)
 
 	zip_path = Path("./output/sandhi/padavibhāga.zip")
-	# change bookname
-	# change unzip
 
 	with open("output/sandhi/matches.json", "r") as gd_data:
 		data_read = json.load(gd_data)
