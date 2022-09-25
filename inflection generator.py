@@ -52,9 +52,12 @@ if __name__ == "__main__":
 	tic()
 	dpd_df, dpd_df_length, headwords_list, inflection_tables_dict = setup()
 	all_words_set = combine_word_sets()
-	grammar_dict = generate_grammar_dict(
-			dpd_df, dpd_df_length, all_words_set, inflection_tables_dict)
-	grammar_data_df, grammar_data_df_mdict = make_grammar_data_df(grammar_dict)
+	generate_grammar_dict(
+		dpd_df, dpd_df_length, inflection_tables_dict, args, changed_headwords)
+	grammar_dict_html = build_html_dict(all_words_set)
+
+	grammar_data_df, grammar_data_df_mdict = make_grammar_data_df(
+		grammar_dict_html)
 	make_goldendict(grammar_data_df)
 	make_mdict(grammar_data_df_mdict)
 	make_raw_inflections_table(inflection_tables_dict)
