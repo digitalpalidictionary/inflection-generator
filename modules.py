@@ -561,7 +561,58 @@ def unused_patterns():
 	# save csv of most common patterns
 	most_common_patterns_df = pd.DataFrame.from_dict(used_infl, orient = "index")
 	most_common_patterns_df.sort_values(0, inplace=True, ascending=False)
-	most_common_patterns_df.to_csv("output/most common patterns.csv", sep="\t", header=None) 
+	most_common_patterns_df.to_csv("output/most common patterns.csv", sep="\t", header=None)
+
+
+def generate_inflection_patterns_json():
+	"""make a json file of all inflection patterns for use in other apps"""
+	print(f"{timeis()} {green}generating inflection patterns html json")
+	inflection_tables_html_dict = {}
+
+	for pattern in inflection_tables_dict:
+		df_table = inflection_tables_dict[pattern]["df"].copy()
+		df_table.fillna("", inplace=True)
+		df_rows = df_table.shape[0]
+		df_columns = df_table.shape[1]
+
+		for rows in range(0, df_rows):
+			for columns in range(0, df_columns, 2):  # 1 to 0
+				html_cell = df_table.iloc[rows, columns]
+				html_cell = re.sub(r"(.+)", f"<b>\\1</b>", html_cell)  # add bold
+				html_cell = re.sub("\\n", "<br>", html_cell)  # add line breaks
+				df_table.iloc[rows, columns] = html_cell
+
+		column_list = []
+		for i in range(1, df_columns, 2):
+			column_list.append(i)
+
+		df_table.drop(df_table.columns[column_list], axis=1, inplace=True)
+		html_table = df_table.to_html(escape=False)
+		html_table = re.sub("Unnamed.+", "", html_table)
+		html_table = re.sub("NaN", "", html_table)
+		html_table = re.sub(' style="text-align: right;"', "", html_table)
+		html_table = re.sub('border="1" ', '', html_table)
+		html_table = re.sub('table class="dataframe"',
+							'table class="inflection-table"', html_table)
+		html_table = re.sub('<thead>\n', "", html_table)
+		html_table = re.sub('</thead>\n', "", html_table)
+		html_table = re.sub('<tbody>\n', "", html_table)
+		html_table = re.sub('</tbody>\n', "", html_table)
+		html_table = re.sub('\n', "", html_table)
+		html_table = re.sub('\t', "", html_table)
+		html_table = re.sub('      ', "", html_table)
+		html_table = re.sub('    ', "", html_table)
+		html_table = re.sub('  ', "", html_table)
+
+		inflection_tables_html_dict[pattern] = {"df": "", "like": ""}
+		inflection_tables_html_dict[pattern]["df"] = html_table
+		inflection_tables_html_dict[pattern]["like"] = inflection_tables_dict[pattern]["like"]
+
+	inflection_tables_html_df = pd.DataFrame(inflection_tables_html_dict)
+	inflection_tables_html_df.to_json(
+		"output/inflection tables html.json", force_ascii=False, orient="columns", indent=4)
+	inflection_tables_html_df.to_json(
+		"../dpd-app/data/inflection tables html.json", force_ascii=False, orient="columns", indent=4)
 
 
 def generate_html_inflection_table(make_tables, changed_headwords):

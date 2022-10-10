@@ -41,6 +41,7 @@ if __name__ == "__main__":
 		make_tables = True
 	else:
 		make_tables = False
+	generate_inflection_patterns_json()
 	generate_html_inflection_table(make_tables, changed_headwords)
 
 	transliterate_inflections()

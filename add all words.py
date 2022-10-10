@@ -17,8 +17,8 @@ def make_text_list():
 	text_list = []
 	text_path = "../Cst4/txt/"
 	texts = []
-	texts += ["vin01m.mul.xml.txt"]  # VIN1
-	# texts += ["vin02m1.mul.xml.txt"]  # VIN2
+	# texts += ["vin01m.mul.xml.txt"]  # VIN1
+	texts += ["vin02m1.mul.xml.txt"]  # VIN2
 	# texts += ["vin02m2.mul.xml.txt"]  # VIN3
 	# texts += ["vin02m3.mul.xml.txt"]  # VIN4
 	# texts += ["vin02m4.mul.xml.txt"]  # VIN5
@@ -55,8 +55,8 @@ def make_sc_text_list():
 	sc_path = "/home/bhikkhu/git/Tipitaka-Pali-Projector/tipitaka_projector_data/pali/"
 	
 	sc_texts = []
-	sc_texts += ["11010a.js"]  # VIN1
-	# sc_texts += ["11020a.js"]  # VIN2
+	# sc_texts += ["11010a.js"]  # VIN1
+	sc_texts += ["11020a.js"]  # VIN2
 	# sc_texts += ["11030a.js"]  # VIN3
 	# sc_texts += ["11040a.js"]  # VIN4
 	# sc_texts += ["11050a.js"]  # VIN5
@@ -183,6 +183,13 @@ toc()
 # 930 > 938
 # 938 > 769
 # 775 > 543
-# 555 > 
+# 555 > 426
+# 423 > 186
+# 186 > 0
+# 	9 > 0
+
+# unmatched
+# 304 > 204
+# 
 
 

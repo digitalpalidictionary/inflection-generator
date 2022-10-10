@@ -92,6 +92,13 @@ def combine_word_sets():
 	print(f"{white}{len(all_words)}")
 	with open("output/allwords set", "wb") as p:
 		pickle.dump(all_words, p)
+
+	# to json 
+	all_words_json = json.dumps(list(all_words), ensure_ascii=False, indent=4)
+	with open("output/allwords set.json", "w") as f:
+		f.write(all_words_json)
+	with open("../dpd-app/data/allwords set.json", "w") as f:
+		f.write(all_words_json)
 	return all_words
 
 

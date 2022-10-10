@@ -31,7 +31,7 @@ def make_text_set():
 	text_list = []
 
 	text_list += ["vin01m.mul.xml.txt"]  # VIN1 mūla
-	# text_list += ["vin02m1.mul.xml.txt"]  # VIN2 mūla
+	text_list += ["vin02m1.mul.xml.txt"]  # VIN2 mūla
 	# text_list += ["vin02m2.mul.xml.txt"]  # VIN3 mūla
 	# text_list += ["vin02m3.mul.xml.txt"]  # VIN4 mūla
 	# text_list += ["vin02m4.mul.xml.txt"]  # VIN5 mūla
@@ -62,7 +62,7 @@ def make_text_set():
 	# text_list += ["s0404m3.mul.xml.txt"]  # AN10 mūla
 	# text_list += ["s0404m4.mul.xml.txt"]  # AN11 mūla
 
-	# text_list += ["s0202a.att.xml.txt"]  # MN2 aṭṭhakathā
+	text_list += ["s0202a.att.xml.txt"]  # MN2 aṭṭhakathā
 
 	text_path = "../Cst4/txt/"
 	text_string = ""
@@ -88,7 +88,7 @@ def make_sc_text_set():
 
 	sc_texts = []
 	sc_texts += ["11010a.js"]  # VIN1
-	# sc_texts += ["11020a.js"]  # VIN2
+	sc_texts += ["11020a.js"]  # VIN2
 	# sc_texts += ["11030a.js"]  # VIN3
 	# sc_texts += ["11040a.js"]  # VIN4
 	# sc_texts += ["11050a.js"]  # VIN5
