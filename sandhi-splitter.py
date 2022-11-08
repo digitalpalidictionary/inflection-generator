@@ -9,6 +9,7 @@ import random
 import json
 import pickle
 import re
+import time
 
 from modules import clean_machine
 from timeis import timeis, blue, green, yellow, line, white, red, tic, toc
@@ -23,7 +24,22 @@ print(f"{timeis()} {yellow}sandhi splitter")
 print(f"{timeis()} {line}")
 
 vowels = ["a", "ā", "i", "ī", "u", "ū", "o", "e"]
+timer_dict = {}
 
+class Timer:
+	
+	def start(self):
+		"""Start Button"""
+		self._start_time = time.perf_counter()
+
+	def stop(self, headword):
+		"""Stop button, add to timer_dict"""
+
+		elapsed_time = time.perf_counter() - self._start_time
+		timer_dict[headword] = elapsed_time
+	
+	def return_timer(self):
+		return timer_dict
 
 def make_text_set():
 
@@ -45,8 +61,8 @@ def make_text_set():
 	text_list += ["s0203m.mul.xml.txt"]  # MN3 mūla
 
 	text_list += ["s0301m.mul.xml.txt"]  # SN1 mūla
-	# text_list += ["s0302m.mul.xml.txt"]  # SN2 mūla
-	# text_list += ["s0303m.mul.xml.txt"]  # SN3 mūla
+	text_list += ["s0302m.mul.xml.txt"]  # SN2 mūla
+	text_list += ["s0303m.mul.xml.txt"]  # SN3 mūla
 	# text_list += ["s0304m.mul.xml.txt"]  # SN4 mūla
 	# text_list += ["s0305m.mul.xml.txt"]  # SN5 mūla
 
@@ -74,17 +90,15 @@ def make_text_set():
 	text_string = clean_machine(text_string)
 	text_set = set(text_string.split())
 
-	with open(f"output/set text", "wb") as p:
-		pickle.dump(text_set, p)
-	
 	print(f"{white} {len(text_set)}")
+	return text_set
 
 
 def make_sc_text_set():
 
 	print(f"{timeis()} {green}making sutta central text set", end=" ")
 
-	sc_path = "/home/bhikkhu/git/Tipitaka-Pali-Projector/tipitaka_projector_data/pali/"
+	sc_path = "../Tipitaka-Pali-Projector/tipitaka_projector_data/pali/"
 
 	sc_texts = []
 	sc_texts += ["11010a.js"]  # VIN1
@@ -102,8 +116,8 @@ def make_sc_text_set():
 	sc_texts += ["31030a.js"]  # MN3
 
 	sc_texts += ["41010a.js"]  # SN1
-	# sc_texts += ["41020a.js"]  # SN2
-	# sc_texts += ["41030a.js"]  # SN3
+	sc_texts += ["41020a.js"]  # SN2
+	sc_texts += ["41030a.js"]  # SN3
 	# sc_texts += ["41040a.js"]  # SN4
 	# sc_texts += ["41050a.js"]  # SN5
 
@@ -135,18 +149,160 @@ def make_sc_text_set():
 	text_string = clean_machine(text_string)
 	sc_text_set = set(text_string.split())
 
-	with open("output/sc_text_set.csv", "w") as f:
-		for word in sorted(sc_text_set):
-			f.write(f"{word}\n")
-			
 	print(f"{white} {len(sc_text_set)}")
 	return sc_text_set
 
 
+def make_bjt_text_set():
+
+	print(f"{timeis()} {green}making buddhajayanti text set", end=" ")
+	texts = []
+
+	# # pārājika
+	# texts += ["vp-prj.txt"]
+	# texts += ["vp-prj-2-3.txt"]
+	# texts += ["vp-prj-3.txt"]
+	# texts += ["vp-prj-3-4.txt"]
+	# texts += ["vp-prj-4.txt"]
+
+	# # pācittiya
+	# texts += ["vp-pct.txt"]
+	# texts += ["vp-pct-1-1-5.txt"]
+	# texts += ["vp-pct-1-2.txt"]
+	# texts += ["vp-pct-2.txt"]
+	# texts += ["vp-pct-2-4-3.txt"]
+	# texts += ["vp-pct-2-5.txt"]
+	
+	# # mahāvagga
+	# texts += ["vp-mv.txt"]
+	# texts += ["vp-mv-2.txt"]
+	# texts += ["vp-mv-4.txt"]
+	# texts += ["vp-mv-6.txt"]
+	# texts += ["vp-mv-7.txt"]
+	# texts += ["vp-mv-9.txt"]
+
+	# # cūlavagga
+	# texts += ["vp-cv.txt"]
+	# texts += ["vp-cv-3.txt"]
+	# texts += ["vp-cv-5.txt"]
+	# texts += ["vp-cv-8.txt"]
+
+	# # parivāra
+	# texts += ["vp-pv.txt"]
+	# texts += ["vp-pv-2.txt"]
+	# texts += ["vp-pv-5.txt"]
+	# texts += ["vp-pv-14.txt"]
+
+	# # dīgha
+	# texts += ["dn-1.txt"]
+	# texts += ["dn-1-3.txt"]
+	# texts += ["dn-1-6.txt"]
+	# texts += ["dn-1-11.txt"]
+
+	# texts += ["dn-2.txt"]
+	# texts += ["dn-2-3.txt"]
+	# texts += ["dn-2-4.txt"]
+	# texts += ["dn-2-7.txt"]
+
+	# texts += ["dn-3.txt"]
+	# texts += ["dn-3-10.txt"]
+	# texts += ["dn-3-5.txt"]
+
+	# # majjhima
+	# texts += ["mn-1-1.txt"]
+	# texts += ["mn-1-2.txt"]
+	# texts += ["mn-1-3.txt"]
+	# texts += ["mn-1-4.txt"]
+	# texts += ["mn-1-5.txt"]
+
+	# texts += ["mn-2-1.txt"]
+	# texts += ["mn-2-2.txt"]
+	# texts += ["mn-2-3.txt"]
+	# texts += ["mn-2-4.txt"]
+	# texts += ["mn-2-5.txt"]
+
+	# texts += ["mn-3-1.txt"]
+	# texts += ["mn-3-2.txt"]
+	# texts += ["mn-3-3.txt"]
+	# texts += ["mn-3-4.txt"]
+	# texts += ["mn-3-5.txt"]
+
+	# # saṃyutta
+	# texts += ["sn-1.txt"]
+	# texts += ["sn-1-3.txt"]
+	# texts += ["sn-1-7.txt"]
+	
+	# texts += ["sn-2.txt"]
+	# texts += ["sn-2-1-5.txt"]
+	# texts += ["sn-2-2.txt"]
+	# texts += ["sn-2-5.txt"]
+	
+	# texts += ["sn-3.txt"]
+	# texts += ["sn-3-1-2.txt"]
+	# texts += ["sn-3-1-3.txt"]
+	# texts += ["sn-3-2.txt"]
+	# texts += ["sn-3-7.txt"]
+	
+	# texts += ["sn-4.txt"]
+	# texts += ["sn-4-1-12.txt"]
+	# texts += ["sn-4-2.txt"]
+	# texts += ["sn-4-8.txt"]
+	
+	# texts += ["sn-5.txt"]
+	# texts += ["sn-5-11.txt"]
+	# texts += ["sn-5-12.txt"]
+	# texts += ["sn-5-2.txt"]
+	# texts += ["sn-5-3.txt"]
+	# texts += ["sn-5-4.txt"]
+	# texts += ["sn-5-7.txt"]
+
+	# # aṅguttara
+	# texts += ["an-1.txt"]
+	# texts += ["an-2.txt"]
+	# texts += ["an-3-2.txt"]
+	# texts += ["an-3-3.txt"]
+	# texts += ["an-3.txt"]
+	# texts += ["an-4-2.txt"]
+	# texts += ["an-4-3.txt"]
+	# texts += ["an-4-4.txt"]
+	# texts += ["an-4-5.txt"]
+	# texts += ["an-4.txt"]
+	# texts += ["an-5-2.txt"]
+	# texts += ["an-5-3.txt"]
+	# texts += ["an-5-4.txt"]
+	# texts += ["an-5-5.txt"]
+	# texts += ["an-5.txt"]
+	# texts += ["an-6-2.txt"]
+	# texts += ["an-6.txt"]
+	# texts += ["an-7-2.txt"]
+	# texts += ["an-7.txt"]
+	# texts += ["an-8-2.txt"]
+	# texts += ["an-8.txt"]
+	# texts += ["an-9.txt"]
+	# texts += ["an-10-2.txt"]
+	# texts += ["an-10-3.txt"]
+	# texts += ["an-10-4.txt"]
+	# texts += ["an-10-5.txt"]
+	# texts += ["an-10.txt"]
+	# texts += ["an-11.txt"]
+
+	text_path = "../../../../git/tipitaka.lk/public/static/text roman/"
+	text_string = ""
+
+	for text in texts:
+		with open(f"{text_path}/{text}", "r") as f:
+			text_string += f.read()
+
+	text_string = clean_machine(text_string)
+	bjt_text_set = set(text_string.split())
+
+	print(f"{white} {len(bjt_text_set)}")
+	return bjt_text_set
+
+
 def make_spelling_mistakes_set():
-	global spelling_mistakes_set
-	global spelling_corrections_set
 	print(f"{timeis()} {green}making spelling mistakes set", end=" ")
+
 	sp_mistakes_df = pd.read_csv(
 		"sandhi/spelling mistakes.csv", dtype=str, header=None, sep="\t")
 	sp_mistakes_df.fillna("", inplace=True)
@@ -185,12 +341,12 @@ def make_spelling_mistakes_set():
 		f2.write(f"{mistake}\tincorrect spelling of <i>{correction}</i>\tspelling\tsp\n")
 	f2.close()
 
+	return spelling_mistakes_set, spelling_corrections_set
+
 
 def make_variant_readings_set():
-	global variant_readings_set
-	global variant_corrections_set
-
 	print(f"{timeis()} {green}making variant readings set", end=" ")
+
 	variant_reading_df = pd.read_csv(
 		"sandhi/variant readings.csv", dtype=str, header=None, sep="\t")
 	variant_reading_df.fillna("", inplace=True)
@@ -228,18 +384,14 @@ def make_variant_readings_set():
 		f2.write(f"{variant}\tvariant reading of <i>{correction}</i>\tvariant\tv\n")
 	f2.close()
 
+	return variant_readings_set, variant_corrections_set
+
 
 def make_abbreviations_and_neg_set():
 	
 	print(f"{timeis()} {green}making abbreviations set", end=" ")
 		
-	global dpd_df
-	global dpd_df_length
-
-	global abbreviations_set
 	abbreviations_set = []
-	
-	global neg_headwords_set
 	neg_headwords_set = []
 
 	dpd_df = pd.read_csv("../csvs/dpd-full.csv", sep="\t", dtype=str)
@@ -264,12 +416,13 @@ def make_abbreviations_and_neg_set():
 	print(f"{timeis()} {green}making neg headwords set", end=" ")
 	print(f"{white}{len(neg_headwords_set)}")
 
+	return abbreviations_set, neg_headwords_set
+
 
 def make_manual_corrections_set():
 	
 	print(f"{timeis()} {green}making manual corrections set", end=" ")
 	
-	global manual_corrections_set
 	manual_corrections_df = pd.read_csv("sandhi/manual corrections.csv", dtype=str, header=None, sep="\t")
 	manual_corrections_df.fillna("", inplace=True)
 
@@ -292,10 +445,11 @@ def make_manual_corrections_set():
 		f2.write(f"{sandhi}\t{split}\tmanual\tm\n")
 	f2.close()
 
+	return manual_corrections_set
+
 
 def make_shortlist_set():
 
-	global shortlist_set
 	print(f"{timeis()} {green}making shortlist set", end=" ")
 	
 	shortlist_df = pd.read_csv("sandhi/shortlist.csv", dtype=str, header=None, sep="\t")
@@ -304,16 +458,23 @@ def make_shortlist_set():
 	shortlist_set = set(shortlist_df[0].tolist())
 	print(f"{white}{len(shortlist_set)}")
 
+	return shortlist_set
 
-def import_text_set():
 
-	global text_set
-	print(f"{timeis()} {green}importing text set", end=" ")
+def update_text_set():
 
-	with open(f"output/set text", "rb") as p:
-		text_set = pickle.load(p)
+	text_set = make_text_set()
+	sc_text_set = make_sc_text_set()
+	# bjt_text_set = make_bjt_text_set()
+	spelling_mistakes_set, spelling_corrections_set = make_spelling_mistakes_set()
+	variant_readings_set, variant_corrections_set = make_variant_readings_set()
+	abbreviations_set, neg_headwords_set = make_abbreviations_and_neg_set()
+	manual_corrections_set = make_manual_corrections_set()
+	
+	print(f"{timeis()} {green}updating text set", end=" ")
 	
 	text_set = text_set | sc_text_set
+	# text_set = text_set | bjt_text_set
 	text_set = text_set | spelling_corrections_set
 	text_set = text_set | variant_corrections_set
 	text_set = text_set - spelling_mistakes_set
@@ -323,19 +484,19 @@ def import_text_set():
 
 	print(f"{white}{len(text_set)}")
 	
+	return text_set, neg_headwords_set
+	
 
 def make_all_inflections_set():
 
+	text_set, neg_headwords_set = update_text_set()
+
 	print(f"{timeis()} {green}making all inflections set", end=" ")
 
-	global all_inflections_dict
-	global all_inflections_set
 	all_inflections_set = set()
-	
-	global neg_inflections_set
 	neg_inflections_set = set()
 	
-	exceptions_list = ["abbrev", "cs", "idiom", "letter", "prefix", "root", "sandhi", "suffix", "ve"]
+	exceptions_list = ["abbrev", "cs", "idiom", "letter", "prefix", "root", "sandhi", "sandhix", "suffix", "ve"]
 
 	with open("output/all inflections dict", "rb") as f:
 		all_inflections_dict = pickle.load(f)
@@ -350,15 +511,24 @@ def make_all_inflections_set():
 	
 	print(f"{white} {len(all_inflections_set)}")
 	print(f"{timeis()} {green}making neg inflections set {white} {len(neg_inflections_set)}")
-			
-def make_all_inflections_nfl_nll():
+
+	print(f"{timeis()} {green}making unmatched set", end=" ")
+	unmatched_set = text_set - set(all_inflections_set)
+
+	exceptions_df = pd.read_csv("sandhi/sandhi exceptions.csv", header=None)
+	exceptions_set = set(exceptions_df[0].tolist())
+
+	unmatched_set = set(unmatched_set) - exceptions_set
+	all_inflections_set = set(all_inflections_set) - exceptions_set
+
+	print(f"{white}{len(unmatched_set)}")
+
+	return text_set, all_inflections_set, neg_inflections_set, unmatched_set
+
+
+def make_all_inflections_nfl_nll(all_inflections_set):
 
 		print(f"{timeis()} {green}making all inflections nfl & nll", end=" ")
-
-		global all_inflections_nofirst
-		global all_inflections_nolast
-		global all_inflections_first3
-		global all_inflections_last3
 
 		all_inflections_nofirst = []
 		all_inflections_nolast = []
@@ -374,16 +544,8 @@ def make_all_inflections_nfl_nll():
 		
 		print(f"{white}{len(all_inflections_nofirst)}")
 		
-
-def make_unmatched_set():
-
-	print(f"{timeis()} {green}making unmatched set", end = " ")
-	
-	global unmatched_set
-	unmatched_set = text_set - set(all_inflections_set)
-	
-	print(f"{white}{len(unmatched_set)}")
-
+		return all_inflections_nofirst, all_inflections_nolast, all_inflections_first3, all_inflections_last3
+		
 
 def import_sandhi_rules():
 
@@ -426,24 +588,6 @@ def import_sandhi_rules():
 		print(f"{white}ok")
 
 
-
-def remove_exceptions():
-
-	print(f"{timeis()} {green}removing exceptions", end=" ")
-
-	exceptions_df = pd.read_csv("sandhi/sandhi exceptions.csv", header = None)
-	exceptions_set = set(exceptions_df[0].tolist())
-	
-	global unmatched_set
-	unmatched_set = set(unmatched_set) - exceptions_set
-	
-	global all_inflections_set
-	all_inflections_set = set(all_inflections_set) - exceptions_set 
-	
-	print(f"{white}{len(exceptions_set)}")
-
-
-
 def two_word_sandhi():
 
 	print(f"{timeis()} {green}{line}")
@@ -459,6 +603,7 @@ def two_word_sandhi():
 	length = len(unmatched_set)
 
 	for word in unmatched_set:
+		t.start()
 		
 		if counter % 1000 == 0:
 			print(f"{timeis()} {counter}/{length}\t{word}")
@@ -498,7 +643,9 @@ def two_word_sandhi():
 						matches2.append(word)
 						f1.write(f"\t{word1}\t{word2}\t{rule+2}\t-\tmatch\n")
 						f2.write(f"{word}\t{word1}-{word2}\ttwo-word\t{rule+2}\n")
-						
+
+		
+		t.stop(word)				
 		counter += 1
 
 	print(f"{timeis()} {green}two word matches {white}{len(matches2)} {green}(including duplicates)")
@@ -534,6 +681,7 @@ def three_word_sandhi():
 	length = len(unmatched2)
 
 	for word in unmatched2:
+		t.start()
 		
 		if counter % 100 == 0:
 			print(f"{timeis()} {counter}/{length}\t{word}")
@@ -638,7 +786,8 @@ def three_word_sandhi():
 									matches3.append(word)
 									f1.write(f"\t{word1}\t{word2}\t{word3}\t{rulex+2}\t{ruley+2}\tmatch\n")
 									f2.write(f"{word}\t{word1}-{word2}-{word3}\tthree-word\t{rulex+2},{ruley+2}\n")
-												
+
+		t.stop(word)									
 		counter += 1
 
 	print(f"{timeis()} {green}three word matches {white}{len(matches3)} {green}(including duplicates)")
@@ -674,6 +823,7 @@ def four_word_sandhi():
 	length=len(unmatched3)
 
 	for word in unmatched3:
+		t.start()
 
 		if counter % 10 == 0:
 			print(f"{timeis()} {counter}/{length}\t{word}")
@@ -915,7 +1065,7 @@ def four_word_sandhi():
 													matches4.append(word)
 													f1.write(f"\t{word1}\t{word2}\t{word3}\t{word4}\t{rulex+2}\t{ruley+2}\t{rulez+2}\tmatch\n")
 													f2.write(f"{word}\t{word1}-{word2}-{word3}-{word4}\tfour-word\t{rulex+2},{ruley+2},{rulez+2}\n")
-
+		t.stop(word)
 		counter += 1
 
 	print(f"{timeis()} {green}four word matches {white}{len(matches4)} {green}(including duplicates)")
@@ -1353,6 +1503,7 @@ def x_word_sandhi_from_front_and_back():
 	print(f"{timeis()} {green}x-word sandhi from the front")
 	print(f"{timeis()} {green}{line}")
 
+
 	global printme
 	printme = False
 
@@ -1381,6 +1532,7 @@ def x_word_sandhi_from_front_and_back():
 		length = len(unmatched4)
 
 	for word in data_set:
+		t.start()
 		
 		word_initial = word
 		word_front = ""
@@ -1397,6 +1549,8 @@ def x_word_sandhi_from_front_and_back():
 		split_from_front_and_back(word_initial, word_front, word, word_back, comment, rules_front, rules_back)
 		if printme:
 			input(f"{timeis()} press enter to continue \n")
+		
+		t.stop(word)
 		counter += 1
 
 	f1.close()
@@ -1415,8 +1569,13 @@ def x_word_sandhi_from_front_and_back():
 	print(f"{timeis()} {green}x word matches {white}{len(matchesx)} {green}(including duplicates)")
 	print(f"{timeis()} {green}x word unmatched from the front {white}{len(unmatchedxfront)}")
 
+def timer_summary():
+	df = pd.DataFrame.from_dict(timer_dict, orient = "index")
+	df.sort_values
+	df.to_csv("output/timerdict.tsv", sep="\t")
 
-def summary():
+
+def summary(text_set):
 
 	print(f"{timeis()} {green}{line}")
 	print(f"{timeis()} {green}summary")
@@ -1483,7 +1642,8 @@ def combine_matches_df():
 
 	print(f"{white}ok")
 	
-def make_sandhi_dict():
+
+def make_sandhi_dict(neg_inflections_set):
 
 	print(f"{timeis()} {green}making sandhi dict")
 	sandhi_dict = {}
@@ -1755,26 +1915,23 @@ def test_me():
 
 
 tic()
-make_text_set()
-sc_text_set = make_sc_text_set()
-make_spelling_mistakes_set()
-make_variant_readings_set()
-make_abbreviations_and_neg_set()
-make_manual_corrections_set()
-make_shortlist_set()
-import_text_set()
-make_all_inflections_set()
-make_all_inflections_nfl_nll()
-make_unmatched_set()
+t = Timer()
+text_set, all_inflections_set, neg_inflections_set, unmatched_set = make_all_inflections_set()
+
+shortlist_set = make_shortlist_set()
+
+all_inflections_nofirst, all_inflections_nolast, all_inflections_first3, all_inflections_last3 = make_all_inflections_nfl_nll(
+    all_inflections_set)
+
 import_sandhi_rules()
-remove_exceptions()
 two_word_sandhi()
 three_word_sandhi()
 four_word_sandhi()
 x_word_sandhi_from_front_and_back()
-summary()
+timer_summary()
+summary(text_set)
 combine_matches_df()
-make_sandhi_dict()
+make_sandhi_dict(neg_inflections_set)
 make_golden_dict()
 unzip_and_copy()
 value_counts()

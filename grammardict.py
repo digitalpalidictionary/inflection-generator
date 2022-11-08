@@ -261,7 +261,6 @@ def make_grammar_data_df(grammar_dict_html):
 
 def make_goldendict(grammar_data_df):
 	print(f"{timeis()} {green}parsing grammar data")
-	# global dict_data
 	dict_data = grammar_data_df.to_dict(orient="records")
 
 	def item_to_word(x):

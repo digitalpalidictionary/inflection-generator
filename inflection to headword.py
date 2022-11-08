@@ -18,7 +18,7 @@ length = len(all_inflections_dict)
 
 print(f"{timeis()} {yellow}all inflection to headwords dict")
 print(f"{timeis()} {line}")
-print(f"{timeis()} {green}generating all inflections to headwords dict")
+print(f"{timeis()} {green}generating all inflection to headwords dict")
 
 # make lists of all_headwords & clean version
 all_headwords = list(all_inflections_dict.keys())
@@ -42,26 +42,6 @@ for headword in all_inflections_dict:
 	counter+=1
 
 
-# add all sandhi compounds
-print(f"{timeis()} {green}adding sandhi compounds")
-
-with open("output/sandhi dict", "rb") as pf:
-	sandhi_dict = pickle.load(pf)
-
-counter =0
-
-for headword, value in sandhi_dict.items():
-	if counter % 1000 == 0:
-		print(f"{timeis()} {white}{counter}/{len(sandhi_dict)}\t{headword} ")
-
-	if headword not in inflection_to_headword.keys():
-		inflection_to_headword.update({headword: {"headwords": set()}})
-		inflection_to_headword[headword]["headwords"].add(headword)
-	else:
-		inflection_to_headword[headword]["headwords"].add(headword)
-	counter += 1
-
-	
 # add all roots
 print(f"{timeis()} {green}adding roots")
 roots_df = pd.read_csv("../csvs/roots.csv", sep="\t")
@@ -98,13 +78,17 @@ print(f"{timeis()} {green}sorting headwords")
 for inflection in inflection_to_headword:
 	inflection_to_headword[inflection]["headwords"] = sorted(inflection_to_headword[inflection]["headwords"])
 
-
 print(f"{timeis()} {green}saving to picle csv and json")
 with open("output/inflection to headwords dict", "wb") as f:
 	pickle.dump(inflection_to_headword, f)
+
+inflection_to_headword_json = json.dumps(
+	inflection_to_headword, ensure_ascii=False, indent=4)
+with open("../dpd-app/data/inflection to headwords dict.json", "w") as f:
+    f.write(inflection_to_headword_json)
+
 df = pd.DataFrame.from_dict(inflection_to_headword, orient='index')
 df.rename_axis("inflection", inplace=True)
-df.to_csv("output/inflection to headwords dict.csv", sep="\t")
-# df.to_json("output/inflection to headwords dict.json", force_ascii=False, orient="index", indent=6)
+df.to_csv("output/inflection to headwords dict.tsv", sep="\t")
 
 toc()
