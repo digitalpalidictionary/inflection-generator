@@ -76,13 +76,14 @@ print(f"{white}{len(changed_headwords) + len(added_sandhi)}")
 # send to transliterate aksharamukha
 print(f"{timeis()} {green}transliterating with aksharamukha", end=" ")
 
-all_inflections_dict = transliterate_aksharamukha (
+all_inflections_dict, concat_df_len = transliterate_aksharamukha(
 	all_inflections_dict,
 	changed_headwords,
 	added_sandhi
 )
 
-print(f"{white}ok")
+if concat_df_len == 0:
+	print(f"{white}none")
 
 # send to transliterate path nirvana in node.js
 print(f"{timeis()} {green}transliterating with path nirvana in node.js", end=" ")

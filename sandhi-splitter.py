@@ -63,11 +63,11 @@ def make_text_set():
 	text_list += ["s0301m.mul.xml.txt"]  # SN1 mūla
 	text_list += ["s0302m.mul.xml.txt"]  # SN2 mūla
 	text_list += ["s0303m.mul.xml.txt"]  # SN3 mūla
-	# text_list += ["s0304m.mul.xml.txt"]  # SN4 mūla
-	# text_list += ["s0305m.mul.xml.txt"]  # SN5 mūla
+	text_list += ["s0304m.mul.xml.txt"]  # SN4 mūla
+	text_list += ["s0305m.mul.xml.txt"]  # SN5 mūla
 
-	# text_list += ["s0401m.mul.xml.txt"]  # AN1 mūla
-	# text_list += ["s0402m1.mul.xml.txt"]  # AN2 mūla
+	text_list += ["s0401m.mul.xml.txt"]  # AN1 mūla
+	text_list += ["s0402m1.mul.xml.txt"]  # AN2 mūla
 	# text_list += ["s0402m2.mul.xml.txt"]  # AN3 mūla
 	# text_list += ["s0402m3.mul.xml.txt"]  # AN4 mūla
 	# text_list += ["s0403m1.mul.xml.txt"]  # AN5 mūla
@@ -118,11 +118,11 @@ def make_sc_text_set():
 	sc_texts += ["41010a.js"]  # SN1
 	sc_texts += ["41020a.js"]  # SN2
 	sc_texts += ["41030a.js"]  # SN3
-	# sc_texts += ["41040a.js"]  # SN4
-	# sc_texts += ["41050a.js"]  # SN5
+	sc_texts += ["41040a.js"]  # SN4
+	sc_texts += ["41050a.js"]  # SN5
 
-	# sc_texts += ["51010a.js"]  # AN1
-	# sc_texts += ["51020a.js"]  # AN2
+	sc_texts += ["51010a.js"]  # AN1
+	sc_texts += ["51020a.js"]  # AN2
 	# sc_texts += ["51030a.js"]  # AN3
 	# sc_texts += ["51040a.js"]  # AN4
 	# sc_texts += ["51050a.js"]  # AN5

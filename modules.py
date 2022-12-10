@@ -819,8 +819,10 @@ def transliterate_aksharamukha (
 	translit_df = translit_df.dropna()
 	translit_df.fillna("", inplace=True)
 	translit_df.reset_index(inplace=True)
+	concat_df_len = 0
 	
 	if len(translit_df) != 0:
+		print()
 		inflections = translit_df[0].to_csv(index=None, quoting=None, header=None)
 
 		sinhala = transliterate.process(
@@ -838,6 +840,7 @@ def transliterate_aksharamukha (
 
 		concat_df = pd.concat([translit_df, sinhala_df, devanagari_df, thai_df], axis=1)
 		concat_df = concat_df.dropna()
+		concat_df_len = len(concat_df)
 
 		for row in range(len(concat_df)):
 			headword = concat_df.iloc[row, 0]
@@ -854,7 +857,7 @@ def transliterate_aksharamukha (
 			all_inflections_dict[headword]["devanagari"] = set(devanagari.split())
 			all_inflections_dict[headword]["thai"] = set(thai.split())
 
-	return all_inflections_dict
+	return all_inflections_dict, concat_df_len
 	
 
 def transliterate_path_nirvana():
@@ -925,6 +928,7 @@ def clean_machine(text):
 	text = re.sub("`", "", text)
 	text = re.sub("“", "", text)
 	text = re.sub("”", "", text)
+	text = re.sub('"', "", text)
 	text = re.sub("!", "", text)
 	text = re.sub("\\?", "", text)
 	text = re.sub("\\+", "", text)

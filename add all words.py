@@ -23,23 +23,23 @@ def make_text_list():
 	# texts += ["vin02m3.mul.xml.txt"]  # VIN4
 	# texts += ["vin02m4.mul.xml.txt"]  # VIN5
 
-	# texts = ["s0101m.mul.xml.txt"]  # DN1
+	# texts += ["s0101m.mul.xml.txt"]  # DN1
 	# texts += ["s0102m.mul.xml.txt"]  # DN2
 	# texts += ["s0103m.mul.xml.txt"]  # DN3
 
 	# texts += ["s0201m.mul.xml.txt"]  # MN1
-	# texts = ["s0202m.mul.xml.txt"]  # MN2
-	# texts = ["s0203m.mul.xml.txt"]  # MN3
+	# texts += ["s0202m.mul.xml.txt"]  # MN2
+	# texts += ["s0203m.mul.xml.txt"]  # MN3
 
-	# texts = ["s0301m.mul.xml.txt"]  # SN1
-	# texts = ["s0302m.mul.xml.txt"]  # SN2
-	# texts = ["s0303m.mul.xml.txt"]  # SN3
-	# texts = ["s0304m.mul.xml.txt"]  # SN4
-	# texts = ["s0305m.mul.xml.txt"]  # SN5
+	# texts += ["s0301m.mul.xml.txt"]  # SN1
+	# texts += ["s0302m.mul.xml.txt"]  # SN2
+	# texts += ["s0303m.mul.xml.txt"]  # SN3
+	# texts += ["s0304m.mul.xml.txt"]  # SN4
+	# texts += ["s0305m.mul.xml.txt"]  # SN5
 
 	# texts += ["s0401m.mul.xml.txt"]  # AN1 mūla
 	# texts += ["s0402m1.mul.xml.txt"]  # AN2 mūla
-	# texts += ["s0402m2.mul.xml.txt"]  # AN3 mūla
+	texts += ["s0402m2.mul.xml.txt"]  # AN3 mūla
 	# texts += ["s0402m3.mul.xml.txt"]  # AN4 mūla
 	# texts += ["s0403m1.mul.xml.txt"]  # AN5 mūla
 	# texts += ["s0403m2.mul.xml.txt"]  # AN6 mūla
@@ -65,8 +65,8 @@ def make_sc_text_list():
 	print(f"{timeis()} {green}making sutta central text list", end=" ")
 	sc_text_list = []
 	sc_path = "../Tipitaka-Pali-Projector/tipitaka_projector_data/pali/"
-	
 	sc_texts = []
+
 	# sc_texts += ["11010a.js"]  # VIN1
 	# sc_texts += ["11020a.js"]  # VIN2
 	# sc_texts += ["11030a.js"]  # VIN3
@@ -89,7 +89,7 @@ def make_sc_text_list():
 
 	# sc_texts += ["51010a.js"]  # AN1
 	# sc_texts += ["51020a.js"]  # AN2
-	# sc_texts += ["51030a.js"]  # AN3
+	sc_texts += ["51030a.js"]  # AN3
 	# sc_texts += ["51040a.js"]  # AN4
 	# sc_texts += ["51050a.js"]  # AN5
 	# sc_texts += ["51060a.js"]  # AN6
@@ -125,8 +125,8 @@ def make_bjt_text_list():
 	print(f"{timeis()} {green}making buddhajayanti text list", end=" ")
 	text_list = []
 	text_path = "../../../../git/tipitaka.lk/public/static/text roman/"
-	
 	texts = []
+
 	# # pārājika
 	# texts += ["vp-prj.txt"]
 	# texts += ["vp-prj-2-3.txt"]
