@@ -9,17 +9,15 @@ from grammardict import *
 
 if __name__ == "__main__":
 
+	tic()
+
 	# option -ri to regenerate the inflection dicitonary
-	# option -rg to regenerate the grammar dicitonary
 	# option -rt to regenerate the inflection tables
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--regeninflect", "-ri", help="regenerate the inflection dictionary", action="store_true")
-	parser.add_argument("--regengram", "-rg", help="regenerate the grammar dictionary", action="store_true")
 	parser.add_argument("--regentables", "-rt", help="regenerate the inflection tables", action="store_true")
 	args = parser.parse_args()
-	
-	tic()
 	
 	(inflection_table_index_df,
 	inflection_table_index_length,
@@ -123,49 +121,4 @@ if __name__ == "__main__":
 	)
 
 	toc()
-
-	# generate grammar dict
-
-	tic()
-
-	(dpd_df, 
-	dpd_df_length, 
-	headwords_list, 
-	inflection_tables_dict
-	) = setup()
-
-	all_words_set = combine_word_sets()
-
-	generate_grammar_dict(
-		dpd_df, 
-		dpd_df_length,
-		inflection_tables_dict,
-		args,
-		changed_headwords
-		)
-
-	grammar_dict_html = build_html_dict(
-		all_words_set
-		)
-
-	(grammar_data_df,
-	grammar_data_df_mdict
-	) = make_grammar_data_df(
-		grammar_dict_html)
-
-	make_goldendict(
-		grammar_data_df
-		)
-
-	make_mdict(
-		grammar_data_df_mdict
-		)
-
-	make_raw_inflections_table(
-		inflection_tables_dict
-		)
-		
-	toc()
-
-
 

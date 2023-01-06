@@ -21,18 +21,22 @@ import re
 
 def setup():
 
-	print(f"{timeis()} {yellow}grammar dictionary")
-	print(f"{timeis()} {line}")
-	print(f"{timeis()} {green}importing inflection tables dict")
+	print(f"{timeis()} {green}importing changed headwords", end=" ")
+	with open("output/changed headwords", "rb") as f:
+		changed_headwords = pickle.load(f)
+	print(f"{white}{len(changed_headwords)}")
 
+	print(f"{timeis()} {green}importing inflection tables dict", end=" ")
 	with open("output/inflection tables dict", "rb") as p:
 		inflection_tables_dict = pickle.load(p)
+	print(f"{white}{len(inflection_tables_dict)}")
 
-	print(f"{timeis()} {green}creating dpd dataframe")
+	print(f"{timeis()} {green}creating dpd dataframe", end=" ")
 	dpd_df = pd.read_csv("../csvs/dpd-full.csv", sep="\t", dtype=str)
 	dpd_df.fillna("", inplace=True)
-	
 	dpd_df_length = dpd_df.shape[0]
+	print(f"{white}{dpd_df_length}")
+
 	headwords_list = dpd_df["Pāli1"].tolist()
 	
 	nouns = ['fem', 'masc', 'nt', ]
@@ -52,7 +56,7 @@ def setup():
 	dpd_df['Pāli3'] = dpd_df['Pāli1'].str.replace(" \\d*$", "", regex=True)
 	dpd_df.sort_values(by=['Pāli3', 'POS'], inplace=True)
 
-	return dpd_df, dpd_df_length, headwords_list, inflection_tables_dict
+	return dpd_df, dpd_df_length, headwords_list, inflection_tables_dict, changed_headwords
 
 
 def generate_tipitaka_word_set():
@@ -327,7 +331,7 @@ def make_mdict(grammar_data_df_mdict):
 
 
 def make_raw_inflections_table(inflection_tables_dict):
-	print(f"{timeis()} {green}generting list of raw inflections")
+	print(f"{timeis()} {green}generting list of raw inflections", end=" ")
 
 	output_csv = open("output/raw inflections.csv", "w")
 	output_csv.write(f"pattern\tdescription\tpattern name\n")
@@ -355,26 +359,56 @@ def make_raw_inflections_table(inflection_tables_dict):
 	pattern_df.sort_values(
 		["pattern", "description", "pattern name"], inplace=True)
 	pattern_df.to_csv("output/raw inflections.csv", sep="\t", index=None)
+	print(f"{white}{len(pattern_df)}")
 
 
 if __name__ == "__main__":
 
 	tic()
+	print(f"{timeis()} {yellow}grammar dictionary")
+	print(f"{timeis()} {line}")
+
+	# option -rg to regenerate the grammar dicitonary
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--regengram", "-r", help="regenerate the grammar dictionary", action="store_true")
+	parser.add_argument("--regengram", "-rg", help="regenerate the grammar dictionary", action="store_true")
 	args = parser.parse_args()
 
-	changed_headwords = ["akata 1", "akakkasa"]
+	(dpd_df, 
+	dpd_df_length, 
+	headwords_list, 
+	inflection_tables_dict, 
+	changed_headwords
+	) = setup()
 
-	dpd_df, dpd_df_length, headwords_list, inflection_tables_dict = setup()
 	all_words_set = combine_word_sets()
-	generate_grammar_dict(
-		dpd_df, dpd_df_length, inflection_tables_dict, args, changed_headwords)
-	grammar_dict_html = build_html_dict(all_words_set)
 
-	grammar_data_df, grammar_data_df_mdict = make_grammar_data_df(
+	generate_grammar_dict(
+		dpd_df, 
+		dpd_df_length,
+		inflection_tables_dict,
+		args,
+		changed_headwords
+		)
+
+	grammar_dict_html = build_html_dict(
+		all_words_set
+		)
+
+	(grammar_data_df,
+	grammar_data_df_mdict
+	) = make_grammar_data_df(
 		grammar_dict_html)
-	make_goldendict(grammar_data_df)
-	make_mdict(grammar_data_df_mdict)
-	make_raw_inflections_table(inflection_tables_dict)
+
+	make_goldendict(
+		grammar_data_df
+		)
+
+	make_mdict(
+		grammar_data_df_mdict
+		)
+
+	make_raw_inflections_table(
+		inflection_tables_dict
+		)
+		
 	toc()
