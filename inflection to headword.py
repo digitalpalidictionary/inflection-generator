@@ -49,27 +49,31 @@ roots_df.fillna("", inplace=True)
 
 filter = roots_df["Count"] != 0
 roots_df = roots_df[filter]
+roots_list = []
 roots_list = roots_df["Root"].to_list()
 counter = 0
 
 for root in roots_list:
 	if counter % 100 == 0:
-		print(f"{timeis()} {white}{counter}/{len(roots_list)}\t{root} ")
-	root_clean = root.replace("√", "")
+		print(f"{timeis()} {white}{counter}/{len(roots_list)}\t{root}")
+
+	root_clean = re.sub(" \\d*$", "", root)
+	root_no_sign = root_clean.replace("√", "")
 
 	# add roots themselves
-	if root not in inflection_to_headword.keys():
-		inflection_to_headword.update({root: {"headwords": set()}})
-		inflection_to_headword[root]["headwords"].add(root)
-	else:
-		inflection_to_headword[root]["headwords"].add(root)
-
-	# add root_clean
 	if root_clean not in inflection_to_headword.keys():
 		inflection_to_headword.update({root_clean: {"headwords": set()}})
 		inflection_to_headword[root_clean]["headwords"].add(root)
 	else:
 		inflection_to_headword[root_clean]["headwords"].add(root)
+
+	# add root_no_sign
+	if root_no_sign not in inflection_to_headword.keys():
+		inflection_to_headword.update({root_no_sign: {"headwords": set()}})
+		inflection_to_headword[root_no_sign]["headwords"].add(root)
+	else:
+		inflection_to_headword[root_no_sign]["headwords"].add(root)
+	
 	counter += 1
 
 

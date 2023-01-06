@@ -68,8 +68,8 @@ def make_text_set():
 
 	text_list += ["s0401m.mul.xml.txt"]  # AN1 mūla
 	text_list += ["s0402m1.mul.xml.txt"]  # AN2 mūla
-	# text_list += ["s0402m2.mul.xml.txt"]  # AN3 mūla
-	# text_list += ["s0402m3.mul.xml.txt"]  # AN4 mūla
+	text_list += ["s0402m2.mul.xml.txt"]  # AN3 mūla
+	text_list += ["s0402m3.mul.xml.txt"]  # AN4 mūla
 	# text_list += ["s0403m1.mul.xml.txt"]  # AN5 mūla
 	# text_list += ["s0403m2.mul.xml.txt"]  # AN6 mūla
 	# text_list += ["s0403m3.mul.xml.txt"]  # AN7 mūla
@@ -78,7 +78,7 @@ def make_text_set():
 	# text_list += ["s0404m3.mul.xml.txt"]  # AN10 mūla
 	# text_list += ["s0404m4.mul.xml.txt"]  # AN11 mūla
 
-	text_list += ["s0202a.att.xml.txt"]  # MN2 aṭṭhakathā
+	# text_list += ["s0202a.att.xml.txt"]  # MN2 aṭṭhakathā
 
 	text_path = "../Cst4/txt/"
 	text_string = ""
@@ -123,8 +123,8 @@ def make_sc_text_set():
 
 	sc_texts += ["51010a.js"]  # AN1
 	sc_texts += ["51020a.js"]  # AN2
-	# sc_texts += ["51030a.js"]  # AN3
-	# sc_texts += ["51040a.js"]  # AN4
+	sc_texts += ["51030a.js"]  # AN3
+	sc_texts += ["51040a.js"]  # AN4
 	# sc_texts += ["51050a.js"]  # AN5
 	# sc_texts += ["51060a.js"]  # AN6
 	# sc_texts += ["51070a.js"]  # AN7
@@ -520,6 +520,10 @@ def make_all_inflections_set():
 
 	unmatched_set = set(unmatched_set) - exceptions_set
 	all_inflections_set = set(all_inflections_set) - exceptions_set
+	try:
+		all_inflections_set.remove("")
+	except:
+		pass
 
 	print(f"{white}{len(unmatched_set)}")
 
@@ -568,7 +572,8 @@ def import_sandhi_rules():
 		print(f"\n{timeis()} {red}! duplicates found! please remove them and try again")
 		print(f"{timeis()} {red}{line}")
 		print(f"\n{red}{dupes}")
-		sys.exit()
+		input(f"\n{white} press enter to continue")
+		import_sandhi_rules()
 
 	else:
 		print(f"{white}ok")
@@ -582,7 +587,8 @@ def import_sandhi_rules():
     rules_df["ch2"].str.contains(" ").any():
 		print(f"\n{timeis()} {red}! spaces found! please remove them and try again")
 		print(f"{timeis()} {red}{line}")
-		sys.exit()
+		input(f"{timeis()} {white}press enter to continue")
+		import_sandhi_rules()
 
 	else:
 		print(f"{white}ok")
