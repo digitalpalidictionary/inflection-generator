@@ -39,8 +39,8 @@ def make_text_list():
 
 	# texts += ["s0401m.mul.xml.txt"]  # AN1 mūla
 	# texts += ["s0402m1.mul.xml.txt"]  # AN2 mūla
-	texts += ["s0402m2.mul.xml.txt"]  # AN3 mūla
-	# texts += ["s0402m3.mul.xml.txt"]  # AN4 mūla
+	# texts += ["s0402m2.mul.xml.txt"]  # AN3 mūla
+	texts += ["s0402m3.mul.xml.txt"]  # AN4 mūla
 	# texts += ["s0403m1.mul.xml.txt"]  # AN5 mūla
 	# texts += ["s0403m2.mul.xml.txt"]  # AN6 mūla
 	# texts += ["s0403m3.mul.xml.txt"]  # AN7 mūla
@@ -89,8 +89,8 @@ def make_sc_text_list():
 
 	# sc_texts += ["51010a.js"]  # AN1
 	# sc_texts += ["51020a.js"]  # AN2
-	sc_texts += ["51030a.js"]  # AN3
-	# sc_texts += ["51040a.js"]  # AN4
+	# sc_texts += ["51030a.js"]  # AN3
+	sc_texts += ["51040a.js"]  # AN4
 	# sc_texts += ["51050a.js"]  # AN5
 	# sc_texts += ["51060a.js"]  # AN6
 	# sc_texts += ["51070a.js"]  # AN7
