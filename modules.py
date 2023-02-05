@@ -205,8 +205,11 @@ def create_dpd_df():
 def import_old_inflections_dict():
 	print(f"{timeis()} {green}importing old inflections dict")
 
-	with open("output/all inflections dict", "rb") as f:
-		old_inflections_dict = pickle.load(f)
+	try:
+		with open("output/all inflections dict", "rb") as f:
+			old_inflections_dict = pickle.load(f)
+	except:
+		old_inflections_dict = {}
 	
 	return old_inflections_dict
 
@@ -353,7 +356,7 @@ def generate_all_inflections_dict(
 
 	for row in range(dpd_df_length): # dpd_df_length
 		headword = dpd_df.loc[row, "Pāli1"]
-		headword_clean = re.sub(" \\d*$", "", headword)
+		headword_clean = re.sub(" \\d.*$", "", headword)
 		pos = dpd_df.loc[row, "POS"]
 		stem = dpd_df.loc[row, "Stem"]
 		stem_clean = stem
@@ -428,6 +431,8 @@ def generate_all_inflections_dict(
 				all_inflections_dict[headword]["sutta2"] = True
 			else:
 				all_inflections_dict[headword]["sutta2"] = False
+		
+		# all_inflections_dict[headword]["inflections"].add(headword)
 
 	df = pd.DataFrame.from_dict(all_inflections_dict, orient='index')
 	with open("output/all inflections dict", "wb") as f:
@@ -458,7 +463,7 @@ def update_all_inflections_dict(
 
 	for row in range(dpd_df_length): # dpd_df_length
 		headword = dpd_df.loc[row, "Pāli1"]
-		headword_clean = re.sub(" \\d*$", "", headword)
+		headword_clean = re.sub(" \\d.*$", "", headword)
 		pos = dpd_df.loc[row, "POS"]
 		stem = dpd_df.loc[row, "Stem"]
 		stem_clean = stem
@@ -682,7 +687,7 @@ def generate_html_inflection_table(
 
 	for row in range(dpd_df_length): # dpd_df_length
 		headword = dpd_df.loc[row, "Pāli1"]
-		headword_clean = re.sub(" \\d*$", "", headword)
+		headword_clean = re.sub(" \\d.*$", "", headword)
 		stem = dpd_df.loc[row, "Stem"]
 		if re.match("!.+", stem) != None: #stem contains "!.+" - must get inflection table but no synonsyms
 			stem = re.sub("!", "", stem)
@@ -813,7 +818,7 @@ def transliterate_aksharamukha (
 
 			translit_dict[headword] = ""
 			for inflection in all_inflections_dict[headword]["inflections"]:
-				translit_dict[headword] += f"{inflection} "
+				translit_dict[headword] += f"{inflection},"
 	
 	translit_df = pd.DataFrame.from_dict(translit_dict, orient="index")
 	translit_df = translit_df.dropna()
@@ -849,13 +854,20 @@ def transliterate_aksharamukha (
 			devanagari = concat_df.iloc[row, 3]
 			thai = concat_df.iloc[row, 4]
 
+			sinhala = re.sub('"', "", sinhala)
+			sinhala = re.sub(',$', "", sinhala)
+			devanagari = re.sub('"', "", devanagari)
+			devanagari = re.sub(',$', "", devanagari)
+			thai = re.sub('"', "", thai)
+			thai = re.sub(',$', "", thai)
+
 			if len(concat_df) >= 1000:
 				if row % 1000 == 0:
 					print(f"{timeis()} {white}{row}\t{headword}")
 
-			all_inflections_dict[headword]["sinhala"] = set(sinhala.split())
-			all_inflections_dict[headword]["devanagari"] = set(devanagari.split())
-			all_inflections_dict[headword]["thai"] = set(thai.split())
+			all_inflections_dict[headword]["sinhala"] = set(sinhala.split(","))
+			all_inflections_dict[headword]["devanagari"] = set(devanagari.split(","))
+			all_inflections_dict[headword]["thai"] = set(thai.split(","))
 
 	return all_inflections_dict, concat_df_len
 	
@@ -893,17 +905,20 @@ def import_path_nirvana_transliterations (
 			print(f"{timeis()} {white}{counter}/{length}\t{headword}")
 
 		for sinhala_word in new_inflections[headword]["sinhala"]:
-			if sinhala_word not in all_inflections_dict[headword]["sinhala"]:
+			if sinhala_word not in all_inflections_dict[headword]["sinhala"] and \
+			all_inflections_dict[headword]["pos"] != "idiom":
 				all_inflections_dict[headword]["sinhala"].add(sinhala_word)
 				sinhala_count += 1
 
 		for devanagari_word in new_inflections[headword]["devanagari"]:
-			if devanagari_word not in all_inflections_dict[headword]["devanagari"]:
+			if devanagari_word not in all_inflections_dict[headword]["devanagari"] and \
+			all_inflections_dict[headword]["pos"] != "idiom":
 				all_inflections_dict[headword]["devanagari"].add(devanagari_word)
 				devanagari_count += 1
 
 		for thai_word in new_inflections[headword]["thai"]:
-			if thai_word not in all_inflections_dict[headword]["thai"]:
+			if thai_word not in all_inflections_dict[headword]["thai"] and \
+			all_inflections_dict[headword]["pos"] != "idiom":
 				all_inflections_dict[headword]["thai"].add(thai_word)
 				thai_count += 1
 		counter += 1
