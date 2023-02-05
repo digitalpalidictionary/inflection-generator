@@ -53,7 +53,7 @@ def setup():
 	dpd_df.loc[dpd_df['Grammar'].str.contains('emph'), 'POS'] = 'emph'
 	dpd_df.loc[dpd_df['Grammar'].str.contains('interr'), 'POS'] = 'interr'
 
-	dpd_df['Pāli3'] = dpd_df['Pāli1'].str.replace(" \\d*$", "", regex=True)
+	dpd_df['Pāli3'] = dpd_df['Pāli1'].str.replace(" \\d.*$", "", regex=True)
 	dpd_df.sort_values(by=['Pāli3', 'POS'], inplace=True)
 
 	return dpd_df, dpd_df_length, headwords_list, inflection_tables_dict, changed_headwords
@@ -117,7 +117,7 @@ def generate_grammar_dict(dpd_df, dpd_df_length, inflection_tables_dict, args, c
 
 	for row in range(dpd_df_length):  # dpd_df_length
 		headword = dpd_df.loc[row, "Pāli1"]
-		headword_clean = re.sub(" \\d*$", "", headword)
+		headword_clean = re.sub(" \\d.*$", "", headword)
 		stem = dpd_df.loc[row, "Stem"]
 		if re.match("!.+", stem) != None: #stem contains "!.+" - must get inflection table but no synonsyms
 			stem = re.sub("!.+", "!", stem)
@@ -213,7 +213,7 @@ def build_html_dict(all_words_set):
 	exclude = ["prefix", "suffix"]
 
 	for headword, inflections in grammar_dict.items():
-		headword_clean = re.sub(" \\d*$", "", headword)
+		headword_clean = re.sub(" \\d.*$", "", headword)
 		for inflection, grammars in inflections.items():
 			for grammar in grammars:
 				pos = grammar[0]

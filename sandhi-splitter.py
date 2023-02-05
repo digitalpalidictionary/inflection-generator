@@ -70,7 +70,7 @@ def make_text_set():
 	text_list += ["s0402m1.mul.xml.txt"]  # AN2 mūla
 	text_list += ["s0402m2.mul.xml.txt"]  # AN3 mūla
 	text_list += ["s0402m3.mul.xml.txt"]  # AN4 mūla
-	# text_list += ["s0403m1.mul.xml.txt"]  # AN5 mūla
+	text_list += ["s0403m1.mul.xml.txt"]  # AN5 mūla
 	# text_list += ["s0403m2.mul.xml.txt"]  # AN6 mūla
 	# text_list += ["s0403m3.mul.xml.txt"]  # AN7 mūla
 	# text_list += ["s0404m1.mul.xml.txt"]  # AN8 mūla
@@ -125,7 +125,7 @@ def make_sc_text_set():
 	sc_texts += ["51020a.js"]  # AN2
 	sc_texts += ["51030a.js"]  # AN3
 	sc_texts += ["51040a.js"]  # AN4
-	# sc_texts += ["51050a.js"]  # AN5
+	sc_texts += ["51050a.js"]  # AN5
 	# sc_texts += ["51060a.js"]  # AN6
 	# sc_texts += ["51070a.js"]  # AN7
 	# sc_texts += ["51080a.js"]  # AN8
@@ -400,7 +400,7 @@ def make_abbreviations_and_neg_set():
 
 	for row in range(dpd_df_length):  # dpd_df_length
 		headword = dpd_df.loc[row, "Pāli1"]
-		headword_clean = re.sub(r" \d*$", "", headword)
+		headword_clean = re.sub(r" \\d.*$", "", headword)
 		pos = dpd_df.loc[row, "POS"]
 		neg = dpd_df.loc[row, "Neg"]
 

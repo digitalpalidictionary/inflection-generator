@@ -25,7 +25,7 @@ all_headwords = list(all_inflections_dict.keys())
 all_headwords_clean = set()
 
 for headword in all_inflections_dict:
-	all_headwords_clean.add(re.sub(" \\d*$", "", headword))
+	all_headwords_clean.add(re.sub(" \\d.*$", "", headword))
 
 # add all inflections
 for headword in all_inflections_dict:
@@ -57,7 +57,7 @@ for root in roots_list:
 	if counter % 100 == 0:
 		print(f"{timeis()} {white}{counter}/{len(roots_list)}\t{root}")
 
-	root_clean = re.sub(" \\d*$", "", root)
+	root_clean = re.sub(" \\d.*$", "", root)
 	root_no_sign = root_clean.replace("√", "")
 
 	# add roots themselves

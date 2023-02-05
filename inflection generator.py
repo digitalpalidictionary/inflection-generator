@@ -9,116 +9,117 @@ from grammardict import *
 
 if __name__ == "__main__":
 
-	tic()
+    tic()
 
-	# option -ri to regenerate the inflection dicitonary
-	# option -rt to regenerate the inflection tables
+    # option -ri to regenerate the inflection dicitonary
+    # option -rt to regenerate the inflection tables
 
-	parser = argparse.ArgumentParser()
-	parser.add_argument("--regeninflect", "-ri", help="regenerate the inflection dictionary", action="store_true")
-	parser.add_argument("--regentables", "-rt", help="regenerate the inflection tables", action="store_true")
-	args = parser.parse_args()
-	
-	(inflection_table_index_df,
-	inflection_table_index_length,
-	inflection_table_index_dict
-	) = create_inflection_table_index()
-	
-	if args.regeninflect:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--regeninflect", "-ri", 
+        help="regenerate the inflection dictionary", action="store_true")
+    parser.add_argument("--regentables", "-rt", 
+        help="regenerate the inflection tables", action="store_true")
+    args = parser.parse_args()
 
-		generate_inflection_tables_dict(
-			inflection_table_index_df, 
-			inflection_table_index_length
-			)
+    (inflection_table_index_df,
+    inflection_table_index_length,
+    inflection_table_index_dict
+    ) = create_inflection_table_index()
 
-	(inflection_table_df
-	) = create_inflection_table_df()
+    if args.regeninflect:
 
-	(inflection_tables_dict,
-	pattern_changed
-	) = test_inflection_pattern_changed(
-		inflection_table_index_df,
-		inflection_table_index_length,
-		inflection_table_index_dict,
-		inflection_table_df
-		)
-	
-	(dpd_df,
-	dpd_df_length,
-	headwords_list
-	) = create_dpd_df()
-	
-	old_inflections_dict = import_old_inflections_dict()
-	
-	test_for_missing_stem_and_pattern(
-		dpd_df,
-		dpd_df_length
-		)
-	
-	test_for_wrong_patterns(
-		inflection_table_index_df,
-		dpd_df,
-		dpd_df_length
-		)
+        generate_inflection_tables_dict(
+            inflection_table_index_df, 
+            inflection_table_index_length
+            )
 
-	changed_headwords = test_for_differences_in_stem_and_pattern(
-		pattern_changed,
-		dpd_df,
-		dpd_df_length,
-		old_inflections_dict
-		)
-	
-	changed_headwords = test_for_missing_html(
-		headwords_list,
-		changed_headwords
-	)
-	
-	if args.regeninflect:
+    (inflection_table_df
+    ) = create_inflection_table_df()
 
-		all_inflections_dict = generate_all_inflections_dict(
-			inflection_tables_dict,
-			dpd_df,
-			dpd_df_length
-		)
+    (inflection_tables_dict,
+    pattern_changed
+    ) = test_inflection_pattern_changed(
+        inflection_table_index_df,
+        inflection_table_index_length,
+        inflection_table_index_dict,
+        inflection_table_df
+        )
 
-	else:
+    (dpd_df,
+    dpd_df_length,
+    headwords_list
+    ) = create_dpd_df()
 
-		all_inflections_dict = update_all_inflections_dict(
-			inflection_tables_dict,
-			dpd_df,
-			dpd_df_length,
-			old_inflections_dict,
-			changed_headwords
-		)
-	
-	unused_patterns(
-		inflection_table_index_df,
-		dpd_df
-		)
+    old_inflections_dict = import_old_inflections_dict()
 
-	if args.regentables:
-		make_tables = True
-	
-	else:
-		make_tables = False
+    test_for_missing_stem_and_pattern(
+        dpd_df,
+        dpd_df_length
+        )
 
-	generate_inflection_patterns_json(
-		inflection_tables_dict
-	)
-	
-	generate_html_inflection_table(
-		make_tables,
-		changed_headwords,
-		inflection_table_index_dict,
-		inflection_tables_dict,
-		dpd_df,
-		dpd_df_length,
-		headwords_list
-		)
+    test_for_wrong_patterns(
+        inflection_table_index_df,
+        dpd_df,
+        dpd_df_length
+        )
 
-	delete_unused_html_tables(
-		headwords_list
-	)
+    changed_headwords = test_for_differences_in_stem_and_pattern(
+        pattern_changed,
+        dpd_df,
+        dpd_df_length,
+        old_inflections_dict
+        )
 
-	toc()
+    changed_headwords = test_for_missing_html(
+        headwords_list,
+        changed_headwords
+    )
 
+    if args.regeninflect:
+
+        all_inflections_dict = generate_all_inflections_dict(
+            inflection_tables_dict,
+            dpd_df,
+            dpd_df_length
+        )
+
+    else:
+
+        all_inflections_dict = update_all_inflections_dict(
+            inflection_tables_dict,
+            dpd_df,
+            dpd_df_length,
+            old_inflections_dict,
+            changed_headwords
+        )
+
+    unused_patterns(
+        inflection_table_index_df,
+        dpd_df
+        )
+
+    if args.regentables:
+        make_tables = True
+
+    else:
+        make_tables = False
+
+    generate_inflection_patterns_json(
+        inflection_tables_dict
+    )
+
+    generate_html_inflection_table(
+        make_tables,
+        changed_headwords,
+        inflection_table_index_dict,
+        inflection_tables_dict,
+        dpd_df,
+        dpd_df_length,
+        headwords_list
+        )
+
+    delete_unused_html_tables(
+        headwords_list
+    )
+
+    toc()

@@ -37,11 +37,11 @@ def make_text_list():
 	# texts += ["s0304m.mul.xml.txt"]  # SN4
 	# texts += ["s0305m.mul.xml.txt"]  # SN5
 
-	# texts += ["s0401m.mul.xml.txt"]  # AN1 mūla
-	# texts += ["s0402m1.mul.xml.txt"]  # AN2 mūla
-	# texts += ["s0402m2.mul.xml.txt"]  # AN3 mūla
+	texts += ["s0401m.mul.xml.txt"]  # AN1 mūla
+	texts += ["s0402m1.mul.xml.txt"]  # AN2 mūla
+	texts += ["s0402m2.mul.xml.txt"]  # AN3 mūla
 	texts += ["s0402m3.mul.xml.txt"]  # AN4 mūla
-	# texts += ["s0403m1.mul.xml.txt"]  # AN5 mūla
+	texts += ["s0403m1.mul.xml.txt"]  # AN5 mūla
 	# texts += ["s0403m2.mul.xml.txt"]  # AN6 mūla
 	# texts += ["s0403m3.mul.xml.txt"]  # AN7 mūla
 	# texts += ["s0404m1.mul.xml.txt"]  # AN8 mūla
@@ -87,11 +87,11 @@ def make_sc_text_list():
 	# sc_texts += ["41040a.js"]  # SN4
 	# sc_texts += ["41050a.js"]  # SN5
 
-	# sc_texts += ["51010a.js"]  # AN1
-	# sc_texts += ["51020a.js"]  # AN2
-	# sc_texts += ["51030a.js"]  # AN3
+	sc_texts += ["51010a.js"]  # AN1
+	sc_texts += ["51020a.js"]  # AN2
+	sc_texts += ["51030a.js"]  # AN3
 	sc_texts += ["51040a.js"]  # AN4
-	# sc_texts += ["51050a.js"]  # AN5
+	sc_texts += ["51050a.js"]  # AN5
 	# sc_texts += ["51060a.js"]  # AN6
 	# sc_texts += ["51070a.js"]  # AN7
 	# sc_texts += ["51080a.js"]  # AN8
@@ -527,5 +527,4 @@ def write_all_missing_words():
 write_all_missing_words()
 toc()
 
-# (oti|āti|īti|ūti|āpi|opi|yeva|ñca|mpi|metaṃ|pissa|tveva|nti|va|ipi|upi|api|ñce|ñhi|ūpi)$
-
+# (oti|āti|īti|ūti|āpi|opi|yeva|ñca|mpi|metaṃ|pissa|tveva|nti|va|ipi|upi|api|ñce|ñhi|ūpi|epi)$
